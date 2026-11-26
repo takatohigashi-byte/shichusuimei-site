@@ -983,8 +983,6 @@
     h += '<h3>社会で育てていく持ち味（' + ty('格局') + '：' + tyWrap(r.kakkyoku) + '）</h3>';
     h += '<p>仕事や人と関わるとき、あなたの持ち味はこんなふうに生きてきます。</p>';
     h += parasHtml(tsuKaku(r.genmei));
-    h += '<h3>' + ty('月支') + 'にひそむ' + ty('蔵干') + '</h3>';
-    h += zokanLayersHtml(mon, r);
     if (mon.juniun) {
       h += '<h3>' + ty('十二運') + 'の現れ方（' + tyCell(mon.juniun) + '）</h3>';
       if (['死', '墓', '絶', '病'].indexOf(mon.juniun) >= 0) {
