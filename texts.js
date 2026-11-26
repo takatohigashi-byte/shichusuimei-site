@@ -349,39 +349,48 @@ SHICHU_TEXTS.elemManyFew = function (g, order) {
 // 段の順と五行・個数は、五行図と同じ compute の groups を使う。
 SHICHU_TEXTS.cycleStages = {
   比劫: {
-    action: 'やってみたいことを言葉にして、企画の出発点を決める',
-    result: '自分の希望を伝えやすくなりそうです',
-    support: '気心の知れた人に話しながら、まずやりたいことを一つ書き出す',
-    bridge: 'そこから二人で試したいことを一つ選ぶ'
+    action: 'やってみたいことを言葉にします。',
+    support: '気心の知れた人に話しながら、やってみたいことを一つ書き出しましょう。',
+    next: 'ふたりで試したいことを選べば、企画の出発点が見えてきます。',
+    role: 'ふたりの希望を言葉にします',
+    aid: 'やってみたいことを一つ書き出す'
   },
   食傷: {
-    action: 'その思いからアイデアを出し、人に話せる企画にする',
-    result: 'その案を具体的に想像し、自分の意見を足しやすくなりそうです',
-    support: '発想の豊かな人に「ほかにどんな案がある？」と聞いてみる',
-    bridge: '出てきた案を短いメモにして、次に声をかける相手に渡す'
+    action: 'やりたいことをもとに、新しい案を出してみます。',
+    support: '案を考えるときは、発想の豊かな人に「ほかにどんな案がある？」と聞いてみるのも手です。',
+    next: '出てきた案を短いメモにすると、協力を頼むときに渡せます。',
+    role: '希望を企画に広げます',
+    aid: '発想の豊かな人に案を聞く'
   },
   財星: {
-    action: 'その案を必要な人に届け、協力してくれる仲間に声をかけて予算を整える',
-    result: '誰と何を始められるか見えてきそうです',
-    support: '人をつなぐのが得意な人に、最初は誰に声をかけるとよさそうか相談する',
-    bridge: '手を貸してくれる人と使える予算を一枚にまとめる'
+    action: '案を届けたい人に声をかけ、使える予算を整えます。',
+    support: '誰に声をかけるか迷ったら、人をつなぐのが得意な人に相談してみてください。',
+    next: '協力してくれる人と使える予算を一枚にまとめておくと、担当を決めるときに役立ちます。',
+    role: 'アイデアを協力者や予算につなぎます',
+    aid: '協力者と予算を一枚にまとめる'
   },
   官星: {
-    action: '集まった仲間と予算をもとに、担当と期限を決めて実際の仕事にする',
-    result: '自分が引き受ける仕事に取りかかりやすくなりそうです',
-    support: '段取りが得意な人に、最初の一週間でどこまで進めるか相談する',
-    bridge: '最初に動く人と、その日にすることを決める'
+    action: '集まった仲間と予算をもとに、担当と期限を決めます。',
+    support: 'まず一週間の予定を立て、誰が何をするか決めておくと動き出しやすくなります。',
+    next: 'その週にできたことは、次の振り返りに持ち寄れます。',
+    role: '担当と期限を決めて計画を動かします',
+    aid: '一週間の予定と担当を決める'
   },
   印星: {
-    action: '仕事で得たことを学び直し、自分たちが次も大切にしたい考え方として残す',
-    result: '次の仕事に持っていきたい工夫を見つけやすくなりそうです',
-    support: '経験を言葉にするのが得意な人に、終わった仕事について聞いてもらう',
-    bridge: '次も大切にしたいことを一行だけ残す'
+    action: 'やってみて学んだことを振り返ります。',
+    support: '話を聞いてくれる人に、やってみて気づいたことを話してみましょう。',
+    next: '次も大切にしたいことを一行残し、それを手がかりに次の「やってみたいこと」（比劫）を選べます。',
+    role: '経験から得た学びを次の出発点に返します',
+    aid: '振り返りを一行残す'
   }
 };
 
+SHICHU_TEXTS.cycleLevel = function (n) {
+  return n >= 3 ? '存在感がある' : n === 2 ? 'ほどよくある' : n === 1 ? '控えめ' : 'なし';
+};
+
 SHICHU_TEXTS.cycleAmount = function (n) {
-  return n + '個・' + (n >= 3 ? '存在感がある' : n === 2 ? 'ほどよくある' : n === 1 ? '控えめ' : 'なし');
+  return n + '個・' + SHICHU_TEXTS.cycleLevel(n);
 };
 
 SHICHU_TEXTS.gogyoCompatReading = function (rA, rB, nameA, nameB, order) {
@@ -420,48 +429,68 @@ SHICHU_TEXTS.starsByGroup = function (r, S) {
   return result;
 };
 
-SHICHU_TEXTS.compatCycleReading = function (a, b) {
+SHICHU_TEXTS.compatCycleReading = function (a, b, strongestGrowth) {
+  var stages = SHICHU_TEXTS.cycleStages;
   var groups = Object.keys(a.chart.groups);
   var rows = groups.map(function (group) {
     var x = a.chart.groups[group], y = b.chart.groups[group];
     var owner = x.count > y.count ? a : y.count > x.count ? b : null;
-    var star = owner && owner.stars[group][0];
-    return { group: group, a: x, b: y, owner: owner, star: star };
+    return { group: group, a: x, b: y, owner: owner, max: Math.max(x.count, y.count) };
   });
-  // 企画の受け渡しが見えるように、具体名は食傷・財を優先して二つまで。
+  var ranked = rows.filter(function (row) { return row.max >= 2; })
+    .sort(function (x, y) { return y.max - x.max; });
+  var highlights = ranked.slice(0, 2).sort(function (x, y) {
+    return groups.indexOf(x.group) - groups.indexOf(y.group);
+  });
+  var shared = rows.filter(function (row) { return row.max <= 1; });
+  var summary = [];
+  if (highlights.length) {
+    summary.push(highlights.map(function (row, i) {
+      var entry = row.owner === b ? row.b : row.a;
+      var subject = row.owner ? row.owner.name + 'の' + row.group + '（' + entry.elem + entry.count + '）が' :
+        row.group + 'ではふたりが';
+      var role = stages[row.group].role;
+      return subject + (i === highlights.length - 1 ? role : role.slice(0, -2));
+    }).join('、') + '。');
+  }
+  if (strongestGrowth) {
+    summary.push(strongestGrowth.from.person.name + 'の' + strongestGrowth.from.elem + 'が' +
+      strongestGrowth.to.person.name + 'の' + strongestGrowth.to.elem + 'を育てる、' +
+      strongestGrowth.label + 'の流れもあります。');
+  }
+  if (!summary.length) summary.push('やりたいことを一つ選び、得意な人の手も借りながら小さく試してみましょう。');
+  if (shared.length) {
+    summary.push(shared.map(function (row) {
+      return row.group + 'では' + stages[row.group].aid;
+    }).join('、') + 'など、人の手や習慣を取り入れると循環を続けやすくなります。');
+  } else if (summary.length < 2) {
+    summary.push('それぞれの得意な段で手を貸し、終わったら学びを一行残すと、次の企画にも活かせます。');
+  }
+
+  // 企画の受け渡しに関わる具体名は、命式にあるものを二つまで。
   var named = ['食傷', '財星', '官星', '印星', '比劫'].filter(function (group) {
-    return rows.some(function (row) { return row.group === group && row.star; });
+    return rows.some(function (row) { return row.group === group && row.owner && row.owner.stars[group].length; });
   }).slice(0, 2);
-  return rows.map(function (row) {
-    var stage = SHICHU_TEXTS.cycleStages[row.group];
-    var detail = '';
-    if (row.owner) {
-      var star = named.indexOf(row.group) >= 0 ? row.star : '';
-      var actor = row.owner.name + (star ? '（' + star + '）' : '');
-      var action = row.group === '食傷' && star === '傷官' ?
-        'その思いを受けて、いつものやり方を見直し、新しい案を出す' : stage.action;
-      var other = row.owner === a ? b : a;
-      var smaller = Math.min(row.a.count, row.b.count);
-      detail = actor + 'が' + action + (smaller <= 1 ? 'と、' + other.name + 'も' + stage.result + '。' : '役を引き受けやすそうです。');
-    } else if (row.a.count >= 2) {
-      detail = 'ふたりともこの段を担いやすいので、一緒に' + stage.action + 'と、次につながりそうです。';
-    }
-    var larger = Math.max(row.a.count, row.b.count);
-    if (larger <= 1) {
-      var opening = larger === 0 ? 'ふたりとも図に●がない段です。' :
-        detail ? 'この段はふたりとも量が少なめです。' : 'ふたりとも控えめな段です。';
-      detail += opening + stage.support + 'ところから始め、' + stage.bridge + 'と、流れをつなげそうです。';
-    }
-    if (row.group === groups[groups.length - 1]) {
-      detail += 'そこで得た学びをもとに、ふたりが次にやってみたいことを選ぶと、比劫へ戻ってもう一周が始まります。';
-    }
-    return {
-      group: row.group,
-      counts: a.name + ' ' + row.a.elem + SHICHU_TEXTS.cycleAmount(row.a.count) + ' ／ ' +
-        b.name + ' ' + row.b.elem + SHICHU_TEXTS.cycleAmount(row.b.count),
-      detail: detail
-    };
-  });
+  function levelLabel(person, entry) {
+    return person.name + '：' + entry.elem + '（' + SHICHU_TEXTS.cycleLevel(entry.count) + '）';
+  }
+  return {
+    summary: summary.join(''),
+    rows: rows.map(function (row) {
+      var stage = stages[row.group];
+      var star = row.owner && named.indexOf(row.group) >= 0 ? row.owner.stars[row.group][0] : '';
+      var actor = row.owner && row.owner.name + (star ? '（' + star + '）' : '');
+      var lead = actor ? actor + 'が' + stage.action : 'ふたりで' + stage.action;
+      var detail = row.max <= 1 ? stage.support : lead;
+      if (row.max <= 1 && actor) detail = lead + stage.support;
+      detail += stage.next;
+      return {
+        group: row.group,
+        counts: levelLabel(a, row.a) + ' ／ ' + levelLabel(b, row.b),
+        detail: detail
+      };
+    })
+  };
 };
 
 SHICHU_TEXTS.individualCycleReading = function (r) {
@@ -475,49 +504,28 @@ SHICHU_TEXTS.individualCycleReading = function (r) {
   var strongest = groups.filter(function (group) { return r.groups[group].count === high; });
   var weak = groups.filter(function (group) { return r.groups[group].count === low; });
   var first = counts.indexOf(high);
-  var next = (first + 1) % groups.length;
   var start = high === low ? '五つの段が同じ数でそろっています。' :
     'この図で' + (high >= 3 ? '存在感があるのは' : 'いちばん数が多いのは') +
     strongest.map(label).join('と') + 'です。';
-  var beginning = SHICHU_TEXTS.cycleStages[groups[first]];
-  start += beginning.bridge + 'ところから始め、' + groups[next] + 'の段で' +
-    SHICHU_TEXTS.cycleStages[groups[next]].bridge + 'と、次へ進みやすそうです。';
+  var stage = SHICHU_TEXTS.cycleStages[groups[first]];
+  start += stage.aid + 'ことから始めてみましょう。' + stage.next;
   if (high === low) return [start];
   var focus = weak[0];
   var bottleneck = weak.map(label).join('と') +
-    (low === 0 ? 'は図に●がなく、流れがいったん止まりやすい段です。' : 'は図でいちばん控えめで、ひと工夫あると次につなぎやすい段です。');
-  bottleneck += (weak.length > 1 ? 'まず' + focus + 'を補うなら、' : '') +
-    SHICHU_TEXTS.cycleStages[focus].support + 'ところから試してみましょう。';
+    (low === 0 ? 'には図の●がありません。' : 'が図でいちばん控えめです。');
+  bottleneck += (weak.length > 1 ? 'まず' + focus + 'の段に目を向けてみましょう。' : '') +
+    SHICHU_TEXTS.cycleStages[focus].support;
   return [start, bottleneck];
 };
 
-SHICHU_TEXTS.starCompatReading = function (a, b) {
-  var groups = Object.keys(a.chart.groups);
-  var scenes = {
-    比劫: ['やりたいことを率直に伝え', '使える時間や予算を見せると、どこから始めれば実現できるか見えてきそうです。'],
-    食傷: ['もっと楽しめるやり方を提案し', '守りたい約束を伝えると、自由に試せる範囲を一緒に広げられそうです。'],
-    財星: ['今ある時間や道具でできることを提案し', '調べたことや経験から別の手順を示すと、ふたりが納得して始められる方法が見えてきそうです。'],
-    官星: ['一緒に進めるうえで大切にしたい約束を伝え', '自分のやり方も提案すると、ふたりで守れて工夫もできるルールになりそうです。'],
-    印星: ['取り組む前に参考になる例を一つ紹介し', 'まず小さく試せる案を出すと、学びと発想の両方が活きそうです。']
-  };
-  var candidates = [];
-  [[a, b], [b, a]].forEach(function (pair) {
-    var from = pair[0], to = pair[1];
-    groups.forEach(function (group, i) {
-      var other = groups[(i + 2) % groups.length];
-      var source = from.stars[group], target = to.stars[other];
-      var x = from.chart.groups[group].count, y = to.chart.groups[other].count;
-      if (!source.length || !target.length || !x || !y) return;
-      candidates.push({ from: from.name, to: to.name, star: source[0], otherStar: target[0],
-        group: group, otherGroup: other, scene: scenes[group], weight: x + y });
-    });
-  });
-  candidates.sort(function (a, b) { return b.weight - a.weight; });
-  if (!candidates.length) return '';
-  var pick = candidates[0];
-  return pick.from + 'の' + pick.star + 'と、' + pick.to + 'の' + pick.otherStar + 'は相剋（' +
-    pick.group + '→' + pick.otherGroup + '）です。お互い刺激し合って高め合える組み合わせです。' +
-    pick.from + 'が' + pick.scene[0] + '、' + pick.to + 'が' + pick.scene[1];
+SHICHU_TEXTS.starCompatReading = function (pair) {
+  function label(entry) {
+    var star = entry.person.stars[entry.group][0];
+    return entry.person.name + 'の' + (star ? star : entry.group) + '（' + entry.elem + '）';
+  }
+  return label(pair.from) + 'と、' + label(pair.to) + 'は' + pair.label +
+    'で、お互い刺激し合って高め合う関係です。' + pair.from.person.name +
+    'と' + pair.to.person.name + 'がそれぞれの案を一つずつ出し、相手の案から取り入れたいところを伝え合ってみましょう。';
 };
 
 // 合のやさしい説明（画面用。既存の鑑定文オブジェクトは変えない）

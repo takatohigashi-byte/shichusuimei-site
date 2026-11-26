@@ -1320,11 +1320,49 @@
     return html + '<p class="note">用語ずかんで読む　' + links.join('・') + '</p>';
   }
 
+  function elementRelation(a, b) {
+    if (a === b) return { kind: '比和', direction: '同じ五行', fromA: true };
+    var grows = isShengAdj(a, b);
+    var fromA = grows ? SHENG_NEXT[a] === b : KE_PAIRS.some(function (pair) {
+      return pair[0] === a && pair[1] === b;
+    });
+    return {
+      kind: grows ? '相生' : '相剋',
+      direction: (fromA ? a : b) + (grows ? '生' : '剋') + (fromA ? b : a),
+      fromA: fromA
+    };
+  }
+
+  function strongElementPairs(a, b) {
+    function entries(person) {
+      return Object.keys(person.chart.groups).map(function (group) {
+        var entry = person.chart.groups[group];
+        return { person: person, group: group, elem: entry.elem, count: entry.count };
+      }).filter(function (entry) { return entry.count >= 2; });
+    }
+    var pairs = [], right = entries(b);
+    entries(a).forEach(function (x) {
+      right.forEach(function (y) {
+        var rel = elementRelation(x.elem, y.elem);
+        pairs.push({
+          kind: rel.kind,
+          label: rel.kind + '（' + rel.direction + '）',
+          from: rel.fromA ? x : y,
+          to: rel.fromA ? y : x,
+          weight: x.count + y.count
+        });
+      });
+    });
+    return pairs.sort(function (x, y) { return y.weight - x.weight; });
+  }
+
   function renderCompat(rA, rB, nameA, nameB) {
     nameA = nameA || 'あなた'; nameB = nameB || 'お相手';
     lastA = { rA: rA, rB: rB, na: nameA, nb: nameB };
     var c = S.compat(rA, rB, 'A', 'B');
     var dr = c.dayRel;
+    var dayDirection = elementRelation(dr.elemA, dr.elemB).direction;
+    var dayDetail = dayDirection + (dr.kind === '比和' ? '' : '・' + dr.dir);
     var imgA = T.nikkan[rA.dayStem] ? T.nikkan[rA.dayStem].img : rA.dayStem;
     var imgB = T.nikkan[rB.dayStem] ? T.nikkan[rB.dayStem].img : rB.dayStem;
     var text = T.compatReading(c, rA, rB, nameA, nameB);
@@ -1333,7 +1371,7 @@
     var joins = ['kangou', 'shigou', 'hankai', 'sankyoku'].filter(function (key) { return c.between[key].length; });
     var h = '';
     h += '<section class="card summary" id="guide-a-sum"><h2>ふたりの相性</h2><div class="sum-lines">';
-    h += '<div class="sum-item"><span class="lbl">' + ty('日干') + 'の関係</span><p>' + esc(nameA) + 'は' + kanYomi(rA.dayStem) + '（' + esc(imgA) + '）、' + esc(nameB) + 'は' + kanYomi(rB.dayStem) + '（' + esc(imgB) + '）。' + tyCell(dr.kind) + '（' + esc(dr.dir) + '）です。</p></div>';
+    h += '<div class="sum-item"><span class="lbl">' + ty('日干') + 'の関係</span><p>' + esc(nameA) + 'は' + kanYomi(rA.dayStem) + '（' + esc(imgA) + '）、' + esc(nameB) + 'は' + kanYomi(rB.dayStem) + '（' + esc(imgB) + '）。' + tyCell(dr.kind) + '（' + esc(dayDetail) + '）です。</p></div>';
     h += '<div class="sum-item"><span class="lbl">五行の特徴</span><p>' + esc(nameA) + 'は' + esc(gogyoSummaryLine(rA, true)) + '　' + esc(nameB) + 'は' + esc(gogyoSummaryLine(rB, true)) + '</p></div>';
     h += '<div class="sum-item"><span class="lbl">ひとこと</span><p>' + (joins.length ? 'おふたりの命式には、' + joins.map(function (key) { return REL_NAMES[key]; }).join('・') + 'が見られます。力を合わせるときに、自然とつながりやすい組み合わせです。' : '目立つ合は少なめです。個性を保ったまま、ちょうどよい距離で歩ける組み合わせと見ることもできます。') + '</p></div>';
     h += '</div></section>';
@@ -1357,12 +1395,15 @@
     h += gogyoCompare(c.gogyoA, c.gogyoB, nameA, nameB) + '</div>';
     var a = { chart: rA, name: nameA, stars: T.starsByGroup(rA, S) };
     var b = { chart: rB, name: nameB, stars: T.starsByGroup(rB, S) };
-    h += '<div class="gogyo-reading" id="aisho-cycle-reading"><h3>ふたりで回す相生の循環</h3>';
-    T.compatCycleReading(a, b).forEach(function (reading) {
+    h += '<div id="aisho-cycle-reading"><h3>ふたりで回す相生の循環</h3>';
+    var pairs = strongElementPairs(a, b);
+    var cycle = T.compatCycleReading(a, b, pairs.find(function (pair) { return pair.kind === '相生'; }));
+    h += '<div class="gogyo-reading" id="aisho-cycle-summary"><p>' + esc(cycle.summary) + '</p></div>';
+    cycle.rows.forEach(function (reading) {
       h += '<p><strong>' + esc(reading.group) + '</strong><br><span class="note">' + esc(reading.counts) + '</span><br>' + esc(reading.detail) + '</p>';
     });
-    var tension = T.starCompatReading(a, b);
-    if (tension) h += '<h4>お互いを高めるひと工夫</h4><p id="aisho-star-reading">' + esc(tension) + '</p>';
+    var tension = pairs.find(function (pair) { return pair.kind === '相剋'; });
+    if (tension) h += '<h4>お互いを高めるひと工夫</h4><p id="aisho-star-reading">' + esc(T.starCompatReading(tension)) + '</p>';
     h += '</div>' + cycleGuideHtml(rA.groups);
     h += '<div id="aisho-element-reading"><h3>五行ごとの内訳</h3>';
     T.gogyoCompatReading(rA, rB, nameA, nameB, S.ELEMS).forEach(function (reading) {
@@ -1380,7 +1421,7 @@
     h += '<section class="card" id="guide-a-day"><h2>' + ty('日干') + 'の関係' + qTip('dayrel', '日干の関係') + qTip('hiwa', '比和') + ' ' + ty('比和') + qTip('shosei', '相生') + ' ' + ty('相生') + qTip('shokoku', '相剋') + ' ' + ty('相剋') + '</h2>';
     h += '<p>' + esc(nameA) + '：' + esc(rA.dayStem) + '（' + esc(imgA) + '・' + esc(dr.elemA) + '）　／　' +
       esc(nameB) + '：' + esc(rB.dayStem) + '（' + esc(imgB) + '・' + esc(dr.elemB) + '）</p>';
-    h += '<p><b>' + tyCell(dr.kind) + '</b>（' + esc(dr.dir) + '）' + (dr.kangou ? '　' + ty('日干') + 'の' + ty('干合') + '（' + kanshiYomi(rA.dayStem + rB.dayStem) + '→' + esc(dr.kangou) + '）' : '') +
+    h += '<p><b>' + tyCell(dr.kind) + '</b>（' + esc(dayDetail) + '）' + (dr.kangou ? '　' + ty('日干') + 'の' + ty('干合') + '（' + kanshiYomi(rA.dayStem + rB.dayStem) + '→' + esc(dr.kangou) + '）' : '') +
       (c.dayShigou ? '　日支の' + ty('支合') + '→' + esc(c.dayShigou) : '') +
       (c.dayChuu ? '　日支の' + ty('冲') + '（' + esc(c.dayChuu) + '）' : '') + '</p></section>';
 
