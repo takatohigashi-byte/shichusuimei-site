@@ -1448,6 +1448,7 @@
       (c.dayChuu ? '　日支の' + ty('冲') + '（' + esc(c.dayChuu) + '）' : '') + '</p></section>';
 
     h += '<section class="card" id="guide-a-rels"><h2>ふたりの結びつき</h2>';
+    h += '<p>合（ごう）と冲（ちゅう）は、ふたりの命式をかけ合わせたときに出てくる、気と気の結びつきです。合は手をつなぐ関係で、自然と歩調が合い、力を合わせやすいところ。冲は向かい合う関係で、刺激し合い、お互いを動かすきっかけになるところです。</p>';
     h += compatRelsHtml(c.between, nameA, nameB);
     h += '</section>';
 
