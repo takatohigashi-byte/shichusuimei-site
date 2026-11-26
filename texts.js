@@ -389,6 +389,14 @@ SHICHU_TEXTS.cycleLevel = function (n) {
   return n >= 3 ? '存在感がある' : n === 2 ? 'ほどよくある' : n === 1 ? '控えめ' : 'なし';
 };
 
+SHICHU_TEXTS.compatCycleTogether = {
+  比劫: 'それぞれの「やってみたい」が違うときは、希望を一つずつ出して、どちらにも楽しみがある案を選んでみてください。',
+  食傷: '案がいくつも出て迷ったら、相手の案から好きなところを一つ選び、自分の案と組み合わせてみると発想が広がります。',
+  財星: '声をかけたい人やお金をかけたいところが違うときは、予算の上限を一緒に決め、得意な相手への声かけを分担するのも手です。',
+  官星: '進め方にそれぞれの考えがあるときは、締め切りだけ先にそろえ、担当した作業の段取りはそれぞれに任せましょう。',
+  印星: '同じ経験から違う学びを得たときは、先にお互いの気づきを聞いておくと、次に試せることが増えます。'
+};
+
 SHICHU_TEXTS.cycleAmount = function (n) {
   return n + '個・' + SHICHU_TEXTS.cycleLevel(n);
 };
@@ -478,16 +486,26 @@ SHICHU_TEXTS.compatCycleReading = function (a, b, strongestGrowth) {
     summary: summary.join(''),
     rows: rows.map(function (row) {
       var stage = stages[row.group];
-      var star = row.owner && named.indexOf(row.group) >= 0 ? row.owner.stars[row.group][0] : '';
-      var actor = row.owner && row.owner.name + (star ? '（' + star + '）' : '');
-      var lead = actor ? actor + 'が' + stage.action : 'ふたりで' + stage.action;
-      var detail = row.max <= 1 ? stage.support : lead;
-      if (row.max <= 1 && actor) detail = lead + stage.support;
-      detail += stage.next;
+      var label = row.group + (row.a.elem === row.b.elem ? '（' + row.a.elem + '）' : '');
+      var detail;
+      if (row.max <= 1) {
+        detail = label + 'は' + a.name + 'も' + b.name + 'も控えめです。' + stage.support;
+      } else if (row.a.count >= 2 && row.b.count >= 2) {
+        var amount = Math.min(row.a.count, row.b.count) >= 3 ? '存在感があります' : 'しっかりあります';
+        detail = label + 'は' + a.name + 'にも' + b.name + 'にも' + amount + '。' +
+          SHICHU_TEXTS.compatCycleTogether[row.group];
+      } else {
+        var quieter = row.owner === a ? b : a;
+        var star = named.indexOf(row.group) >= 0 ? row.owner.stars[row.group][0] : '';
+        var actor = row.owner.name + (star ? '（' + star + '）' : '');
+        detail = label + 'は' + quieter.name + 'が控えめで、' + row.owner.name +
+          (row.max >= 3 ? 'に存在感があります。' : 'にはほどよくあります。') +
+          'まずは' + actor + 'が' + stage.action;
+      }
       return {
         group: row.group,
         counts: levelLabel(a, row.a) + ' ／ ' + levelLabel(b, row.b),
-        detail: detail
+        detail: detail + stage.next
       };
     })
   };
