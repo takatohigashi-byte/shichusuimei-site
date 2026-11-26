@@ -249,8 +249,31 @@
     var gender = $(genderId).value;
     var mode = $('mode') ? $('mode').value : 'precise';
     var zokanMode = $('zokanMode') ? $('zokanMode').value : 'since';
-    var tg = (!prefix && $('target') && $('target').value) ? ymd($('target').value) : { y: today.getFullYear(), m: today.getMonth() + 1, d: today.getDate() };
+    var target = !prefix && $('target');
+    if (target && target.validity.badInput) throw new Error('鑑定する日を日付で入力してください。');
+    var tg = (target && target.value) ? ymd(target.value) : { y: today.getFullYear(), m: today.getMonth() + 1, d: today.getDate() };
+    if (target && S.serial(tg.y, tg.m, tg.d) < S.serial(b.y, b.m, b.d)) {
+      throw new Error('鑑定する日は、生年月日より前にできません。生年月日以降の日付を入れてください。');
+    }
     return { y: b.y, m: b.m, d: b.d, hour: hour, minute: minute, gender: gender, mode: mode, zokanMode: zokanMode, target: tg };
+  }
+
+  function hasSetsuiriTimeNote(input) {
+    if (input.mode !== 'precise' || (input.hour != null && input.hour !== '')) return false;
+    var day = Math.floor(S.serial(input.y, input.m, input.d));
+    for (var y = input.y - 1; y <= input.y + 1; y++) {
+      for (var m = 1; m <= 12; m++) {
+        var t = S.setsuPoint(y, m, input.mode);
+        if (t > day && Math.floor(t) === day) return true;
+      }
+    }
+    return false;
+  }
+
+  function setsuiriTimeNoteHtml(id, names) {
+    return '<p id="' + id + '" class="note setsuiri-time-note">' +
+      (names ? '<strong>' + esc(names) + '：</strong>' : '') +
+      'この日は季節の変わり目のため、生まれた時間によって結果が変わることがあります。時間がわかれば入れてみてください。</p>';
   }
 
   var GEL = ['木', '火', '土', '金', '水'];
@@ -1069,36 +1092,90 @@
       return canvasToPngBlob(canvas).then(function (blob) { saveBlob(blob, '四柱推命_命式.png'); });
     }).catch(function (err) { setSaveStatus('画像の保存に失敗しました: ' + (err && err.message ? err.message : err)); });
   }
+  function pdfBreaks(root, pageHeight) {
+    var origin = root.getBoundingClientRect().top;
+    var breaks = [];
+    // 章はカードごとに、ページに収まらないカードは中の段落や小見出しごとに分ける。
+    function collect(parent) {
+      var blocks = Array.from(parent.children).filter(function (child) {
+        return child.getBoundingClientRect().height > 0;
+      });
+      blocks.forEach(function (child, i) {
+        var rect = child.getBoundingClientRect();
+        var previous = blocks[i - 1];
+        if (previous && !previous.matches('h2,h3,h4,.ch-label,summary')) {
+          var bottom = previous.getBoundingClientRect().bottom;
+          if (bottom <= rect.top) breaks.push((bottom + rect.top) / 2 - origin);
+        }
+        if (child.classList.contains('chapter') || rect.height > pageHeight) collect(child);
+      });
+    }
+    collect(root);
+    return breaks.sort(function (a, b) { return a - b; });
+  }
   function saveChartPdf() {
     var el = $('out');
     if (!el || !el.querySelector('table.meishiki')) { setSaveStatus('鑑定結果がまだありません。先に鑑定してください。'); return; }
     var JsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
     if (typeof html2canvas !== 'function' || !JsPDF) { setSaveStatus('PDFライブラリを読み込めませんでした'); return; }
     setSaveStatus('PDFを準備しています…');
-    captureElement(el, { backgroundColor: '#fff7fa' }).then(function (canvas) {
+    var width = 820, scale = 2, breaks;
+    Promise.resolve().then(function () {
       var pdf = new JsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
-      var pageW = pdf.internal.pageSize.getWidth();
-      var pageH = pdf.internal.pageSize.getHeight();
-      var margin = 8;
-      var usableW = pageW - margin * 2;
-      var usableH = pageH - margin * 2;
-      var pageCanvasH = Math.max(1, Math.floor(canvas.width * usableH / usableW));
-      var y = 0, first = true;
-      while (y < canvas.height) {
-        var sliceH = Math.min(pageCanvasH, canvas.height - y);
+      var margin = 10;
+      var usableW = pdf.internal.pageSize.getWidth() - margin * 2;
+      var usableH = pdf.internal.pageSize.getHeight() - margin * 2;
+      var pageCanvasH = Math.floor(width * scale * usableH / usableW);
+      var sourceSvg = el.querySelector('svg.gogyo');
+      var art = sourceSvg && sourceSvg.cloneNode(true);
+      return captureElement(el, {
+        backgroundColor: '#fff7fa',
+        width: width,
+        windowWidth: width + 36,
+        scale: scale,
+        onclone: function (doc, root) {
+          root.style.width = width + 'px';
+          root.style.display = 'flow-root';
+          root.querySelectorAll('button,.guide-hl').forEach(function (node) {
+            if (node.matches('button')) node.remove();
+            else node.classList.remove('guide-hl');
+          });
+          root.querySelectorAll('details:not([open]) > :not(summary)').forEach(function (node) {
+            node.remove();
+          });
+          var svg = root.querySelector('svg.gogyo');
+          if (svg && art) {
+            // SVG に画面上の位置や寸法がインライン化される前の図を使う。
+            art.setAttribute('width', '360');
+            art.setAttribute('height', '350');
+            art.setAttribute('font-family', doc.defaultView.getComputedStyle(svg).fontFamily);
+            var img = doc.createElement('img');
+            img.width = 360;
+            img.height = 350;
+            img.alt = svg.getAttribute('aria-label');
+            img.style.cssText = 'display:block;margin:0 auto';
+            img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(art));
+            svg.replaceWith(img);
+          }
+          breaks = pdfBreaks(root, pageCanvasH / scale).map(function (y) { return Math.round(y * scale); });
+        }
+      }).then(function (canvas) {
+        breaks.push(canvas.height);
         var slice = document.createElement('canvas');
         slice.width = canvas.width;
-        slice.height = sliceH;
-        slice.getContext('2d').drawImage(canvas, 0, y, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
-        var data = slice.toDataURL('image/jpeg', 0.92);
-        var h = sliceH * usableW / canvas.width;
-        if (!first) pdf.addPage();
-        first = false;
-        pdf.addImage(data, 'JPEG', margin, margin, usableW, h);
-        y += sliceH;
-      }
-      var blob = pdf.output('blob');
-      saveBlob(blob, '四柱推命_鑑定結果.pdf');
+        var y = 0, next = 0;
+        while (y < canvas.height) {
+          var end = y;
+          while (next < breaks.length && breaks[next] <= y + pageCanvasH) end = breaks[next++];
+          if (end <= y) throw new Error('この表示をページに収められませんでした。「印刷する」から保存してください。');
+          slice.height = end - y;
+          slice.getContext('2d').drawImage(canvas, 0, y, canvas.width, slice.height, 0, 0, slice.width, slice.height);
+          if (y) pdf.addPage();
+          pdf.addImage(slice.toDataURL('image/jpeg', 0.92), 'JPEG', margin, margin, usableW, slice.height * usableW / slice.width);
+          y = end;
+        }
+        saveBlob(pdf.output('blob'), '四柱推命_鑑定結果.pdf');
+      });
     }).catch(function (err) { setSaveStatus('PDFの保存に失敗しました: ' + (err && err.message ? err.message : err)); });
   }
   function printChart() { window.print(); }
@@ -1110,6 +1187,7 @@
     h += '<div class="chapter" id="ch-intro">';
     h += reassureHtml();
     h += summaryHtml(r);
+    if (hasSetsuiriTimeNote(r.input)) h += setsuiriTimeNoteHtml('setsuiri-time-note');
     h += '</div>';
 
     h += '<div class="chapter" id="ch1">' + chapterHead('1', '基本の命式と、あなたのなりたち');
@@ -1162,14 +1240,14 @@
         }
         if (c.ryujitsu) h += '<div class="unki-block"><h3>' + unkiHeading('day', c.ryujitsu, r) + '</h3>' + unkiBody(c.ryujitsu.stemStar, c.ryujitsu.juniun) + '</div>';
         var lines = [['大運', c.daiun], ['今年（流年）', c.ryunen], ['今月', c.ryugetsu], ['今日', c.ryujitsu]];
-        h += '<h3>いまの運の一覧</h3><div class="stars-wrap"><table class="stars"><tr><th></th><th>' + ty('干支') + '</th><th>' + ty('通変星') + '</th><th>' + ty('十二運') + '</th><th>' + ty('地支') + '<br>' + ty('通変星') + '</th></tr>';
+        h += '<div class="unki-table"><h3>いまの運の一覧</h3><div class="stars-wrap"><table class="stars"><tr><th></th><th>' + ty('干支') + '</th><th>' + ty('通変星') + '</th><th>' + ty('十二運') + '</th><th>' + ty('地支') + '<br>' + ty('通変星') + '</th></tr>';
         lines.forEach(function (l) { if (l[1]) h += '<tr><th>' + tyWrap(l[0]) + '</th><td>' + kanshiYomi(l[1].name) + '</td><td>' + tyCell(l[1].stemStar) + '</td><td>' + tyCell(l[1].juniun) + '</td><td>' + tyCell(l[1].branchStar) + '</td></tr>'; });
-        h += '</table></div>';
+        h += '</table></div></div>';
       }
       if (r.daiunInfo) {
         var list = daiunTo100(r);
         var cur = r.current;
-        h += '<h3>' + ty('大運') + 'のながれ（およそ100歳まで）</h3>';
+        h += '<div class="unki-table"><h3>' + ty('大運') + 'のながれ（およそ100歳まで）</h3>';
         if (r.daiunInfo.replaced) h += '<p class="note">節入りまでの日数から求めた値が範囲外のため、10年運としています。</p>';
         h += '<p class="note">数え歳は、生まれたときを1歳と数える、占いでよく使う年齢です。大運の区切りは人によって6〜10年ほど。色のついた行が、いまの大運です。</p>';
         h += '<div class="stars-wrap"><table class="stars"><tr><th>年齢<br>（数え）</th><th>' + ty('干支') + '</th><th>' + ty('通変星') + '</th><th>' + ty('十二運') + '</th><th>' + ty('地支') + '<br>' + ty('通変星') + '</th></tr>';
@@ -1177,7 +1255,7 @@
           var isCur = cur && cur.daiun && cur.daiun.from === d.from;
           h += '<tr class="' + (isCur ? 'cur' : '') + '"><td>' + d.from + '〜' + d.to + '歳</td><td>' + kanshiYomi(d.name) + '</td><td>' + tyCell(d.stemStar) + '</td><td>' + tyCell(d.juniun) + '</td><td>' + tyCell(d.branchStar) + '</td></tr>';
         });
-        h += '</table></div>';
+        h += '</table></div></div>';
       }
       h += '</section></div>';
     }
@@ -1222,6 +1300,11 @@
     h += '<div class="sum-item"><span class="lbl">ひとこと</span><p>' + (gouN ? 'おふたりの命式には、干合や支合などの結びつきが見られます。力を合わせるときに、自然とつながりやすい組み合わせです。' : '目立つ合は少なめです。個性を保ったまま、ちょうどよい距離で歩ける組み合わせと見ることもできます。') + '</p></div>';
     h += '</div></section>';
 
+    var setsuiriNames = [];
+    if (hasSetsuiriTimeNote(rA.input)) setsuiriNames.push(nameA === 'あなた' ? nameA : 'あなた（' + nameA + '）');
+    if (hasSetsuiriTimeNote(rB.input)) setsuiriNames.push(nameB === 'お相手' ? nameB : 'お相手（' + nameB + '）');
+    if (setsuiriNames.length) h += setsuiriTimeNoteHtml('setsuiri-time-note-aisho', setsuiriNames.join('・'));
+
     h += '<div class="two" id="guide-a-mei">';
     h += '<p class="note lead-mei" style="flex-basis:100%">これがおふたりの命式です。保存しておくと、いつでも見返せます。</p>';
     h += '<section class="card"><h2>' + esc(nameA) + 'の' + ty('命式') + qTip('meishiki', '命式') + '</h2>' + meishikiTable(rA) +
@@ -1263,8 +1346,22 @@
     if (guideOn) updateTour();
   }
 
+  var initialKanteiHtml = $('empty-kantei').outerHTML;
+  var initialAishoHtml = $('empty-aisho').outerHTML;
   function emptyKanteiHtml() {
-    return $('empty-kantei') ? $('empty-kantei').outerHTML : '';
+    return initialKanteiHtml;
+  }
+  function showInputError(isAisho, message) {
+    if (isAisho) {
+      lastA = null;
+      $('outA').innerHTML = initialAishoHtml;
+    } else {
+      lastK = null;
+      $('out').innerHTML = emptyKanteiHtml();
+    }
+    $(isAisho ? 'errA' : 'err').textContent = message;
+    closeTip();
+    if (guideOn) updateTour();
   }
   var TIME_HINT = '生まれた時間がわかれば入れてください。わからないときは「時間がわからない」を選んでください。';
   function missingTime(prefix, who) {
@@ -1278,17 +1375,17 @@
   function run(e) {
     if (e) e.preventDefault();
     var msg = missingTime('', '');
-    if (msg) { $('err').textContent = msg; return; }
+    if (msg) { showInputError(false, msg); return; }
     $('err').textContent = '';
     try {
       render(S.compute(readInput('')));
       if ($('out')) try { $('out').scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e2) {}
-    } catch (err) { $('err').textContent = 'エラー: ' + err.message; }
+    } catch (err) { showInputError(false, 'エラー: ' + err.message); }
   }
   function runAisho(e) {
     if (e) e.preventDefault();
     var msg = missingTime('a', 'あなた') || missingTime('b', 'お相手');
-    if (msg) { $('errA').textContent = msg; return; }
+    if (msg) { showInputError(true, msg); return; }
     $('errA').textContent = '';
     try {
       var rA = S.compute(readInput('a')), rB = S.compute(readInput('b'));
@@ -1296,7 +1393,7 @@
       var nb = ($('bName').value || '').trim() || 'お相手';
       renderCompat(rA, rB, na, nb);
       if ($('outA')) try { $('outA').scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e2) {}
-    } catch (err) { $('errA').textContent = 'エラー: ' + err.message; }
+    } catch (err) { showInputError(true, 'エラー: ' + err.message); }
   }
 
   function showTab(name) {
