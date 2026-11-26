@@ -197,7 +197,7 @@ details.more[open]>summary{margin-bottom:12px;color:#c45a86;border-color:var(--a
 .calm-panel{border-top:1px solid #e7dff0;padding:6px 0;margin:6px 0 10px}
 .rel-card{background:#fffafc;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:8px 0}
 .def-line{font-size:.86rem;color:var(--sub);line-height:1.7}
-#guide-a-rels .note a,#guide-rels .rel-card a{color:#69488a;text-decoration:underline}
+#guide-a-rels .note a,#guide-rels .rel-card a,.stage-signs a{color:#69488a;text-decoration:underline}
 details.more.inner{margin:8px 0}
 details.more.inner>summary{padding:8px 14px;font-size:.86rem}
 @media(max-width:400px){
@@ -250,6 +250,7 @@ body.zukan-open{overflow:hidden}
 <div id="panel-kantei" class="panel on">
 <section class="card">
   <form id="f" novalidate>
+    <label>お名前（任意）<input type="text" id="birthName" autocomplete="name"></label>
     <label>生年月日<input type="text" id="birth" inputmode="numeric" placeholder="例：19870617" required></label>
     <label>生まれた時間<input type="time" id="time"></label>
     <label style="flex-direction:row;align-items:center;gap:4px"><input type="checkbox" id="notime"> 時間がわからない</label>

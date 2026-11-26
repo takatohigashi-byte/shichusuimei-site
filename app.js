@@ -108,7 +108,8 @@
     var nk = T.nikkan[r.dayStem] || { img: '', text: '' };
     var yearLine = '生年月日を基準に、今年の流れを見られます。';
     if (r.current && r.current.ryunen) yearLine = firstSentence(tsuUn(r.current.ryunen.stemStar));
-    return '<section class="card summary" id="guide-summary"><h2>あなたはこういう人</h2><div class="sum-lines">' +
+    var title = r.displayName ? esc(r.displayName) + 'さんの鑑定' : 'あなたはこういう人';
+    return '<section class="card summary" id="guide-summary"><h2>' + title + '</h2><div class="sum-lines">' +
       '<div class="sum-item"><span class="lbl">' + ty('日干') + '＝あなた</span><p>' + kanYomi(r.dayStem) + '（' + esc(nk.img) + '）　' + esc(nk.text) + '</p></div>' +
       '<div class="sum-item"><span class="lbl">' + ty('五行') + 'の特徴</span><p>' + esc(gogyoSummaryLine(r)) + '</p></div>' +
       '<div class="sum-item"><span class="lbl">今年のひとこと</span><p>' + esc(yearLine) + '</p></div>' +
@@ -750,13 +751,19 @@
     if (!star || star === '（日主）' || star === '日主') return ty('日主');
     return tyCell(star);
   }
-  function starLead(star) {
-    if (!star || star === '（日主）' || star === '日主') return 'あなた自身の中心の気';
-    return firstSentence(tsuText(star)) || (star + 'の力がテーマ');
+  function pillarStarHtml(star) {
+    return starSoft(star) + '（' + esc(T.pillarStars[star][0]) + '）';
   }
-  function junLead(ju) {
-    if (!ju) return '';
-    return firstSentence(junText(ju)) || (ju + 'の段階');
+
+  function pillarAction(p, key) {
+    var visible = T.pillarStars[p.stemStar];
+    var inner = T.pillarStars[p.zokanStar];
+    var step = T.pillarStages[p.juniun][1];
+    var check = '「' + inner[2] + '」';
+    if (key === 'year') return '学校や家で興味を持ったことに取り組むなら、' + step + '、' + visible[1] + 'と、' + check + 'を確かめやすくなります。';
+    if (key === 'month') return '仕事で迷ったら、' + check + 'を目安に、' + step + '、' + visible[1] + 'ところから。';
+    if (key === 'hour') return '趣味や地域の活動では、' + check + 'を考えながら、' + step + '、' + visible[1] + '機会を作ってみてください。';
+    return '毎日の暮らしでは、' + step + '、' + inner[1] + 'ところから始めてみてください。';
   }
 
   function zokanLayersHtml(pillar, r) {
@@ -795,10 +802,7 @@
       h += '<p class="note">十二運の名前は、エネルギーの段階をあらわす言葉です。こわい意味ではありません。</p>';
       h += parasHtml(junText(mon.juniun));
     }
-    var tip = '月の天干の' + (mon.stemStar || '') + 'を日々の得意なことで活かし';
-    if (mon.zokanStar) tip += '、蔵干の' + mon.zokanStar + 'の深みを支えや学びに変えると';
-    tip += '、人生の中心の時期の力がやさしく伸びます。';
-    h += '<p class="ikashi"><b>生かし方：</b>' + esc(tip) + '</p>';
+    h += '<p class="ikashi"><b>生かし方：</b>' + esc(pillarAction(mon, 'month')) + '</p>';
     return h + '</section>';
   }
 
@@ -811,30 +815,19 @@
       h += '<p>' + esc(T.lifeStages.noHour || '') + '</p></article>';
       return h;
     }
-    var bits = [];
-    if (key === 'day') {
-      bits.push('日の柱は、人生を通じてのあなた自身と、パートナーとの関係のベースです。' + kanshiYomi(p.name) + 'のリズムが、いつの時期もまんなかにあります。');
-    } else {
-      bits.push(esc(stg.lead || '') + '、' + kanshiYomi(p.name) + 'のリズムで進みやすい時期です。');
-    }
-    if (stg.extra) bits.push(esc(stg.extra));
-    if (p.stemStar && p.stemStar !== '日主' && p.stemStar !== '（日主）') {
-      bits.push('天の通変星は' + starSoft(p.stemStar) + '。' + esc(starLead(p.stemStar)));
-    } else if (key === 'day') {
-      bits.push('日の天干は、いつの時期も変わらないあなたの中心です。');
-    }
-    if (p.zokan && p.zokanStar) {
-      bits.push('地の中の蔵干は' + kanYomi(p.zokan) + '（' + starSoft(p.zokanStar) + '）が深みを添えます。');
+    var traits = T.pillarTraits;
+    var body = stg.body.replace('{stem}', traits.stem[p.stem]).replace('{branch}', traits.branch[p.branch]);
+    h += '<p>' + kanshiYomi(p.name) + '（' + esc(p.stemElem + 'と' + p.branchElem) + '）。' + esc(body) + '</p>';
+    var signs = [];
+    if (T.pillarStars[p.stemStar]) signs.push('表に出やすいのは' + pillarStarHtml(p.stemStar) + '。');
+    if (p.zokan && T.pillarStars[p.zokanStar]) {
+      signs.push('内側では' + kanYomi(p.zokan) + 'の' + pillarStarHtml(p.zokanStar) + 'が支えに。');
     }
     if (p.juniun) {
-      bits.push('十二運は' + tyCell(p.juniun) + 'の段階。名前はエネルギーの波で、こわい意味ではありません。');
+      signs.push('十二運の' + tyCell(p.juniun) + 'は、' + esc(T.pillarStages[p.juniun][0]) + 'です。');
     }
-    var live = '今ある持ち味を、無理に変えず、小さな習慣で活かしてみてください。';
-    if (p.stemStar && p.stemStar !== '日主' && p.stemStar !== '（日主）') {
-      live = (p.stemStar) + 'の力を、自分のペースで少しずつ使うと、この時期がやさしく整います。';
-    }
-    h += '<p>' + bits.join('') + '</p>';
-    h += '<p class="ikashi"><b>生かし方：</b>' + esc(live) + '</p>';
+    h += '<p class="note stage-signs">' + signs.join('') + '</p>';
+    h += '<p class="ikashi"><b>生かし方：</b>' + esc(pillarAction(p, key)) + '</p>';
     if (key === 'day') {
       h += '<details class="more inner"><summary>日柱のくわしい特徴</summary>';
       h += nicchuHtml(p.name);
@@ -958,8 +951,25 @@
     var relName = REL_NAMES[kind] || kind;
     var elemBit = elem ? elemPhrase(elem, true) + 'がめぐりやすい時期。' : '新しい流れが生まれやすい時期。';
     var body = periodLabel + 'が、' + who + 'と結びつき（' + relName + '）、' + elemBit;
-    var live = '今ある持ち味を活かし、無理のないペースで一歩ずつ進めてみてください。';
-    if (elem) live = elemPhrase(elem, false) + 'を、暮らしの小さな習慣や人との関わりで丁寧に使うと、形になりやすいでしょう。';
+    var elemActions = {
+      木: '気になっていたことを一つ選び、入門の本を開いてみましょう。',
+      火: '一緒に取り組む人に、自分が面白いと思った点を一つ伝えてみてください。',
+      土: '続けたい予定を一つ選び、曜日と時間を決めておきましょう。',
+      金: '抱えている用事を並べ、先に終えるものを一つ決めてみてください。',
+      水: '状況が変わったら、詳しい人に話を聞いて次の手を考えてみましょう。'
+    };
+    var relActions = {
+      kangou: 'それぞれの案から良いところを一つずつ選び、小さな試作品にしてみましょう。',
+      shigou: '一緒に過ごす人と、次に会う日や時間を相談してみてください。',
+      hankai: '共通の関心がある人に、おすすめを一つ聞いてみましょう。',
+      sankyoku: '一緒に進めたいことを一つ選び、それぞれの役割を話してみましょう。',
+      chuu: '予定がぶつかったら、先に動かせる日時を一つずつ出してみてください。',
+      kei: '譲りにくいことがあれば、大切にしたい理由を一行書いてみましょう。',
+      gai: '話がかみ合わないと感じたら、相手の意図を一度聞き返してみてください。',
+      ha: '続けづらくなった手順を一つ選び、次に試すやり方を考えてみましょう。',
+      tensen: '予定を変える前に、今週中にすませておきたい用事を一つ確認しましょう。'
+    };
+    var live = elemActions[elem] || relActions[kind];
     return '<article class="rel-card"><p>' + esc(body) + '</p><p class="ikashi"><b>過ごし方：</b>' + esc(live) + '</p></article>';
   }
   function luckRelHtml(r, label, star, periodTitle) {
@@ -1494,7 +1504,9 @@
     if (msg) { showInputError(false, msg); return; }
     $('err').textContent = '';
     try {
-      render(S.compute(readInput('')));
+      var result = S.compute(readInput(''));
+      result.displayName = $('birthName').value.trim();
+      render(result);
       if ($('out')) try { $('out').scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e2) {}
     } catch (err) { showInputError(false, 'エラー: ' + err.message); }
   }

@@ -197,7 +197,7 @@ details.more[open]>summary{margin-bottom:12px;color:#c45a86;border-color:var(--a
 .calm-panel{border-top:1px solid #e7dff0;padding:6px 0;margin:6px 0 10px}
 .rel-card{background:#fffafc;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:8px 0}
 .def-line{font-size:.86rem;color:var(--sub);line-height:1.7}
-#guide-a-rels .note a,#guide-rels .rel-card a{color:#69488a;text-decoration:underline}
+#guide-a-rels .note a,#guide-rels .rel-card a,.stage-signs a{color:#69488a;text-decoration:underline}
 details.more.inner{margin:8px 0}
 details.more.inner>summary{padding:8px 14px;font-size:.86rem}
 @media(max-width:400px){
@@ -250,6 +250,7 @@ body.zukan-open{overflow:hidden}
 <div id="panel-kantei" class="panel on">
 <section class="card">
   <form id="f" novalidate>
+    <label>お名前（任意）<input type="text" id="birthName" autocomplete="name"></label>
     <label>生年月日<input type="text" id="birth" inputmode="numeric" placeholder="例：19870617" required></label>
     <label>生まれた時間<input type="time" id="time"></label>
     <label style="flex-direction:row;align-items:center;gap:4px"><input type="checkbox" id="notime"> 時間がわからない</label>
@@ -1899,12 +1900,61 @@ SHICHU_TEXTS.calmWords = [
 ];
 SHICHU_TEXTS.lifeStages = {
   note: '四つの柱を、人生の流れの目安として並べています。年齢の区切りは人それぞれなので、大まかな物語として読んでみてください。細かく見るときは、あとから出てくる大運や今年の流れもあわせて見てください。',
-  year: { key: 'year', title: '若いころ', age: '幼少〜青年期', lead: '若いころは', extra: '育ちの土台や、家族・ルーツとの縁も、この柱に現れやすいとされます。' },
-  month: { key: 'month', title: '成年期', age: '働き盛り・人生の中心', lead: '成年期（働き盛り）は' },
-  day: { key: 'day', title: '人生を通じて', age: '自分自身・パートナー', lead: '人生を通じて' },
-  hour: { key: 'hour', title: '晩年', age: '', lead: '晩年は' },
+  year: { title: '若いころ', age: '幼少〜青年期', body: '家や学校では、{stem}と{branch}が、好きなことや得意なことを見つける手がかりになりそうです。' },
+  month: { title: '成年期', age: '働き盛り・人生の中心', body: '仕事や人と協力する場面でまず出やすいのは、{stem}です。そこに{branch}も加わります。' },
+  day: { title: '人生を通じて', age: '自分自身・パートナー', body: '自分で何かを選ぶときや、身近な人と過ごすときには、{stem}に{branch}が重なります。' },
+  hour: { title: '晩年', age: '', body: '経験を重ねた先で、{stem}と{branch}が、これからも大切にしたいことを選ぶ助けになりそうです。' },
   noHour: '生まれた時間がわからないため、晩年の読みは、ここではお出しできません。時間が分かれば、この欄にあなたの時の柱が入ります。'
 };
+// 本人の柱に合わせて、天干の持ち味と地支の傾向を短く伝える。
+SHICHU_TEXTS.pillarTraits = {
+  stem: {
+    甲: '大樹のようにまっすぐ伸びる意志', 乙: '草花のように環境になじむしなやかさ',
+    丙: '太陽のように周りを明るくする力', 丁: '灯火のようにそっと人を気づかう心',
+    戊: '山のようにどっしり構えて人を支える力', 己: '田畑のように手をかけて育てる力',
+    庚: '鍛えた鉄のような意志と決断力', 辛: '磨いた宝石のような繊細さ',
+    壬: '大河のように変化を受け止めるおおらかさ', 癸: '雨のしずくのように静かに人を支える心'
+  },
+  branch: {
+    子: '様子を見ながら柔軟に動く力', 丑: '時間をかけて積み上げる粘り強さ',
+    寅: '新しいことに踏み出す勢い', 卯: '人と打ち解けて関係を育てる柔らかさ',
+    辰: '大きな構想を形にする力', 巳: '気になったことを深く掘り下げる集中力',
+    午: '思いを周りに伝えて場を盛り上げる力', 未: '身近な人を気にかけて暮らしを整える力',
+    申: '状況に応じて手早く工夫する力', 酉: '細部を整え、けじめをつける力',
+    戌: '大切な約束を守り続ける誠実さ', 亥: '関心を持ったことに素直に向かう勢い'
+  }
+};
+
+// 表に出やすい行動と、内側で支えになる判断の目安。
+SHICHU_TEXTS.pillarStars = {
+  比肩: ['自分で考えて進める星', '自分なりの手順を考える', '自分で納得して選べるか'],
+  劫財: ['仲間と刺激を受け合う星', '仲間と役割を一つずつ決める', '互いの得意を持ち寄れるか'],
+  敗財: ['人と助け合う星', '手を貸せる範囲を伝える', '頼る側にも回れるか'],
+  食神: ['好きなことを楽しみ、分かち合う星', '作ったものを身近な一人に見せる', '作る時間も楽しめるか'],
+  傷官: ['こだわりを磨き、表現する星', '気になるところを直して前後を見比べる', '伝えたいことが伝わる形になったか'],
+  偏財: ['人や情報をつなぐ星', '役立ちそうな情報を一人に届ける', '相手が今ほしい情報か'],
+  正財: ['小さな約束を積み重ねる星', '続けたい手順をメモに残す', '次も同じように続けられるか'],
+  偏官: ['必要な場面で一歩踏み出す星', '最初に手をつけることを一つ決める', '引き受ける範囲を決められるか'],
+  正官: ['役割と約束を整える星', '誰がいつまでに何をするか確かめる', 'お互いに守れる約束か'],
+  偏印: ['ひらめきを試して広げる星', '思いついた案を一つ試す', '違うやり方でもっと面白くなるか'],
+  印綬: ['学んだことを理解して伝える星', '調べたことを自分の言葉で書く', '初めて聞く人にも分かるか']
+};
+
+SHICHU_TEXTS.pillarStages = {
+  長生: ['新しい力が育ち始める段階', 'まず一度やってみて'],
+  沐浴: ['新しい環境にふれて視野が広がる段階', 'いつもと違うやり方で'],
+  冠帯: ['育ててきたものを人前に出す段階', '人に見せられるところまで進めて'],
+  建禄: ['自分で進める力が安定する段階', '自分で続けられる手順を意識して'],
+  帝旺: ['持ち味を十分に発揮しやすい段階', '力を注ぐことを一つに決めて'],
+  衰: ['経験を落ち着いて生かす段階', '前にうまくいった方法を手がかりに'],
+  病: ['小さな変化や気持ちに気づきやすい段階', '小さな違いにも目を向けて'],
+  死: ['一つのことにじっくり集中する段階', '一つに絞ってじっくり'],
+  墓: ['経験や知識を蓄える段階', 'あとで見返せる形を意識して'],
+  絶: ['気持ちを切り替えて新しく始める段階', '以前のやり方を一つ見直して'],
+  胎: ['新しい考えが芽生える段階', '手をつける前に下書きを用意して'],
+  養: ['助けを受けながら力を育てる段階', '身近な人に手を借りながら']
+};
+
 SHICHU_TEXTS.monthCoreIntro = '月の柱は、仕事や人との関わりで出やすい持ち味を見る場所です。表に出やすい一面と、自分の中で支えになる一面を分けて読んでみましょう。';
 SHICHU_TEXTS.zokanIntro = '地支の中には、表にすぐ見える気と、そっと控えている気があります。本気がいちばん中心で、中気や余気がある支では、そこに深みが加わります。';
 
@@ -2047,7 +2097,8 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     var nk = T.nikkan[r.dayStem] || { img: '', text: '' };
     var yearLine = '生年月日を基準に、今年の流れを見られます。';
     if (r.current && r.current.ryunen) yearLine = firstSentence(tsuUn(r.current.ryunen.stemStar));
-    return '<section class="card summary" id="guide-summary"><h2>あなたはこういう人</h2><div class="sum-lines">' +
+    var title = r.displayName ? esc(r.displayName) + 'さんの鑑定' : 'あなたはこういう人';
+    return '<section class="card summary" id="guide-summary"><h2>' + title + '</h2><div class="sum-lines">' +
       '<div class="sum-item"><span class="lbl">' + ty('日干') + '＝あなた</span><p>' + kanYomi(r.dayStem) + '（' + esc(nk.img) + '）　' + esc(nk.text) + '</p></div>' +
       '<div class="sum-item"><span class="lbl">' + ty('五行') + 'の特徴</span><p>' + esc(gogyoSummaryLine(r)) + '</p></div>' +
       '<div class="sum-item"><span class="lbl">今年のひとこと</span><p>' + esc(yearLine) + '</p></div>' +
@@ -2689,13 +2740,19 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     if (!star || star === '（日主）' || star === '日主') return ty('日主');
     return tyCell(star);
   }
-  function starLead(star) {
-    if (!star || star === '（日主）' || star === '日主') return 'あなた自身の中心の気';
-    return firstSentence(tsuText(star)) || (star + 'の力がテーマ');
+  function pillarStarHtml(star) {
+    return starSoft(star) + '（' + esc(T.pillarStars[star][0]) + '）';
   }
-  function junLead(ju) {
-    if (!ju) return '';
-    return firstSentence(junText(ju)) || (ju + 'の段階');
+
+  function pillarAction(p, key) {
+    var visible = T.pillarStars[p.stemStar];
+    var inner = T.pillarStars[p.zokanStar];
+    var step = T.pillarStages[p.juniun][1];
+    var check = '「' + inner[2] + '」';
+    if (key === 'year') return '学校や家で興味を持ったことに取り組むなら、' + step + '、' + visible[1] + 'と、' + check + 'を確かめやすくなります。';
+    if (key === 'month') return '仕事で迷ったら、' + check + 'を目安に、' + step + '、' + visible[1] + 'ところから。';
+    if (key === 'hour') return '趣味や地域の活動では、' + check + 'を考えながら、' + step + '、' + visible[1] + '機会を作ってみてください。';
+    return '毎日の暮らしでは、' + step + '、' + inner[1] + 'ところから始めてみてください。';
   }
 
   function zokanLayersHtml(pillar, r) {
@@ -2734,10 +2791,7 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
       h += '<p class="note">十二運の名前は、エネルギーの段階をあらわす言葉です。こわい意味ではありません。</p>';
       h += parasHtml(junText(mon.juniun));
     }
-    var tip = '月の天干の' + (mon.stemStar || '') + 'を日々の得意なことで活かし';
-    if (mon.zokanStar) tip += '、蔵干の' + mon.zokanStar + 'の深みを支えや学びに変えると';
-    tip += '、人生の中心の時期の力がやさしく伸びます。';
-    h += '<p class="ikashi"><b>生かし方：</b>' + esc(tip) + '</p>';
+    h += '<p class="ikashi"><b>生かし方：</b>' + esc(pillarAction(mon, 'month')) + '</p>';
     return h + '</section>';
   }
 
@@ -2750,30 +2804,19 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
       h += '<p>' + esc(T.lifeStages.noHour || '') + '</p></article>';
       return h;
     }
-    var bits = [];
-    if (key === 'day') {
-      bits.push('日の柱は、人生を通じてのあなた自身と、パートナーとの関係のベースです。' + kanshiYomi(p.name) + 'のリズムが、いつの時期もまんなかにあります。');
-    } else {
-      bits.push(esc(stg.lead || '') + '、' + kanshiYomi(p.name) + 'のリズムで進みやすい時期です。');
-    }
-    if (stg.extra) bits.push(esc(stg.extra));
-    if (p.stemStar && p.stemStar !== '日主' && p.stemStar !== '（日主）') {
-      bits.push('天の通変星は' + starSoft(p.stemStar) + '。' + esc(starLead(p.stemStar)));
-    } else if (key === 'day') {
-      bits.push('日の天干は、いつの時期も変わらないあなたの中心です。');
-    }
-    if (p.zokan && p.zokanStar) {
-      bits.push('地の中の蔵干は' + kanYomi(p.zokan) + '（' + starSoft(p.zokanStar) + '）が深みを添えます。');
+    var traits = T.pillarTraits;
+    var body = stg.body.replace('{stem}', traits.stem[p.stem]).replace('{branch}', traits.branch[p.branch]);
+    h += '<p>' + kanshiYomi(p.name) + '（' + esc(p.stemElem + 'と' + p.branchElem) + '）。' + esc(body) + '</p>';
+    var signs = [];
+    if (T.pillarStars[p.stemStar]) signs.push('表に出やすいのは' + pillarStarHtml(p.stemStar) + '。');
+    if (p.zokan && T.pillarStars[p.zokanStar]) {
+      signs.push('内側では' + kanYomi(p.zokan) + 'の' + pillarStarHtml(p.zokanStar) + 'が支えに。');
     }
     if (p.juniun) {
-      bits.push('十二運は' + tyCell(p.juniun) + 'の段階。名前はエネルギーの波で、こわい意味ではありません。');
+      signs.push('十二運の' + tyCell(p.juniun) + 'は、' + esc(T.pillarStages[p.juniun][0]) + 'です。');
     }
-    var live = '今ある持ち味を、無理に変えず、小さな習慣で活かしてみてください。';
-    if (p.stemStar && p.stemStar !== '日主' && p.stemStar !== '（日主）') {
-      live = (p.stemStar) + 'の力を、自分のペースで少しずつ使うと、この時期がやさしく整います。';
-    }
-    h += '<p>' + bits.join('') + '</p>';
-    h += '<p class="ikashi"><b>生かし方：</b>' + esc(live) + '</p>';
+    h += '<p class="note stage-signs">' + signs.join('') + '</p>';
+    h += '<p class="ikashi"><b>生かし方：</b>' + esc(pillarAction(p, key)) + '</p>';
     if (key === 'day') {
       h += '<details class="more inner"><summary>日柱のくわしい特徴</summary>';
       h += nicchuHtml(p.name);
@@ -2897,8 +2940,25 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     var relName = REL_NAMES[kind] || kind;
     var elemBit = elem ? elemPhrase(elem, true) + 'がめぐりやすい時期。' : '新しい流れが生まれやすい時期。';
     var body = periodLabel + 'が、' + who + 'と結びつき（' + relName + '）、' + elemBit;
-    var live = '今ある持ち味を活かし、無理のないペースで一歩ずつ進めてみてください。';
-    if (elem) live = elemPhrase(elem, false) + 'を、暮らしの小さな習慣や人との関わりで丁寧に使うと、形になりやすいでしょう。';
+    var elemActions = {
+      木: '気になっていたことを一つ選び、入門の本を開いてみましょう。',
+      火: '一緒に取り組む人に、自分が面白いと思った点を一つ伝えてみてください。',
+      土: '続けたい予定を一つ選び、曜日と時間を決めておきましょう。',
+      金: '抱えている用事を並べ、先に終えるものを一つ決めてみてください。',
+      水: '状況が変わったら、詳しい人に話を聞いて次の手を考えてみましょう。'
+    };
+    var relActions = {
+      kangou: 'それぞれの案から良いところを一つずつ選び、小さな試作品にしてみましょう。',
+      shigou: '一緒に過ごす人と、次に会う日や時間を相談してみてください。',
+      hankai: '共通の関心がある人に、おすすめを一つ聞いてみましょう。',
+      sankyoku: '一緒に進めたいことを一つ選び、それぞれの役割を話してみましょう。',
+      chuu: '予定がぶつかったら、先に動かせる日時を一つずつ出してみてください。',
+      kei: '譲りにくいことがあれば、大切にしたい理由を一行書いてみましょう。',
+      gai: '話がかみ合わないと感じたら、相手の意図を一度聞き返してみてください。',
+      ha: '続けづらくなった手順を一つ選び、次に試すやり方を考えてみましょう。',
+      tensen: '予定を変える前に、今週中にすませておきたい用事を一つ確認しましょう。'
+    };
+    var live = elemActions[elem] || relActions[kind];
     return '<article class="rel-card"><p>' + esc(body) + '</p><p class="ikashi"><b>過ごし方：</b>' + esc(live) + '</p></article>';
   }
   function luckRelHtml(r, label, star, periodTitle) {
@@ -3433,7 +3493,9 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     if (msg) { showInputError(false, msg); return; }
     $('err').textContent = '';
     try {
-      render(S.compute(readInput('')));
+      var result = S.compute(readInput(''));
+      result.displayName = $('birthName').value.trim();
+      render(result);
       if ($('out')) try { $('out').scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e2) {}
     } catch (err) { showInputError(false, 'エラー: ' + err.message); }
   }
