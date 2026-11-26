@@ -1024,7 +1024,7 @@
       var traits = T.pillarTraits;
       var body = stg.body.replace('{stem}', traits.stem[p.stem]).replace('{branch}', traits.branch[p.branch]);
       var SEE = { year: ['若いころ', '年柱', '生まれた年'], month: ['成年期', '月柱', '生まれた月'], hour: ['晩年', '時柱', '生まれた時刻'] }[key];
-      if (SEE) h += '<p class="stage-signs">' + SEE[0] + 'は、' + ty(SEE[1]) + '（' + SEE[2] + 'の柱）を見ています。下に出てくる干支や星は、この' + ty(SEE[1]) + 'のものです。</p>';
+      if (SEE) h += '<p class="stage-signs">' + SEE[0] + 'は' + ty(SEE[1]) + 'に現れてきます。</p>';
       h += '<h4>特徴</h4><p class="stage-signs">' + elements + esc(body);
       if (p.stemStar === p.zokanStar) {
         h += pillarStarHtml(p.stemStar) + 'の持ち味が、外にも内にも表れやすいでしょう。';
