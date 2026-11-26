@@ -788,7 +788,7 @@
     h += '<h3>' + ty('月柱') + 'の天干の' + ty('通変星') + '（' + starSoft(mon.stemStar) + '）</h3>';
     h += parasHtml(tsuText(mon.stemStar));
     h += '<h3>社会で育てていく持ち味（' + ty('格局') + '：' + tyWrap(r.kakkyoku) + '）</h3>';
-    h += '<p>第1章で見たあなたらしさを、仕事や人との関わりでどう使うか。その手がかりを、生まれ月から読んでいきます。向いている仕事を一つに決めるものではありません。</p>';
+    h += '<p>上の「あなたの本質（日干）」で見たあなたらしさを、仕事や人との関わりでどう使うか。その手がかりを、生まれ月から読んでいきます。向いている仕事を一つに決めるものではありません。</p>';
     h += parasHtml(tsuKaku(r.genmei));
     h += '<h3>' + ty('月支') + 'にひそむ' + ty('蔵干') + '</h3>';
     h += zokanLayersHtml(mon, r);
@@ -990,7 +990,7 @@
     return '<p class="ch-label">' + n + '. ' + esc(title) + '</p>';
   }
   function natalRelsHtml(r) {
- var h='<section class="card" id="guide-rels"><h2>あなたの持ち味が重なるところ</h2><p>第1章の月の柱や日の柱を、今度は組み合わせて見ます。書かれていることを今の暮らしと照らし合わせ、しっくりくる部分だけを使ってください。</p>';
+ var h='<section class="card" id="guide-rels"><h2>あなたの持ち味が重なるところ</h2><p>上の「人生の中心（月柱）」で見た月の柱と、日の柱を、今度は組み合わせて見ます。書かれていることを今の暮らしと照らし合わせ、しっくりくる部分だけを使ってください。</p>';
  var rel=r.relations||{}, n=0;
  var titles={kangou:'考え方を重ねて、新しい形をつくる',shigou:'暮らしのリズムを合わせる',hankai:'共通の関心を育てる',sankyoku:'力を一つのテーマに集める',chuu:'違うペースの間に余白をつくる',kei:'自分のこだわりと付き合う',gai:'言葉にして、すれ違いをほどく',ha:'いつものやり方を見直す',tensen:'変化の前に、足もとを整える'};
  Object.keys(REL_NAMES).forEach(function(k){(rel[k]||[]).forEach(function(x){
@@ -1000,7 +1000,7 @@
  var line=(domains?domains+'の間で、':'いくつかの暮らしの場面で、')+ideas[k];
  h+='<article class="rel-card"><h3>'+esc(titles[k])+'</h3><p>あなたの場合は、'+esc(line)+'</p><details class="more inner"><summary>対応する言葉と組み合わせを読む</summary><p>'+esc(x)+'</p><p>'+ty(REL_NAMES[k])+'：'+esc((T.relExplain||{})[k]||'柱どうしの組み合わせにつけられた名前です。')+'</p></details></article>';
  });});
- if(!n)h+='<p>あなたの場合は、ここで扱う目立った組み合わせは見られません。足りないという意味ではありません。第1章の一つひとつの持ち味から、使いやすいものを見つけてください。</p>';
+ if(!n)h+='<p>あなたの場合は、ここで扱う目立った組み合わせは見られません。足りないという意味ではありません。上で見た一つひとつの持ち味から、使いやすいものを見つけてください。</p>';
  return h+'</section>';
  }
 
@@ -1018,7 +1018,7 @@
     h+='<details class="more inner"><summary>もっと読む</summary>';
     h+=bal.map(function(a){return '<h4>'+tyWrap(a.title)+'</h4><p>'+esc(a.text)+'</p>';}).join('');
     h+='<p class="note">●は生まれ持った柱の数です。生まれ月の季節や組み合わせの記号とは分けて見てください。</p></details>';
-    h+='<h3>今の流れ</h3><p>＋はこの10年、⊕は今年のテーマです。生まれ持った数が増減したわけではありません。第3章で、いま試したいことを一つ選んでみましょう。</p></section>';
+    h+='<h3>今の流れ</h3><p>＋はこの10年、⊕は今年のテーマです。生まれ持った数が増減したわけではありません。下の「大運・今年・今月」で、いま試したいことを一つ選んでみましょう。</p></section>';
     return h;
   }
 
@@ -1095,7 +1095,7 @@
   function pdfBreaks(root, pageHeight) {
     var origin = root.getBoundingClientRect().top;
     var breaks = [];
-    // 章はカードごとに、ページに収まらないカードは中の段落や小見出しごとに分ける。
+    // カードの境目で改ページし、収まらないカードは中の段落や小見出しの境目で分ける。
     function collect(parent) {
       var blocks = Array.from(parent.children).filter(function (child) {
         return child.getBoundingClientRect().height > 0;
