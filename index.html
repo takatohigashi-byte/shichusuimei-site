@@ -202,6 +202,21 @@ details.more[open]>summary{margin-bottom:12px;color:#c45a86;border-color:var(--a
 .fortune-reading h3{margin:0;color:#834b61}
 .fortune-reading p{margin:4px 0;font-size:.9rem}
 .fortune-years{white-space:nowrap}
+.fortune-phases{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;list-style:none;padding:0;margin:10px 0;text-align:center;color:#624752}
+.fortune-phases li{padding:5px 3px 3px;border-radius:8px;background:#f4e8fa;font-size:.82rem;line-height:1.4;white-space:nowrap}
+.fortune-phases li:nth-child(2){background:#dff1e9}
+.fortune-phases li:nth-child(3){background:#e5e9fa}
+.fortune-phases li:nth-child(4){background:#ffedce}
+.fortune-phase-range{display:block;font-size:.69rem;font-variant-numeric:tabular-nums}
+.fortune-phase-track{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:17px 16px;gap:2px;margin-top:4px;font-size:.67rem;line-height:16px}
+.fortune-phase-track>span{background:#ffffffa0;border-radius:4px}
+.fortune-phase-track>[aria-current]{background:#be416c;color:#fff;font-weight:bold}
+.fortune-phase-track>.fortune-selection{grid-column:span 2;background:#e7d9ef;color:#60446e;font-weight:bold}
+.fortune-phase-guide{display:grid;gap:3px;margin:0 0 10px;font-size:.85rem}
+.fortune-phase-guide>div{display:grid;grid-template-columns:3.25em 1fr;gap:4px;padding:2px 5px}
+.fortune-phase-guide dt{font-weight:bold;color:#834b61}
+.fortune-phase-guide dd{margin:0}
+.fortune-phase-active{background:#fbe0e9;border-radius:8px}
 @media(max-width:1050px){.fortune-scroll-hint{display:block}}
 @media(max-width:600px){
   .fortune-figure{padding:12px 8px}

@@ -188,16 +188,41 @@
     return h + `<text x="145" y="137" font-size="17" font-weight="bold">${year}年</text>
       <text x="145" y="157" font-size="13">${branch}年</text></svg>`;
   }
+  var fortunePhases = [
+    ['仕込み', '次にやりたいことの種をまく時期です。', '気になることを、小さな一歩から試してみましょう。'],
+    ['育成', '芽を少しずつ育てる時期です。', '始めたことを、自分のペースで続けてみましょう。'],
+    ['伸長', '育ってきたものを思い切って伸ばす時期です。', '手応えのあることに、少し時間を増やしてみましょう。'],
+    ['収穫', 'これまでの実りを受け取る時期です。', '積み重ねてきたことを振り返り、小さな成果にも目を向けてみましょう。'],
+    ['選別', '本当に大事なものを選び直す時期です。', 'これからも続けたいことを、自分のペースで見つめ直してみましょう。']
+  ];
+  function fortunePhaseGuide(start, year, phase, selecting) {
+    var blocks = fortunePhases.slice(0, 4).map(function (entry, i) {
+      var first = start + i * 3;
+      var years = [first, first + 1, first + 2].map(function (y) {
+        return `<span title="${y}年"${y === year ? ' aria-current="date"' : ''}>${y === year ? '今' : ''}</span>`;
+      }).join('');
+      return `<li><strong>${entry[0]}</strong><span class="fortune-phase-range">${first}–${first + 2}</span>
+        <div class="fortune-phase-track">${years}${i === 3 ?
+          `<span class="fortune-selection" aria-label="${first}年・${first + 1}年は選別">選別</span>` : ''}</div></li>`;
+    }).join('');
+    var explanations = fortunePhases.map(function (entry, i) {
+      var active = i === phase || (i === 4 && selecting);
+      return `<div${active ? ' class="fortune-phase-active"' : ''}><dt>${entry[0]}</dt>
+        <dd>${entry[1]}${active ? entry[2] : ''}</dd></div>`;
+    }).join('');
+    return `<ol class="fortune-phases" aria-label="今年を含む12年の流れ" role="list">${blocks}</ol>
+      <dl class="fortune-phase-guide">${explanations}</dl>`;
+  }
   function fortuneHtml(r) {
     var c = r.current, info = r.daiunInfo;
     var year = ryunenYear(r), birthYear = year - c.age + 1;
     var branch = c.ryunen.name.charAt(1);
     var offset = (S.BRANCHES.indexOf(branch) - S.BRANCHES.indexOf(r.kubou.charAt(0)) + 12) % 12;
     var harvest = year - offset;
-    var phases = ['収穫', '仕込み', '育成', '伸長'];
-    var phase = Math.floor(offset / 3), phaseYear = offset % 3 + 1;
-    var phaseText = phases[phase] + 'の' + phaseYear + '年目';
-    var nextPhase = phases[(phase + 1) % phases.length];
+    var cycleStart = offset < 3 ? harvest - 9 : harvest + 3;
+    var phase = Math.floor((year - cycleStart) / 3), phaseYear = offset % 3 + 1;
+    var phaseText = fortunePhases[phase][0] + 'の' + phaseYear + '年目';
+    var nextPhase = fortunePhases[(phase + 1) % 4][0];
     var span = function (start, end) { return '<span class="fortune-years">' + start + '〜' + end + '年</span>'; };
     var current = c.age >= 1 && c.daiun;
     var bands = info && c.age + 14 >= 1 ? daiunTo100(r, c.age - 10, c.age + 14) : [];
@@ -225,7 +250,8 @@
         ${next ? '<p>' + (current ? '次の大運' : '最初の大運') + ' <strong>' + esc(next.name) + '</strong> は ' + (birthYear + next.from - 1) + '年から。</p>' : ''}
       </div><div><h3>空亡サイクル</h3>
         <p><strong>${phaseText}</strong>。${phaseYear === 3 ? '来年' : (year + 4 - phaseYear) + '年'}から${nextPhase}。</p>
-        <p>${offset < 2 ? '今の空亡' : '前回の空亡'}は${span(harvest, harvest + 1)}。次は${span(harvest + 12, harvest + 13)}。${offset < 2 ? '今は選別も重なる年。手放すものや続けたいことを選び直す目安です。' : ''}</p>
+        ${fortunePhaseGuide(cycleStart, year, phase, offset < 2)}
+        <p>${offset < 2 ? '今の空亡' : '前回の空亡'}は${span(harvest, harvest + 1)}。次は${span(harvest + 12, harvest + 13)}。</p>
       </div></div></section>`;
     return h;
   }
