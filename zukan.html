@@ -74,6 +74,13 @@ footer.note{font-size:.8rem;color:var(--sub);background:var(--card);border-radiu
   .term p{font-size:.72rem;line-height:1.65;margin:3px 0 0}
   .sec-lead{font-size:.82rem}
 }
+
+.site-footer{max-width:1000px;margin:4px auto 32px;padding:0 16px;text-align:center}
+.site-footer nav{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 10px}
+.site-footer nav a{display:inline-block;background:#fff;color:#a0708c;text-decoration:none;border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.82rem;font-weight:bold}
+.site-footer nav a:hover,.site-footer nav a:focus{background:linear-gradient(135deg,#f49bbd,#c3a6ee);color:#fff;border-color:transparent;outline:none}
+.site-footer nav a[aria-current="page"]{border-color:var(--acc);color:#c45a86}
+.site-footer .copy{margin:0;font-size:.75rem;color:var(--sub)}
 </style>
 </head>
 <body>
@@ -212,5 +219,14 @@ footer.note{font-size:.8rem;color:var(--sub);background:var(--card);border-radiu
 </section>
 <p class="bottom-back"><a class="back" href="index.html">♡ 無料鑑定にもどる</a></p>
 </main>
+<footer class="site-footer">
+  <nav aria-label="サイト情報">
+    <a href="about.html">このサイトについて</a>
+    <a href="privacy.html">プライバシーポリシー</a>
+    <a href="contact.html">お問い合わせ</a>
+  </nav>
+  <p class="copy">© 2026 shichu-techo.com</p>
+</footer>
+
 </body>
 </html>
