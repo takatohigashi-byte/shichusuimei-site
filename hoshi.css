@@ -167,3 +167,10 @@ thead { background:var(--hl); }
   }
   tbody tr.cur { border-radius:14px; margin:4px 0; padding-left:10px; padding-right:10px; }
 }
+
+.site-footer{max-width:1000px;margin:8px auto 32px;padding:0 16px;text-align:center}
+.site-footer nav{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 10px}
+.site-footer nav a{display:inline-block;background:#fff;color:#a0708c;text-decoration:none;border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.82rem;font-weight:bold}
+.site-footer nav a:hover,.site-footer nav a:focus{background:linear-gradient(135deg,#f49bbd,#c3a6ee);color:#fff;border-color:transparent;outline:none}
+.site-footer .copy{margin:0;font-size:.75rem;color:var(--sub)}
+.site-footer .ad-note{margin:4px 0 0;font-size:.72rem;color:var(--sub)}

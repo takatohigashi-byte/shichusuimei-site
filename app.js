@@ -127,7 +127,7 @@
     return year === currentYear ? r.current :
       S.compute(Object.assign({}, r.input, { target: { y: year, m: 6, d: 1 } })).current;
   }
-  function fortuneTimeline(bands, birthYear, year, harvest, pinLines) {
+  function fortuneTimeline(bands, birthYear, year, kubouStart, pinLines) {
     var first = Math.min(year, bands.length ? birthYear + bands[0].from - 1 : year - 10);
     var last = Math.max(year + 14, bands.length ? birthYear + bands[bands.length - 1].to : year + 14);
     var step = 25, margin = 33, width = (last - first) * step + margin * 2;
@@ -144,7 +144,7 @@
         <text x="${x((start + end) / 2)}" y="147" font-size="13">${esc(d.stemStar)}</text>
         <text x="${x((start + end) / 2)}" y="166" font-size="12">${d.from}〜${d.to}歳</text>`;
     });
-    for (var k = harvest + Math.floor((first - harvest) / 12) * 12; k < last; k += 12) {
+    for (var k = kubouStart + Math.floor((first - kubouStart) / 12) * 12; k < last; k += 12) {
       var left = Math.max(first, k), right = Math.min(last, k + 12);
       var middle = x((left + right) / 2);
       cycles += `<path d="M${x(left)},96 Q${middle},63 ${x(right)},96" fill="none" stroke="#df9eb2" stroke-width="1.5"/>`;
@@ -153,7 +153,7 @@
       var end = Math.min(last, k + 2);
       var center = x((left + end) / 2);
       rects += `<rect x="${x(left)}" y="98" width="${x(end) - x(left)}" height="85" rx="5" fill="#77727e" opacity=".23"/>`;
-      labels += `<text x="${center}" y="198" font-size="13" font-weight="bold">空亡</text>
+      labels += `<text x="${center}" y="198" font-size="13" font-weight="bold">選別</text>
         <text x="${center}" y="215" font-size="11">${left}${end - left === 2 ? '・' + (left + 1) : ''}</text>`;
     }
     var axis = `<path d="M${x(first)},229 H${x(last)}" stroke="#c8a8b4"/>`;
@@ -175,6 +175,8 @@
   }
   function fortuneClock(year, branch, kubou) {
     var first = year - S.BRANCHES.indexOf(branch);
+    var firstKubou = S.BRANCHES.indexOf(kubou.charAt(0));
+    var fills = { sort: '#d9d5dc', prepare: '#f8d0de', nurture: '#d8f3ec', extend: '#f9e6b8', reflect: '#e4d7f6' };
     var point = function (radius, angle) {
       return [145 + radius * Math.cos(angle), 145 + radius * Math.sin(angle)];
     };
@@ -182,47 +184,56 @@
     Array.from(S.BRANCHES).forEach(function (b, i) {
       var angle = i * Math.PI / 6 - Math.PI / 2, a = angle - Math.PI / 12, z = angle + Math.PI / 12;
       var active = b === branch, empty = kubou.includes(b);
+      var phase = fortunePhaseAt((i - firstKubou + 12) % 12);
+      var fill = active ? '#be416c' : (fills[phase.style] || '#fae0e8');
       var inner = 46, outer = 105;
       var label = point(75, angle), date = point(123, angle);
       h += `<path d="M${point(inner, a)} L${point(outer, a)} A${outer},${outer} 0 0 1 ${point(outer, z)}
         L${point(inner, z)} A${inner},${inner} 0 0 0 ${point(inner, a)} Z"
-        fill="${empty ? '#c4bec9' : active ? '#be416c' : '#fae0e8'}" stroke="${active && empty ? '#be416c' : '#fffaf7'}" stroke-width="${active && empty ? 4 : 2}"/>
-        <text x="${label[0]}" y="${label[1]}" font-size="18" font-weight="bold" fill="${active && !empty ? '#fff' : '#624752'}">${b}</text>
+        fill="${fill}" stroke="${active ? '#9d345c' : '#fffaf7'}" stroke-width="${active ? 4 : 2}"/>
+        <text x="${label[0]}" y="${label[1]}" font-size="18" font-weight="bold" fill="${active ? '#fff' : '#624752'}">${b}</text>
         <text x="${date[0]}" y="${date[1]}" font-size="11" ${active ? 'font-weight="bold" fill="#9d345c"' : ''}>${first + i}</text>`;
     });
     return h + `<text x="145" y="137" font-size="17" font-weight="bold">${year}年</text>
       <text x="145" y="157" font-size="13">${branch}年</text></svg>`;
   }
-  var fortunePhases = [
-    ['仕込み', '次にやりたいことを、静かに整える時期です。', '気になることがあれば、小さな一歩から始めてみてください。'],
-    ['育成', '始めたことを、自分のペースで育てる時期です。', '続けてきた習慣を、無理のない速さで積み重ねてみてください。'],
-    ['伸長', '手応えの出てきたことを、思い切って伸ばす時期です。', '力が入ることに、少し時間を増やしてみてください。'],
-    ['実り', '積み重ねてきたことを受け取り、確かめる時期です。', '小さな成果にも目を向けて、ここまでの歩みを振り返ってみてください。'],
-    ['選別', '本当に大切にしたいことを、選び直す時期です。', 'これからも続けたいことを、自分のペースで見つめ直してみてください。']
-  ];
-  function fortunePhaseGuide(start, year, phase, selecting) {
-    var blocks = fortunePhases.slice(0, 4).map(function (entry, i) {
-      var first = start + i * 3;
-      var years = [first, first + 1, first + 2].map(function (y) {
+  var fortunePhaseTexts = {
+    '選別': ['自分の星をふり返り、大事なものを選び直す時期です。', '今も大事にしたいことを、自分のペースで書き出してみてください。'],
+    '仕込み': ['アイデアや好きなことを、形にし始める時期です。', '気になることがあれば、小さな一歩から始めてみてください。'],
+    '育成': ['人やお金とのご縁を見つけ、育てていく時期です。', '無理なく続けられる関わり方や使い方を、考えてみてください。'],
+    '伸長': ['責任や挑戦を引き受け、できることを広げる時期です。', '関心のあることに、自分のペースで手を挙げてみてください。'],
+    '実り': ['やってきたことを仕組みにし、学びを深める時期です。', '続けてきた工夫を振り返り、あとから見返せるようにしてみてください。']
+  };
+  function fortunePhaseAt(offset) {
+    if (!window.Hoshi || !window.Hoshi.phaseForOffset) {
+      throw new Error('星の巡りの計算を読み込めませんでした');
+    }
+    return window.Hoshi.phaseForOffset(offset);
+  }
+  function fortunePhaseGuide(start, year, current) {
+    var phases = window.Hoshi.phases;
+    var blocks = phases.map(function (phase) {
+      var first = start + phase.from;
+      var years = Array.from({ length: phase.length }, function (_, i) {
+        var y = first + i;
         return `<span title="${y}年"${y === year ? ' aria-current="date"' : ''}>${y === year ? '今' : ''}</span>`;
       }).join('');
-      return `<li><strong>${entry[0]}</strong><span class="fortune-phase-range">${first}–${first + 2}</span>
-        <div class="fortune-phase-track">${years}${i === 3 ?
-          `<span class="fortune-selection" aria-label="${first}年・${first + 1}年は選別">選別</span>` : ''}</div></li>`;
+      var active = phase.name === current.name;
+      return `<li class="${esc(phase.style)} span-${phase.length}"${active ? ' aria-current="true"' : ''}>
+        <strong>${esc(phase.name)}</strong><span class="fortune-phase-range">${first}–${first + phase.length - 1}</span>
+        <div class="fortune-phase-track cols-${phase.length}">${years}</div></li>`;
     }).join('');
-    var explanations = fortunePhases.map(function (entry, i) {
-      var active = i === phase || (i === 4 && selecting);
-      return `<div${active ? ' class="fortune-phase-active"' : ''}><dt>${entry[0]}</dt>
-        <dd>${entry[1]}${active ? entry[2] : ''}</dd></div>`;
+    var explanations = phases.map(function (phase) {
+      var texts = fortunePhaseTexts[phase.name] || ['', ''];
+      var active = phase.name === current.name;
+      return `<div${active ? ' class="fortune-phase-active"' : ''}><dt>${esc(phase.name)}</dt>
+        <dd>${esc(texts[0])}${active ? esc(texts[1]) : ''}</dd></div>`;
     }).join('');
     return `<ol class="fortune-phases" aria-label="今年を含む12年の流れ" role="list">${blocks}</ol>
       <dl class="fortune-phase-guide">${explanations}</dl>`;
   }
   function fortuneCycleOffset(branch, kubou) {
     return (S.BRANCHES.indexOf(branch) - S.BRANCHES.indexOf(kubou.charAt(0)) + 12) % 12;
-  }
-  function fortunePhaseIndex(offset) {
-    return (Math.floor(offset / 3) + 3) % 4;
   }
   function yearKubou(kanshi) {
     return ['戌亥', '申酉', '午未', '辰巳', '寅卯', '子丑'][Math.floor((S.kanshiIndex(kanshi) - 1) / 10)];
@@ -232,7 +243,7 @@
     for (var y = year - 3; y <= year + 6; y++) {
       var c = currentForRyunenYear(r, y, year), star = c.ryunen;
       var offset = fortuneCycleOffset(star.name.charAt(1), r.kubou);
-      var phase = fortunePhaseIndex(offset);
+      var phase = fortunePhaseAt(offset);
       cards += `<li class="fortune-ryunen-card"${y === year ? ' aria-current="date"' : ''}>
         <div class="fortune-ryunen-date"><strong>${y}年</strong>${y === year ? '<span>今年</span>' : ''}</div>
         <div class="fortune-ryunen-pillar"><strong>${esc(star.name)}</strong><span>${c.age >= 1 ? '数え' + c.age + '歳' : '生年より前'}</span></div>
@@ -240,8 +251,8 @@
         <div class="fortune-ryunen-details"><span>大運 ${c.age >= 1 && c.daiun ? esc(c.daiun.name) : '—'}</span>
           <span>年の空亡: ${yearKubou(star.name)}</span></div>
         <div class="fortune-ryunen-tags">
-          <span class="fortune-ryunen-phase" data-phase="${phase}">${fortunePhases[phase][0]}</span>
-          ${offset < 2 ? '<span class="fortune-ryunen-selection">選別</span><span class="fortune-ryunen-kubou">空亡</span>' : ''}
+          <span class="fortune-ryunen-phase" data-phase="${esc(phase.style)}">${esc(phase.name)}</span>
+          ${phase.from === 0 ? '<span class="fortune-ryunen-kubou">空亡</span>' : ''}
         </div>
       </li>`;
     }
@@ -255,11 +266,13 @@
     var year = ryunenYear(r), birthYear = year - c.age + 1;
     var branch = c.ryunen.name.charAt(1);
     var offset = fortuneCycleOffset(branch, r.kubou);
-    var harvest = year - offset;
-    var cycleStart = offset < 3 ? harvest - 9 : harvest + 3;
-    var phase = fortunePhaseIndex(offset), phaseYear = offset % 3 + 1;
-    var phaseText = fortunePhases[phase][0] + 'の' + phaseYear + '年目';
-    var nextPhase = fortunePhases[(phase + 1) % 4][0];
+    var kubouStart = year - offset;
+    var cycleStart = kubouStart;
+    var phase = fortunePhaseAt(offset);
+    var phaseYear = offset - phase.from + 1;
+    var nextPhase = fortunePhaseAt((phase.from + phase.length) % 12);
+    var nextYear = kubouStart + phase.from + phase.length;
+    var phaseText = phase.name + 'の' + phaseYear + '年目';
     var span = function (start, end) { return '<span class="fortune-years">' + start + '〜' + end + '年</span>'; };
     var current = c.age >= 1 && c.daiun;
     var bands = info && c.age + 14 >= 1 ? daiunTo100(r, c.age - 10, c.age + 14) : [];
@@ -273,22 +286,29 @@
       <figure class="fortune-figure">
         <figcaption>${name}の大運と空亡サイクル</figcaption>
         <p class="fortune-note">${info ? '大運は' + info.un + '年ごと。' : ''}年と数え歳は立春で切り替わります。</p>
-        ${fortuneTimeline(bands, birthYear, year, harvest, pinLines)}
+        ${fortuneTimeline(bands, birthYear, year, kubouStart, pinLines)}
         <p class="fortune-scroll-hint fortune-note">年表は左右にスクロールできます。</p>
         <div class="fortune-cycle">
           <div class="fortune-wheel"><h3>12年の時計</h3>${fortuneClock(year, branch, r.kubou)}</div>
-          <ul class="fortune-legend"><li><i class="fortune-pink"></i>今の年・大運</li>
-            <li><i class="fortune-gray"></i>空亡（${esc(r.kubou.split('').join('・'))}）</li></ul>
+          <ul class="fortune-legend">
+            <li><i class="fortune-pink"></i>今年</li>
+            <li><i class="phase-sort"></i>選別（空亡）</li>
+            <li><i class="phase-prepare"></i>仕込み</li>
+            <li><i class="phase-nurture"></i>育成</li>
+            <li><i class="phase-extend"></i>伸長</li>
+            <li><i class="phase-reflect"></i>実り</li>
+          </ul>
         </div>
       </figure>
+      <p class="hoshi-bar"><a class="hoshi-btn" href="hoshi.html">✦ 星の巡りを見る</a></p>
       <div class="fortune-reading"><div><h3>今の大運</h3>
         <p>${current ? '<strong>' + esc(current.name + '・' + current.stemStar + '・' + step + '年目') + '</strong>（' +
           span(birthYear + current.from - 1, birthYear + current.to - 1) + '）' : pinLines[1]}</p>
         ${next ? '<p>' + (current ? '次の大運' : '最初の大運') + ' <strong>' + esc(next.name) + '</strong> は ' + (birthYear + next.from - 1) + '年から。</p>' : ''}
       </div><div><h3>空亡サイクル</h3>
-        <p><strong>${phaseText}</strong>。${phaseYear === 3 ? '来年' : (year + 4 - phaseYear) + '年'}から${nextPhase}。</p>
-        ${fortunePhaseGuide(cycleStart, year, phase, offset < 2)}
-        <p>${offset < 2 ? '今の空亡' : '前回の空亡'}は${span(harvest, harvest + 1)}。次は${span(harvest + 12, harvest + 13)}。</p>
+        <p><strong>${esc(phaseText)}</strong>。${nextYear}年から${esc(nextPhase.name)}。</p>
+        ${fortunePhaseGuide(cycleStart, year, phase)}
+        <p>${offset < 2 ? '今の空亡' : '前回の空亡'}は${span(kubouStart, kubouStart + 1)}。次は${span(kubouStart + 12, kubouStart + 13)}。</p>
       </div></div>
       ${fortuneRyunen(r, year)}
     </section>`;
@@ -1685,14 +1705,27 @@
     }
     return '';
   }
+  function saveLastInput(input) {
+    try {
+      var unknown = input.hour == null || input.hour === '';
+      localStorage.setItem('shichu_last_input', JSON.stringify({
+        y: input.y, m: input.m, d: input.d,
+        hour: unknown ? null : input.hour,
+        minute: unknown ? null : input.minute,
+        gender: input.gender
+      }));
+    } catch (err) {}
+  }
   function run(e) {
     if (e) e.preventDefault();
     var msg = missingTime('', '');
     if (msg) { showInputError(false, msg); return; }
     $('err').textContent = '';
     try {
-      var result = S.compute(readInput(''));
+      var input = readInput('');
+      var result = S.compute(input);
       result.displayName = $('birthName').value.trim();
+      saveLastInput(input);
       render(result);
       if ($('out')) try { $('out').scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e2) {}
     } catch (err) { showInputError(false, 'エラー: ' + err.message); }

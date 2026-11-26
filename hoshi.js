@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var S = window.Shichu;
+  var S = (typeof globalThis !== 'undefined' && globalThis.Shichu) || (typeof window !== 'undefined' && window.Shichu);
   var phases = [
     { name: '選別', from: 0, length: 2, stars: '比肩・敗財', style: 'sort',
       summary: '自分の星をふり返り、大事なものを選び直す。',
@@ -172,10 +172,18 @@
     document.getElementById('reading').hidden = false;
   }
 
+  var api = {
+    phases: phases,
+    phaseForOffset: phaseForOffset,
+    parseInput: parseInput,
+    buildCycle: buildCycle
+  };
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { parseInput: parseInput, buildCycle: buildCycle };
+    module.exports = api;
   }
+  if (typeof window !== 'undefined') window.Hoshi = api;
   if (typeof document === 'undefined') return;
+  if (!document.getElementById('cycle') || !document.getElementById('reading')) return;
 
   var raw;
   try {
