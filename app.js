@@ -657,7 +657,7 @@
       { tg: null, title: '相性の見方', body: 'ふたりの命式を並べて、「どう活かし合えるか」を見ます。決まった点数や良い悪いを出すものではありません。' },
       { tg: 'guide-a-sum', title: 'まずはまとめから', body: 'いちばん上に、おふたりの日干と関係の要点をまとめました。まずはそこから読んでみてください。' },
       { tg: 'guide-a-mei', title: 'ふたりの命式', body: na + 'と' + nb + 'の四つの柱を並べています。占い師さんから表をもらえなくても、ここでおふたりの命式を確認できます。' },
-      { tg: 'guide-a-gogyo', title: '五行のバランス', body: '図と棒グラフに続いて、木・火・土・金・水を一つずつ比べ、ふたりで補い合える場面を見ていきます。' },
+      { tg: 'guide-a-gogyo', title: '五行のバランス', body: '図と棒グラフに続いて、比劫から印星へと進み、比劫に戻る流れから、ふたりがどこで補い合えるかを見ます。' },
       { tg: 'guide-a-read', title: '相性の鑑定', body: '日干を中心に、お互いのエネルギーをどう生かすかを書いた文章です。相手を変えるより、自分の力の使い方を整えることが鍵です。' },
       { tg: 'guide-a-day', title: '日干の関係', body: 'おふたりのまんなかの気どうしの流れです。' + (sa && sb ? na + 'は「' + sa + '」、' + nb + 'は「' + sb + '」。' : '') + '比和・相生・相剋は、育て合い方のちがいを示す言葉です。' },
       { tg: 'guide-a-rels', title: 'ふたりの結びつき', body: '柱どうしの干合や支合、冲などを見ます。合は新しい流れ、冲はペースのちがいが見えやすいサインです。' },
@@ -1005,17 +1005,22 @@
  return h+'</section>';
  }
 
+  function cycleGuideHtml(groups) {
+    var order = Object.keys(groups);
+    return '<p class="note">上の丸が日干の五行（比劫）です。図の相生の矢印は ' +
+      esc(order.concat(order[0]).join(' → ')) + ' とめぐります。丸の大きさと●は、命式にある五行の数を表します。</p>';
+  }
+
   function gogyoSectionHtml(r, sid, who) {
     sid = sid || 'g1';
-    var zero = Object.keys(r.groups).filter(function (g) { return r.groups[g].count === 0; });
-    var many = Object.keys(r.groups).filter(function (g) { return r.groups[g].count >= 3; });
     var h = '<section class="card text" id="guide-gogyo"><h2>' + ty('五行') + 'のバランス' + qTip('gogyo', '五行') + qTip('marks', '記号') + qTip('anata', 'あなた') + '</h2>';
     h += '<p class="lead">組み合わせも含めて見ると、あなたの五行はこんなバランスです。</p>';
     h += gogyoSvg(r, sid, who || 'あなた') + legendHtml();
-    var bal=gogyoBalanceItems(r);
-    var strong=many.length?many.map(function(g){return elemPhrase(r.groups[g].elem,true,true);}).join('・'):'一つに偏らず、場面に合わせて使える持ち味';
-    var add=zero.length?zero.map(function(g){return elemPhrase(r.groups[g].elem,true,true);}).join('・'):'不足を探すより、使う場面を選んでみる';
-    h+='<h3>生まれ持ったもの</h3><p>得意な気：'+esc(strong)+'</p><p>補うと伸びる気：'+esc(add)+'</p><p>全体：数の多さで人の価値や未来は決まりません。自分に合う工夫を選ぶための見取り図です。</p>';
+    h += '<div id="individual-cycle"><h3>あなたの相生の循環</h3>';
+    h += cycleGuideHtml(r.groups);
+    T.individualCycleReading(r).forEach(function (paragraph) { h += '<p>' + esc(paragraph) + '</p>'; });
+    h += '</div>';
+    var bal = gogyoBalanceItems(r);
     h+='<details class="more inner"><summary>もっと読む</summary>';
     h+=bal.map(function(a){return '<h4>'+tyWrap(a.title)+'</h4><p>'+esc(a.text)+'</p>';}).join('');
     h+='<p class="note">●は生まれ持った柱の数です。生まれ月の季節や組み合わせの記号とは分けて見てください。</p></details>';
@@ -1350,19 +1355,22 @@
     h += '<div class="gogyo-comparison"><div class="two">' + gogyoSvg(rA, 'ga', 'あなた') + gogyoSvg(rB, 'gb', 'お相手') + '</div>';
     h += legendHtml();
     h += gogyoCompare(c.gogyoA, c.gogyoB, nameA, nameB) + '</div>';
-    h += '<div class="gogyo-reading"><h3>五行ごとの補い合い</h3>';
-    T.gogyoCompatReading(c.gogyoA, c.gogyoB, nameA, nameB, S.ELEMS).forEach(function (reading) {
-      h += '<p><strong>' + esc(reading.elem) + '</strong>　' + esc(reading.counts) + '<br>' + esc(reading.detail) + '</p>';
+    var a = { chart: rA, name: nameA, stars: T.starsByGroup(rA, S) };
+    var b = { chart: rB, name: nameB, stars: T.starsByGroup(rB, S) };
+    h += '<div class="gogyo-reading" id="aisho-cycle-reading"><h3>ふたりで回す相生の循環</h3>';
+    T.compatCycleReading(a, b).forEach(function (reading) {
+      h += '<p><strong>' + esc(reading.group) + '</strong><br><span class="note">' + esc(reading.counts) + '</span><br>' + esc(reading.detail) + '</p>';
     });
-    var highlight = T.gogyoCompatHighlight(c.gogyoA, c.gogyoB, nameA, nameB, S.ELEMS);
-    if (highlight) h += '<p>' + esc(highlight) + '</p>';
+    var tension = T.starCompatReading(a, b);
+    if (tension) h += '<h4>お互いを高めるひと工夫</h4><p id="aisho-star-reading">' + esc(tension) + '</p>';
+    h += '</div>' + cycleGuideHtml(rA.groups);
+    h += '<div id="aisho-element-reading"><h3>五行ごとの内訳</h3>';
+    T.gogyoCompatReading(rA, rB, nameA, nameB, S.ELEMS).forEach(function (reading) {
+      h += '<p><strong>' + esc(reading.elem) + '</strong>　' + esc(reading.counts);
+      if (reading.detail) h += '<br>' + esc(reading.detail);
+      h += '</p>';
+    });
     h += '</div>';
-    var starReadings = T.starCompatReading(rA, rB, nameA, nameB, S);
-    if (starReadings.length) {
-      h += '<div class="gogyo-reading" id="aisho-star-reading"><h3>通変星で見るふたりの役割</h3>';
-      starReadings.forEach(function (reading) { h += '<p>' + esc(reading) + '</p>'; });
-      h += '</div>';
-    }
     h += '</section>';
 
     h += '<section class="card text" id="guide-a-read"><h2>相性の鑑定' + qTip('aisho', '相性') + '</h2>';
