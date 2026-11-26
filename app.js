@@ -14,7 +14,7 @@
   function ymd(s) {
  s=String(s||'').trim().replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-65248);});
  if(/^\d{8}$/.test(s))s=s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6);
- if(!/^\d{4}-\d{2}-\d{2}$/.test(s))throw Error('生年月日は8けた（例：19810522）または1981-05-22の形で入力してください');
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(s))throw Error('生年月日は8けた（例：19870617）または1987-06-17の形で入力してください');
  var a=s.split('-').map(Number),dt=new Date(Date.UTC(a[0],a[1]-1,a[2]));
  if(dt.getUTCFullYear()!==a[0]||dt.getUTCMonth()!==a[1]-1||dt.getUTCDate()!==a[2])throw Error('実在する日付を入力してください');
  return {y:a[0],m:a[1],d:a[2]};
@@ -1544,11 +1544,11 @@
   });
   var q = (location.search || '').replace(/^\?/, '');
   if (q.indexOf('shot=kantei') >= 0) {
-    $('birth').value = '1981-08-22'; $('time').value = '12:00'; $('gender').value = '女'; $('notime').checked = false; $('time').disabled = false;
+    $('birth').value = '1985-09-18'; $('time').value = '12:00'; $('gender').value = '女'; $('notime').checked = false; $('time').disabled = false;
     showTab('kantei'); run();
   } else if (q.indexOf('shot=aisho') >= 0) {
-    $('aBirth').value = '1981-08-22'; $('aTime').value = '12:00'; $('aGender').value = '女'; $('aNotime').checked = false; $('aTime').disabled = false;
-    $('bBirth').value = '1990-01-01'; $('bTime').value = '12:00'; $('bGender').value = '男'; $('bNotime').checked = false; $('bTime').disabled = false;
+    $('aBirth').value = '1985-09-18'; $('aTime').value = '12:00'; $('aGender').value = '女'; $('aNotime').checked = false; $('aTime').disabled = false;
+    $('bBirth').value = '1992-04-14'; $('bTime').value = '12:00'; $('bGender').value = '男'; $('bNotime').checked = false; $('bTime').disabled = false;
     showTab('aisho'); runAisho();
   }
   if (q.indexOf('guide=1') >= 0) {

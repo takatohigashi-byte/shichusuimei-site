@@ -250,7 +250,7 @@ body.zukan-open{overflow:hidden}
 <div id="panel-kantei" class="panel on">
 <section class="card">
   <form id="f" novalidate>
-    <label>生年月日<input type="text" id="birth" inputmode="numeric" placeholder="例：19810522" required></label>
+    <label>生年月日<input type="text" id="birth" inputmode="numeric" placeholder="例：19870617" required></label>
     <label>生まれた時間<input type="time" id="time"></label>
     <label style="flex-direction:row;align-items:center;gap:4px"><input type="checkbox" id="notime"> 時間がわからない</label>
     <label>性別<select id="gender"><option>女</option><option>男</option></select></label>
@@ -293,7 +293,7 @@ body.zukan-open{overflow:hidden}
       <div>
         <p class="who">あなた</p>
         <label>お名前（任意）<input type="text" id="aName" placeholder="あなた" maxlength="20"></label>
-        <label>生年月日<input type="text" id="aBirth" inputmode="numeric" placeholder="例：19810522" required></label>
+        <label>生年月日<input type="text" id="aBirth" inputmode="numeric" placeholder="例：19870617" required></label>
         <label>生まれた時間<input type="time" id="aTime"></label>
         <label style="flex-direction:row;align-items:center;gap:4px"><input type="checkbox" id="aNotime"> 時間がわからない</label>
         <label>性別<select id="aGender"><option>女</option><option>男</option></select></label>
@@ -301,7 +301,7 @@ body.zukan-open{overflow:hidden}
       <div>
         <p class="who">お相手</p>
         <label>お名前（任意）<input type="text" id="bName" placeholder="お相手" maxlength="20"></label>
-        <label>生年月日<input type="text" id="bBirth" inputmode="numeric" placeholder="例：19810522" required></label>
+        <label>生年月日<input type="text" id="bBirth" inputmode="numeric" placeholder="例：19870617" required></label>
         <label>生まれた時間<input type="time" id="bTime"></label>
         <label style="flex-direction:row;align-items:center;gap:4px"><input type="checkbox" id="bNotime"> 時間がわからない</label>
         <label>性別<select id="bGender"><option>男</option><option>女</option></select></label>
@@ -1953,7 +1953,7 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
   function ymd(s) {
  s=String(s||'').trim().replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-65248);});
  if(/^\d{8}$/.test(s))s=s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6);
- if(!/^\d{4}-\d{2}-\d{2}$/.test(s))throw Error('生年月日は8けた（例：19810522）または1981-05-22の形で入力してください');
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(s))throw Error('生年月日は8けた（例：19870617）または1987-06-17の形で入力してください');
  var a=s.split('-').map(Number),dt=new Date(Date.UTC(a[0],a[1]-1,a[2]));
  if(dt.getUTCFullYear()!==a[0]||dt.getUTCMonth()!==a[1]-1||dt.getUTCDate()!==a[2])throw Error('実在する日付を入力してください');
  return {y:a[0],m:a[1],d:a[2]};
@@ -3483,11 +3483,11 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
   });
   var q = (location.search || '').replace(/^\?/, '');
   if (q.indexOf('shot=kantei') >= 0) {
-    $('birth').value = '1981-08-22'; $('time').value = '12:00'; $('gender').value = '女'; $('notime').checked = false; $('time').disabled = false;
+    $('birth').value = '1985-09-18'; $('time').value = '12:00'; $('gender').value = '女'; $('notime').checked = false; $('time').disabled = false;
     showTab('kantei'); run();
   } else if (q.indexOf('shot=aisho') >= 0) {
-    $('aBirth').value = '1981-08-22'; $('aTime').value = '12:00'; $('aGender').value = '女'; $('aNotime').checked = false; $('aTime').disabled = false;
-    $('bBirth').value = '1990-01-01'; $('bTime').value = '12:00'; $('bGender').value = '男'; $('bNotime').checked = false; $('bTime').disabled = false;
+    $('aBirth').value = '1985-09-18'; $('aTime').value = '12:00'; $('aGender').value = '女'; $('aNotime').checked = false; $('aTime').disabled = false;
+    $('bBirth').value = '1992-04-14'; $('bTime').value = '12:00'; $('bGender').value = '男'; $('bNotime').checked = false; $('bTime').disabled = false;
     showTab('aisho'); runAisho();
   }
   if (q.indexOf('guide=1') >= 0) {
