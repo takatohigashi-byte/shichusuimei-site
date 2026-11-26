@@ -999,7 +999,7 @@
  var domains=labs.map(function(l){return roles[l]||'暮らしの一場面';}).join('と');
  var ideas={kangou:'持ち味を持ち寄る見方ができます。自分ひとりで抱えず、相手の得意な方法も試してみましょう。',shigou:'生活のペースをすり合わせる手がかりです。気持ちよく続く小さな習慣を一緒につくってみましょう。',hankai:'共通する関心を少しずつ育てる見方ができます。まずは気になることに触れる時間をつくってみましょう。',sankyoku:'一つのテーマへ力を集める見方ができます。何を大切にしたいかを一言にすると、選びやすくなります。',chuu:'異なるペースに気づく手がかりです。すぐに結論を出さず、それぞれの希望を聞いてみましょう。',kei:'大切にしたいことの違いを見つめる手がかりです。正解を争うより、無理のない約束を一つ決めてみましょう。',gai:'言わずに伝わると思っていることを確かめる手がかりです。短い言葉でも、希望を伝えてみましょう。',ha:'いつものやり方を見直す手がかりです。手放すことと残すことを分けると、次の一歩を選びやすくなります。',tensen:'いくつかの思いを整理する手がかりです。大きな決断を急がず、休む時間や相談相手を確保しましょう。'};
  var line=(domains?domains+'の間で、':'いくつかの暮らしの場面で、')+ideas[k];
- h+='<article class="rel-card"><h3>'+esc(titles[k])+'</h3><p>あなたの場合は、'+esc(line)+'</p><details class="more inner"><summary>対応する言葉と組み合わせを読む</summary><p>'+esc(x)+'</p><p>'+ty(REL_NAMES[k])+'：'+esc((T.relExplain||{})[k]||'柱どうしの組み合わせにつけられた名前です。')+'</p></details></article>';
+ h+='<article class="rel-card"><h3>'+esc(titles[k])+'</h3><p>あなたの場合は、'+esc(line)+'</p><details class="more inner"><summary>対応する言葉と組み合わせを読む</summary><p>'+esc(x)+'</p><p>'+ty(REL_NAMES[k], k === 'sankyoku' ? '三局' : REL_NAMES[k]) + 'を用語ずかんで読む</p></details></article>';
  });});
  if(!n)h+='<p>あなたの場合は、ここで扱う目立った組み合わせは見られません。足りないという意味ではありません。上で見た一つひとつの持ち味から、使いやすいものを見つけてください。</p>';
  return h+'</section>';
