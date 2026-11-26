@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>星の巡り</title>
+  <link rel="stylesheet" href="hoshi.css">
+</head>
+<body>
+  <main id="guidance" class="panel guidance">
+    <p>まず四柱の鑑定をしてね</p>
+    <a class="button" href="index.html">四柱の鑑定へ</a>
+  </main>
+
+  <div id="reading" hidden>
+    <header class="hero">
+      <h1>星の巡り</h1>
+      <p>このサイト独自の見方で、空亡の年を区切りに、12年を十神の相生の流れでたどります。</p>
+      <a class="back" href="index.html">鑑定ページに戻る</a>
+    </header>
+
+    <main class="content">
+      <section class="panel diagram" aria-labelledby="cycle-title">
+        <h2 id="cycle-title">12年の巡り</h2>
+        <div id="cycle"></div>
+      </section>
+      <section id="present" class="panel present" aria-labelledby="present-title"></section>
+      <section class="panel" aria-labelledby="phases-title">
+        <h2 id="phases-title">5つのフェーズ</h2>
+        <ol id="phases" class="phases"></ol>
+        <p id="loop" class="note"></p>
+      </section>
+      <section class="panel" aria-labelledby="years-title">
+        <h2 id="years-title">年ごとの巡り</h2>
+        <p class="note">象徴の十神は時期全体のテーマを表し、流年通変星はあなたの日干から見た、その年ごとの星です。</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-labelledby="years-title">
+          <table aria-labelledby="years-title">
+            <thead>
+              <tr>
+                <th scope="col">西暦</th>
+                <th scope="col">年干支</th>
+                <th scope="col">フェーズ</th>
+                <th scope="col">象徴の十神</th>
+                <th scope="col">流年通変星</th>
+                <th scope="col">空亡</th>
+              </tr>
+            </thead>
+            <tbody id="years"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <footer class="footer"><a class="back" href="index.html">鑑定ページに戻る</a></footer>
+  </div>
+
+  <script src="tables.js"></script>
+  <script src="shichu.js"></script>
+  <script src="hoshi.js"></script>
+</body>
+</html>
