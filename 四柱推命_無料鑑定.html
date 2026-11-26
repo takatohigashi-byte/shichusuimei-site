@@ -3689,13 +3689,13 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
       return h;
     }
     var elements = kanshiYomi(p.name) + '（' + esc(p.stemElem + 'と' + p.branchElem) + '）。';
+    var SEE = { year: ['若いころ', '年柱'], month: ['成年期', '月柱'], day: ['人生を通じて、あなた自身は', '日柱'], hour: ['晩年', '時柱'] }[key];
+    if (SEE) h += '<p class="stage-signs">' + SEE[0] + (key === 'day' ? '' : 'は') + ty(SEE[1]) + 'に現れてきます。</p>';
     if (key === 'day') {
       h += dayStageBody(p, elements);
     } else {
       var traits = T.pillarTraits;
       var body = stg.body.replace('{stem}', traits.stem[p.stem]).replace('{branch}', traits.branch[p.branch]);
-      var SEE = { year: ['若いころ', '年柱', '生まれた年'], month: ['成年期', '月柱', '生まれた月'], hour: ['晩年', '時柱', '生まれた時刻'] }[key];
-      if (SEE) h += '<p class="stage-signs">' + SEE[0] + 'は' + ty(SEE[1]) + 'に現れてきます。</p>';
       h += '<h4>特徴</h4><p class="stage-signs">' + elements + esc(body);
       if (p.stemStar === p.zokanStar) {
         h += pillarStarHtml(p.stemStar) + 'の持ち味が、外にも内にも表れやすいでしょう。';
