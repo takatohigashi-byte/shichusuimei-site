@@ -801,15 +801,15 @@
   }
 
   function dayStageBody(p, elements) {
-    var reading = T.nicchu[p.name];
-    var romanceStart = reading.search(/恋愛で[はも]/);
-    var features = romanceStart < 0 ? reading : reading.slice(0, romanceStart);
-    var romance = romanceStart < 0 ? T.dayRomance[p.name] :
-      reading.slice(romanceStart).split('仕事では')[0];
+    var features = T.nicchu[p.name];
+    var romanceHeadings = ['好きになり方', '恋人といるときのあなた', '合う相手', '気をつけたいこととひと工夫'];
+    var romance = T.dayRomance[p.name].map(function (paragraph, i) {
+      return '<h5>' + romanceHeadings[i] + '</h5><p>' + esc(paragraph) + '</p>';
+    }).join('');
     var stage = T.pillarStages[p.juniun];
     return '<h4>特徴</h4><p class="stage-signs">' + elements + esc(splitSentences(features).slice(0, 2).join('')) +
       '内側では、蔵干の' + pillarStarHtml(p.zokanStar) + 'が持ち味を支えます。</p>' +
-      '<h4>恋愛</h4><p>' + esc(romance) + '</p>' +
+      '<div class="stage-romance"><h4>恋愛</h4>' + romance + '</div>' +
       '<h4>十二運</h4><p class="stage-signs">' + tyCell(p.juniun) + 'は、' + esc(stage[0]) +
       'です。' + esc(stage[2]) + '</p>';
   }
