@@ -145,6 +145,10 @@ table.meishiki th:first-child .term-yomi .ty-y{font-size:6.5px;letter-spacing:-.
 /* v10: 命式テーブルの折り返し防止と、読みやすい見出しブロック */
 table.meishiki td,table.meishiki th{overflow-wrap:normal;word-break:keep-all}
 table.meishiki td .term-yomi,table.meishiki td .kan-yomi,table.meishiki .cell-unit{white-space:nowrap}
+.meishiki .meishiki-star{font-size:1.625rem;font-weight:700;line-height:1.15}
+@media(max-width:760px){
+  .meishiki .meishiki-star{font-size:1.125rem}
+}
 .cell-stack{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;line-height:1.2}
 .stars-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
 table.stars{font-size:.88rem}

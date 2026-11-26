@@ -526,12 +526,12 @@
     h += row(qText('chishi', '地支'), function (p) { return kanYomi(p.branch); }, 'big');
     h += row(ty('天干') + '<br>' + ty('通変星') + qTip('tsuhen', '通変星'), function (p) {
       var s = p.stemStar;
-      if (s === '（日主）' || s === '日主') return '<span class="cell-unit">' + ty('日主') + '</span>';
-      return '<span class="cell-unit">' + tyCell(s) + '</span>';
+      if (s === '（日主）' || s === '日主') return '<span class="cell-unit meishiki-star">' + ty('日主') + '</span>';
+      return '<span class="cell-unit meishiki-star">' + tyCell(s) + '</span>';
     });
     h += row(qText('juniun', '十二運'), function (p) { return '<span class="cell-unit">' + tyCell(p.juniun) + '</span>'; });
-    h += row(ty('地支') + '<br>' + ty('通変星') + qTip('tsuhen', '通変星'), function (p) { return '<span class="cell-unit">' + tyCell(p.branchStar) + '</span>'; });
-    h += row(qText('zokan', '蔵干'), function (p) { return '<span class="cell-stack">' + kanYomi(p.zokan) + '<span class="cell-unit">' + tyCell(p.zokanStar) + '</span></span>'; });
+    h += row(ty('地支') + '<br>' + ty('通変星') + qTip('tsuhen', '通変星'), function (p) { return '<span class="cell-unit meishiki-star">' + tyCell(p.branchStar) + '</span>'; });
+    h += row(qText('zokan', '蔵干'), function (p) { return '<span class="cell-stack">' + kanYomi(p.zokan) + '<span class="cell-unit meishiki-star">' + tyCell(p.zokanStar) + '</span></span>'; });
     h += row(qText('nayin', '納音'), function (p) { return '<span class="cell-unit">' + tyCell(p.nayin) + '</span>'; });
     h += '</table><p class="meishiki-kubou">' + ty('空亡（天中殺）', '空亡') + '　' + kanshiYomi(r.kubou) + '</p>';
     return h;

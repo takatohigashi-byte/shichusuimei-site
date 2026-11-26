@@ -145,6 +145,10 @@ table.meishiki th:first-child .term-yomi .ty-y{font-size:6.5px;letter-spacing:-.
 /* v10: 命式テーブルの折り返し防止と、読みやすい見出しブロック */
 table.meishiki td,table.meishiki th{overflow-wrap:normal;word-break:keep-all}
 table.meishiki td .term-yomi,table.meishiki td .kan-yomi,table.meishiki .cell-unit{white-space:nowrap}
+.meishiki .meishiki-star{font-size:1.625rem;font-weight:700;line-height:1.15}
+@media(max-width:760px){
+  .meishiki .meishiki-star{font-size:1.125rem}
+}
 .cell-stack{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;line-height:1.2}
 .stars-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
 table.stars{font-size:.88rem}
@@ -2883,12 +2887,12 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     h += row(qText('chishi', '地支'), function (p) { return kanYomi(p.branch); }, 'big');
     h += row(ty('天干') + '<br>' + ty('通変星') + qTip('tsuhen', '通変星'), function (p) {
       var s = p.stemStar;
-      if (s === '（日主）' || s === '日主') return '<span class="cell-unit">' + ty('日主') + '</span>';
-      return '<span class="cell-unit">' + tyCell(s) + '</span>';
+      if (s === '（日主）' || s === '日主') return '<span class="cell-unit meishiki-star">' + ty('日主') + '</span>';
+      return '<span class="cell-unit meishiki-star">' + tyCell(s) + '</span>';
     });
     h += row(qText('juniun', '十二運'), function (p) { return '<span class="cell-unit">' + tyCell(p.juniun) + '</span>'; });
-    h += row(ty('地支') + '<br>' + ty('通変星') + qTip('tsuhen', '通変星'), function (p) { return '<span class="cell-unit">' + tyCell(p.branchStar) + '</span>'; });
-    h += row(qText('zokan', '蔵干'), function (p) { return '<span class="cell-stack">' + kanYomi(p.zokan) + '<span class="cell-unit">' + tyCell(p.zokanStar) + '</span></span>'; });
+    h += row(ty('地支') + '<br>' + ty('通変星') + qTip('tsuhen', '通変星'), function (p) { return '<span class="cell-unit meishiki-star">' + tyCell(p.branchStar) + '</span>'; });
+    h += row(qText('zokan', '蔵干'), function (p) { return '<span class="cell-stack">' + kanYomi(p.zokan) + '<span class="cell-unit meishiki-star">' + tyCell(p.zokanStar) + '</span></span>'; });
     h += row(qText('nayin', '納音'), function (p) { return '<span class="cell-unit">' + tyCell(p.nayin) + '</span>'; });
     h += '</table><p class="meishiki-kubou">' + ty('空亡（天中殺）', '空亡') + '　' + kanshiYomi(r.kubou) + '</p>';
     return h;
