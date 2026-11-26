@@ -954,21 +954,17 @@
     return '毎日の暮らしでは、' + step + '、' + inner[1] + 'ところから始めてみてください。';
   }
 
-  var ZOKAN_DESC = { 本気: 'あなたの芯になる、いちばん強い力です。', 中気: '本気をそっと支える、まん中の力です。', 余気: '前の月から少し残っている、やわらかな力です。' };
-
   function zokanLayersHtml(pillar, r) {
     if (!pillar) return '';
     var layers = ZOKAN_LAYERS[pillar.branch] || [];
     var active = pillar.zokan;
     var h = '<p class="note">' + esc(T.zokanIntro || '') + '</p>';
-    h += '<p>あなたの十二支の中には、性質のちがう気がまじっています。</p>';
     h += '<ul class="zokan-layers">';
     layers.forEach(function (ly) {
       var on = ly.stem === active;
       var st = S.tsuhen(r.pillars.day.idx, ly.stem);
       h += '<li class="' + (on ? 'on' : '') + '"><b>' + ty(ly.k) + '</b>　' + kanYomi(ly.stem) + '（' + starSoft(st) + '）';
       if (on) h += '　<span class="now">いま表に出ている蔵干</span>';
-      if (ZOKAN_DESC[ly.k]) h += '<br><small class="zokan-desc">' + ZOKAN_DESC[ly.k] + '</small>';
       h += '</li>';
     });
     h += '</ul>';
