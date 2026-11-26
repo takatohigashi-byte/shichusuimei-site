@@ -347,38 +347,130 @@ SHICHU_TEXTS.elemManyFew = function (g, order) {
 };
 
 SHICHU_TEXTS.gogyoCompatReading = function (gA, gB, nameA, nameB, order) {
-  var a = SHICHU_TEXTS.elemManyFew(gA, order).many;
-  var b = SHICHU_TEXTS.elemManyFew(gB, order).many;
-  var elemA = a[0], elemB = b[0];
-  var result = nameA + 'の五行で存在感があるのは' + a.join('・') + '、' + nameB + 'では' + b.join('・') + 'です。';
-  if (a.length > 1 || b.length > 1) {
-    result += 'ここでは' + nameA + 'の' + elemA + 'と' + nameB + 'の' + elemB + 'を見てみます。';
+  var plain = SHICHU_TEXTS.gogyoPlain;
+  var scenes = {
+    木: ['一緒に試せそうな趣味を一つ提案する', '新しいことを始めるきっかけができそうです'],
+    火: ['楽しみにしていることを先に言葉にする', '誘いに乗りやすくなり、会話も弾みそうです'],
+    土: ['忙しい週でも一緒に食事ができる日を決める', '落ち着いて話せる時間を持てそうです'],
+    金: ['出かける先の候補を二つに絞る', '希望を伝えやすくなり、予定が決まりそうです'],
+    水: ['予定が変わったときに一息ついて別の案を出す', '気持ちを切り替えて、その日を楽しめそうです']
+  };
+  var shared = {
+    木: 'やってみたいことを一つずつ出し、気になったものを今月の楽しみにしてみましょう。',
+    火: '会ったときに、その週にうれしかったことを一つずつ話すと、場があたたまりそうです。',
+    土: '忙しい週こそ、次に一緒に食べる日を決めておくと、暮らしに安心できる時間が増えそうです。',
+    金: '迷ったときは、譲れないことを一つずつ伝え合うと、納得できる選択が見えてきそうです。',
+    水: '予定が変わった日も、一息ついてから案を出し合うと、思いがけない楽しみを見つけられそうです。'
+  };
+  function amount(n) {
+    return n + '個・' + (n >= 3 ? '存在感がある' : n === 2 ? 'ほどよくある' : n === 1 ? '控えめ' : 'なし');
   }
-
-  // Shichu.ELEMS は相生の順。一つ先を生み、二つ先を剋す。
-  var step = (order.indexOf(elemB) - order.indexOf(elemA) + order.length) % order.length;
-  if (!step) {
-    result += 'ふたりの' + elemA + 'の気は比和です。' + SHICHU_TEXTS.gogyoPlain.glossShort[elemA] + 'という持ち味を共有しているので、話し合うときもお互いの感覚をつかみやすいでしょう。';
-  } else {
-    var fromA = step <= 2;
-    var from = fromA ? elemA : elemB, to = fromA ? elemB : elemA;
-    var giver = (fromA ? nameA : nameB) + 'の' + from;
-    var receiver = (fromA ? nameB : nameA) + 'の' + to;
-    var gloss = SHICHU_TEXTS.gogyoPlain.glossShort;
-    if (step === 1 || step === 4) {
-      result += giver + 'が' + receiver + 'を生む相生（' + from + '生' + to + '）です。' + giver + 'の持ち味（' + gloss[from] + '）が、' + receiver + 'の持ち味（' + gloss[to] + '）を引き出すきっかけになりそうです。';
+  return order.map(function (elem) {
+    var a = gA[elem] || 0, b = gB[elem] || 0;
+    var detail;
+    if (!a && !b) {
+      detail = plain.people[elem] + 'からヒントをもらえそうです。暮らしでは、' + plain.life[elem] + 'など、ふたりで続けやすいことから試してみましょう。';
+    } else if (Math.min(a, b) <= 1 && a !== b) {
+      var from = a > b ? nameA : nameB;
+      var to = a > b ? nameB : nameA;
+      detail = from + 'が' + plain.glossShort[elem] + 'を活かして' + scenes[elem][0] + 'と、' + to + 'も' + scenes[elem][1] + '。';
     } else {
-      result += giver + 'が' + receiver + 'を引きしめる相剋（' + from + '剋' + to + '）です。' + giver + 'の持ち味（' + gloss[from] + '）が、' + receiver + 'の持ち味（' + gloss[to] + '）に刺激を添えます。気の使い方が違うぶん、予定や役割を相談すると、互いの視点を取り入れやすいでしょう。';
+      detail = (a >= 3 && b >= 3 ? 'ふたりに共通する持ち味は' + plain.glossShort[elem] + 'です。' : '') + shared[elem];
     }
+    return { elem: elem, counts: nameA + ' ' + amount(a) + ' ／ ' + nameB + ' ' + amount(b), detail: detail };
+  });
+};
+
+SHICHU_TEXTS.gogyoCompatHighlight = function (gA, gB, nameA, nameB, order) {
+  var topA = SHICHU_TEXTS.elemManyFew(gA, order).many[0];
+  var topB = SHICHU_TEXTS.elemManyFew(gB, order).many[0];
+  if (topA === topB || order.some(function (e) {
+    return (e !== topA && gA[e] === gA[topA]) || (e !== topB && gB[e] === gB[topB]);
+  })) return '';
+  var step = (order.indexOf(topB) - order.indexOf(topA) + order.length) % order.length;
+  var fromA = step <= 2;
+  var from = fromA ? topA : topB, to = fromA ? topB : topA;
+  var giver = (fromA ? nameA : nameB) + 'の' + from;
+  var receiver = (fromA ? nameB : nameA) + 'の' + to;
+  var gloss = SHICHU_TEXTS.gogyoPlain.glossShort;
+  if (step === 1 || step === 4) {
+    return giver + 'が' + receiver + 'を生む相生（' + from + '生' + to + '）です。' + gloss[from] + 'が、相手の' + gloss[to] + 'を引き出すきっかけになりそうです。';
+  }
+  return giver + 'と' + receiver + 'は相剋（' + from + '剋' + to + '）です。' + gloss[from] + 'と' + gloss[to] + 'を持ち寄って、お互い刺激し合って高め合える組み合わせです。';
+};
+
+SHICHU_TEXTS.starCompatReading = function (rA, rB, nameA, nameB, S) {
+  function starsByGroup(r) {
+    var byElem = {}, result = {};
+    Object.keys(r.groups).forEach(function (group) {
+      byElem[r.groups[group].elem] = group;
+      result[group] = [];
+    });
+    function add(star, elem) {
+      if (!star || !byElem[elem] || star === '（日主）') return;
+      var stars = result[byElem[elem]];
+      if (stars.indexOf(star) < 0) stars.push(star);
+    }
+    // 命式に表示した天干と蔵干を、月・日・年・時の順で見る。
+    ['month', 'day', 'year', 'hour'].forEach(function (key) {
+      var p = r.pillars[key];
+      if (!p) return;
+      add(p.stemStar, p.stemElem);
+      add(p.zokanStar, S.STEM_ELEM[p.zokan]);
+    });
+    return result;
   }
 
-  [[gA, gB, nameA, nameB], [gB, gA, nameB, nameA]].forEach(function (pair) {
-    var supplied = order.filter(function (elem) { return (pair[0][elem] || 0) <= 1 && pair[1][elem] >= 2; });
-    if (supplied.length) {
-      result += pair[2] + 'の命式で控えめな' + supplied.join('・') + 'の気は、' + pair[3] + 'の持ち味から取り入れやすいでしょう。';
+  // compute のグループ順は日干の五行を起点とする相生順。
+  var groups = Object.keys(rA.groups);
+  var a = { name: nameA, stars: starsByGroup(rA) };
+  var b = { name: nameB, stars: starsByGroup(rB) };
+  var scenes = {
+    相生: {
+      比劫: ['まず自分がやってみたいことを一つ選び', 'それを試作品や人に伝わる言葉にすると、ふたりで始めたことが形になっていきそうです。'],
+      食傷: ['ひらめいたことを話して、企画のたたき台をつくり', '一緒に動ける仲間に声をかけたり、予算を整えたりすると、仕事や企画が回り始めそうです。'],
+      財星: ['使える予算や手を貸してくれる人を確かめ', '担当と締め切りを決めると、ふたりの企画を続けやすくなりそうです。'],
+      官星: ['取り組む順番と目標を決め', '必要なことを調べて練習の場をつくると、ふたりで一段ずつ進めそうです。'],
+      印星: ['調べて分かったことや経験を伝え', '自分ならどうするかを考えてまず試すと、学んだことがふたりの経験になっていきそうです。']
+    },
+    相剋: {
+      比劫: ['やりたいことを率直に伝え', '使える時間や予算を見せると、何から始めれば実現できるかが見えてきそうです。'],
+      食傷: ['もっと楽しめるやり方を提案し', '守りたい約束を伝えると、自由に試せる範囲を一緒に広げられそうです。'],
+      財星: ['今ある時間や道具でできることを提案し', '調べたことや経験から別の手順を示すと、ふたりが納得して始められる方法が見えてきそうです。'],
+      官星: ['一緒に進めるうえで大切にしたい約束を伝え', '自分のやり方も提案すると、ふたりで守れて工夫もできるルールになりそうです。'],
+      印星: ['取り組む前に参考になる例を一つ紹介し', 'まず小さく試せる案を出すと、学びと発想の両方が活きそうです。']
     }
-  });
-  return result;
+  };
+
+  return Object.keys(scenes).reduce(function (readings, kind) {
+    var candidates = [];
+    var step = kind === '相生' ? 1 : 2;
+    [[a, b], [b, a]].forEach(function (pair) {
+      var from = pair[0], to = pair[1];
+      groups.forEach(function (group, i) {
+        var other = groups[(i + step) % groups.length];
+        var source = from.stars[group], target = to.stars[other];
+        if (!source.length || !target.length) return;
+        var exclusive = source.find(function (star) { return to.stars[group].indexOf(star) < 0; });
+        candidates.push({
+          priority: (kind === '相生' && group === '食傷' ? 2 : 0) + (exclusive ? 1 : 0),
+          from: from.name, to: to.name, star: exclusive || source[0], otherStar: target[0],
+          group: group, otherGroup: other, exclusive: exclusive, scene: scenes[kind][group]
+        });
+      });
+    });
+    candidates.sort(function (a, b) { return b.priority - a.priority; });
+    if (!candidates.length) return readings;
+    var pick = candidates[0];
+    var intro = pick.from + 'の' + pick.star + 'と、' + pick.to + 'の' + pick.otherStar + 'は' + kind +
+      '（' + pick.group + '→' + pick.otherGroup + '）です。';
+    if (pick.exclusive) intro += pick.to + 'の天干と蔵干には' + pick.star + 'がありません。';
+    if (kind === '相剋') intro += 'お互い刺激し合って高め合える組み合わせです。';
+    var action = pick.scene[0];
+    if (kind === '相生' && pick.star === '傷官') action = 'いつものやり方を見直して新しい案を出し';
+    readings.push(intro + pick.from + 'が' + action + '、' + pick.to + 'が' + pick.scene[1]);
+    return readings;
+  }, []);
 };
 
 // 合のやさしい説明（画面用。既存の鑑定文オブジェクトは変えない）
@@ -434,7 +526,7 @@ SHICHU_TEXTS.compatReading = function (c, rA, rB, nameA, nameB) {
   var dayKey = dr.kind === '比和' ? '比和' : (dr.kind === '相生' ? (dr.code === 1 ? '相生_A' : '相生_B') : (dr.code === 2 ? '相剋_A' : '相剋_B'));
   var paras = [];
 
-  paras.push(nameA + 'の日干は「' + rA.dayStem + '」（' + imgA + '）、' + nameB + 'の日干は「' + rB.dayStem + '」（' + imgB + '）です。日干は、その人らしいエネルギーの中心。おふたりの関係も、この中心どうしの流れから見ると、活かし方がわかりやすくなります。命式は未来を縛るものではなく、今ある力の使い方を知らせてくれる地図です。どう生かすかは、おふたりの選択にゆだねられています。');
+  paras.push(nameA + 'の日干は「' + rA.dayStem + '」（' + imgA + '）、' + nameB + 'の日干は「' + rB.dayStem + '」（' + imgB + '）です。');
 
   var p2 = T.dayRelText[dayKey] || '';
   if (dr.kangou) {
@@ -446,8 +538,6 @@ SHICHU_TEXTS.compatReading = function (c, rA, rB, nameA, nameB) {
     p2 += '日支には冲の関係も見えます。生活のペースがちがって見えやすいぶん、予定の確認や「ひとりの時間」を大切にすると、刺激が前向きな活力に変わります。';
   }
   paras.push(p2);
-
-  paras.push('相性は、決まった答えを出すものではありません。日干を中心に、お互いのエネルギーをどう生かすか。それが関係を育てるいちばんの鍵です。相手を変えようとするより、自分の力の使い方を整えること。感謝を伝え、間合いを大切にし、楽しい時間を意識して持つこと。その積み重ねが、おふたりらしい調和をつくっていきます。今日からできる小さな選択が、関係の流れをやわらかく、豊かにしてくれるでしょう。');
 
   return paras.join('\n\n');
 };
