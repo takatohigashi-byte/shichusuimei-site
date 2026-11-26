@@ -136,13 +136,45 @@
     if (relHas(rel, 'ha') && ex.ha) h += '<p>' + ty('破') + 'は、' + esc(ex.ha) + '</p>';
     return h + '</div>';
   }
+  function ryunenYear(r) {
+    var t = r.input.target;
+    return S.serial(t.y, t.m, t.d) < S.setsuPoint(t.y, 2, r.mode) ? t.y - 1 : t.y;
+  }
+  function periodTable(head, rows, r, id) {
+    var h = '<div class="stars-wrap"><table class="stars"' + (id ? ' id="' + id + '"' : '') +
+      '><tr><th>' + head + '</th><th>' + ty('干支') + '</th><th>' + ty('通変星') + '</th><th>' + ty('十二運') + '</th><th>' + ty('地支') + '<br>' + ty('通変星') + '</th></tr>';
+    var hasKubou = false;
+    rows.forEach(function (row) {
+      var d = row.star;
+      var kubou = r.kubou && r.kubou.indexOf(d.name.charAt(1)) >= 0;
+      if (kubou) hasKubou = true;
+      h += '<tr' + (row.current ? ' class="cur" aria-current="true"' : '') + '><td>' + row.label +
+        '</td><td>' + kanshiYomi(d.name) + (kubou ? '<span class="kubou-mark">空亡</span>' : '') + '</td><td>' +
+        tyCell(d.stemStar) + '</td><td>' + tyCell(d.juniun) + '</td><td>' + tyCell(d.branchStar) + '</td></tr>';
+    });
+    h += '</table></div>';
+    if (hasKubou) h += '<p class="note">「空亡」の印は、日柱から見た空亡の地支がめぐる時期です。ひと息ついて、自分のペースや日々の習慣を見直す目安にできます。</p>';
+    return h;
+  }
+  function ryunenTable(r) {
+    var first = ryunenYear(r), rows = [];
+    for (var y = first; y < first + 12; y++) {
+      // 6月1日はその年の立春後。年の干支・星・数え歳は鑑定と同じ関数で求める。
+      var current = y === first;
+      var c = current ? r.current : S.compute(Object.assign({}, r.input, { target: { y: y, m: 6, d: 1 } })).current;
+      rows.push({ label: y + '年<br>（数え' + c.age + '歳）', star: c.ryunen, current: current });
+    }
+    return '<div class="unki-table" id="guide-ryunen"><h3>' + ty('流年') + 'のながれ</h3>' +
+      '<p class="note">流年は立春で切り替わります。色のついた行が、鑑定する日を含む流年です。</p>' +
+      periodTable('年<br>（数え歳）', rows, r, 'ryunen-table') + '</div>';
+  }
   function unkiHeading(kind, item, r) {
     var ks = item ? kanshiYomi(item.name) : '';
     if (kind === 'daiun') {
       return 'この10年（' + ty('大運') + '）';
     }
     var tg = r.input && r.input.target;
-    if (kind === 'year') return '今年（' + (tg ? tg.y + '年' : '') + (ks ? '・' + ks : '') + '）';
+    if (kind === 'year') return '今年（' + (tg ? ryunenYear(r) + '年' : '') + (ks ? '・' + ks : '') + '）';
     if (kind === 'month') return '今月' + (tg ? '（' + tg.m + '月' : '（') + (ks ? (tg ? '・' : '') + ks : '') + '）';
     if (kind === 'day') return '今日' + (tg ? '（' + tg.d + '日' : '（') + (ks ? (tg ? '・' : '') + ks : '') + '）';
     return '';
@@ -509,13 +541,13 @@
     return _termKeys;
   }
   function termOf(kanji) { return (T.termYomi && T.termYomi[kanji]) || (T.nayinYomi && T.nayinYomi[kanji]) || ''; }
-  function ty(term) {
-    var y = termOf(term);
+  function ty(term, entry) {
+    var y = termOf(term) || termOf(entry);
     if (!term) return '';
     if (!y) return esc(term);
     var nayin = !!(T.nayinYomi && T.nayinYomi[term]);
     var cls = 'term-yomi' + (nayin ? ' ty-nayin' : '') + (y.length >= 6 ? ' ty-long' : y.length >= 4 ? ' ty-mid' : '');
-    return '<a class="' + cls + '" href="#t-' + encodeURIComponent(term) + '" title="' + esc(term) + '（' + esc(y) + '）"><span class="ty-k">' + esc(term) + '</span><span class="ty-y">' + esc(y) + '</span></a>';
+    return '<a class="' + cls + '" href="#t-' + encodeURIComponent(entry || term) + '" title="' + esc(term) + '（' + esc(y) + '）"><span class="ty-k">' + esc(term) + '</span><span class="ty-y">' + esc(y) + '</span></a>';
   }
   function tyWrap(s) {
     s = String(s == null ? '' : s);
@@ -553,20 +585,33 @@
     h += row(ty('地支') + '<br>' + ty('通変星') + qTip('tsuhen', '通変星'), function (p) { return '<span class="cell-unit">' + tyCell(p.branchStar) + '</span>'; });
     h += row(qText('zokan', '蔵干'), function (p) { return '<span class="cell-stack">' + kanYomi(p.zokan) + '<span class="cell-unit">' + tyCell(p.zokanStar) + '</span></span>'; });
     h += row(qText('nayin', '納音'), function (p) { return '<span class="cell-unit">' + tyCell(p.nayin) + '</span>'; });
-    h += '</table>';
+    h += '</table><p class="meishiki-kubou">' + ty('空亡（天中殺）', '空亡') + '　' + kanshiYomi(r.kubou) + '</p>';
     return h;
+  }
+  function pointRow(label, value) {
+    return '<div class="point-label">' + label + '</div><div>' + value + '</div>';
+  }
+  function pointDates(r) {
+    return pointRow(ty('節入り'), '<span class="point-date">' + esc(r.setsu.prevName) + ' ' + fmtD(r.setsu.prevDate) +
+      '</span> ／ <span class="point-date">次 ' + esc(r.setsu.nextName) + ' ' + fmtD(r.setsu.nextDate) + '</span>') +
+      pointRow(ty('蔵干判定日数'), r.zokanDays + '日');
   }
   function pointsKv(r) {
     var mk = r.meikyu ? kanshiYomi(r.meikyu.name) + '（' + tyCell(r.meikyu.stemStar) + '・' + tyCell(r.meikyu.juniun) + '）' : '— （時刻が必要）';
-    return '<div class="kv">' +
-      '<div>' + qText('nikkan', '日干') + '</div><div>' + kanYomi(r.dayStem) + '（' + esc(T.nikkan[r.dayStem].img) + '）</div>' +
-      '<div>' + ty('月令') + '</div><div>' + tyCell(r.getsurei.name) + '（' + esc(r.getsurei.season) + '生まれ）</div>' +
-      '<div>' + ty('空亡') + '</div><div>' + kanshiYomi(r.kubou) + '</div>' +
-      '<div>' + ty('天乙貴人') + '</div><div>' + kanshiYomi(r.tenotsu) + '</div>' +
-      '<div>' + ty('天徳') + '（' + ty('合') + '）</div><div>' + kanshiYomi(r.tentoku) + '</div>' +
-      '<div>' + ty('羊刃') + '</div><div>' + kanshiYomi(r.youjin) + '</div>' +
-      '<div>' + ty('納音') + '（' + ty('日柱') + '）' + qTip('nayin', '納音') + '</div><div>' + tyCell(r.nayinDay) + '</div>' +
-      '<div>' + ty('命宮') + '</div><div>' + mk + '</div></div>';
+    var h = '<div class="kv points-kv">' +
+      pointRow(ty('日干'), kanYomi(r.dayStem) + '（' + esc(T.nikkan[r.dayStem].img) + '）') +
+      pointRow(ty('月令'), ty(r.getsurei.name, '月令') + '（' + esc(r.getsurei.season) + '生まれ）') +
+      pointRow(ty('空亡'), kanshiYomi(r.kubou)) +
+      pointRow(ty('天乙貴人'), kanshiYomi(r.tenotsu)) +
+      pointRow(ty('天徳（合）', '天徳貴人'), kanshiYomi(r.tentoku)) +
+      pointRow(ty('羊刃'), kanshiYomi(r.youjin)) +
+      pointRow(ty('納音（日柱）', '納音'), tyCell(r.nayinDay)) +
+      pointRow(ty('命宮'), mk) + pointDates(r);
+    Object.keys(CALM_RELATIONS).forEach(function (key) {
+      var pairs = r.relations[key].map(function (item) { return natalPairSource(r, item); });
+      if (pairs.length) h += pointRow(ty(REL_NAMES[key]), esc(pairs.join('、')));
+    });
+    return h + '</div>';
   }
 
 
@@ -860,53 +905,60 @@
     return h;
   }
 
+  var CALM_RELATIONS = { chuu: true, kei: true, gai: true, ha: true, tensen: true };
+  function natalPairSource(r, item) {
+    var columns = { 時: 'hour', 日: 'day', 月: 'month', 年: 'year' };
+    var labels = parsePairLabels(item);
+    return labels ? labels.map(function (label) {
+      return label + '柱の' + r.pillars[columns[label]].branch;
+    }).join('と') : item;
+  }
   function chartWordsOf(r) {
-    var names = [];
-    function add(n) { if (n && names.indexOf(n) < 0) names.push(n); }
-    if (r.kubou) add('空亡');
-    var cols = ['year', 'month', 'day', 'hour'];
-    cols.forEach(function (c) {
-      var p = r.pillars[c];
+    var words = new Map();
+    function add(name, source) {
+      if (!words.has(name)) words.set(name, []);
+      words.get(name).push(source);
+    }
+    if (r.kubou) add('空亡', '命式のポイント（' + r.kubou + '）');
+    var columns = { year: '年柱', month: '月柱', day: '日柱', hour: '時柱' };
+    Object.keys(columns).forEach(function (c) {
+      var p = r.pillars[c], label = columns[c];
       if (!p) return;
-      if (p.juniun && ['死', '墓', '絶', '病'].indexOf(p.juniun) >= 0) add(p.juniun);
-      [p.stemStar, p.branchStar, p.zokanStar].forEach(function (st) {
-        if (!st) return;
-        if (st === '傷官' || st === '敗財' || st === '劫財' || st === '偏官') add(st);
+      if (['死', '墓', '絶', '病'].indexOf(p.juniun) >= 0) add(p.juniun, label + 'の十二運');
+      [['天干通変星', p.stemStar], ['地支通変星', p.branchStar], ['蔵干', p.zokanStar]].forEach(function (row) {
+        if (['傷官', '敗財', '劫財', '偏官'].indexOf(row[1]) >= 0) add(row[1], label + 'の' + row[0]);
       });
-      if (r.youjin && p.branch === r.youjin) add('羊刃');
+      if (p.branch === r.youjin) add('羊刃', '命式のポイント（' + label + 'の' + p.branch + '）');
     });
-    var rel = r.relations || {};
-    if (rel.chuu && rel.chuu.length) add('冲');
-    if (rel.kei && rel.kei.length) add('刑');
-    if (rel.gai && rel.gai.length) add('害');
-    if (rel.ha && rel.ha.length) add('破');
-    if (rel.tensen && rel.tensen.length) add('天戦地冲');
-    if (r.kakkyoku && String(r.kakkyoku).indexOf('七殺') >= 0) add('七殺');
-    return names;
+    Object.keys(CALM_RELATIONS).forEach(function (key) {
+      r.relations[key].forEach(function (item) { add(REL_NAMES[key], natalPairSource(r, item)); });
+    });
+    return words;
   }
   function calmByName(name) {
     var list = T.calmWords || [];
     for (var i = 0; i < list.length; i++) if (list[i].name === name) return list[i];
     return null;
   }
-  function chipRowHtml(names, title) {
-    if (!names || !names.length) return '';
-    var h = '<div class="chip-row"><span class="chip-label">' + esc(title) + '</span>';
-    names.forEach(function (n) {
-      var c = calmByName(n);
-      h += '<button type="button" class="calm-chip" data-calm="' + esc(n) + '">' + (c ? ty(c.name) : tyWrap(n)) + '</button>';
+  function calmLabel(name) {
+    return name === '偏官' ? '偏官（七殺）' : name;
+  }
+  function chipRowHtml(words) {
+    var h = '<p class="chip-label">あなたの命式にある言葉</p><ul class="calm-words">';
+    words.forEach(function (sources, name) {
+      h += '<li><button type="button" class="calm-chip" data-calm="' + esc(name) + '">' +
+        esc(calmLabel(name)) + '</button><span class="calm-sources">' + sources.map(function (source, i) {
+          return '<span>' + esc(source) + (i < sources.length - 1 ? '、' : '') + '</span>';
+        }).join('') + '</span></li>';
     });
-    return h + '</div><div class="calm-panel" hidden></div>';
+    return h + '</ul><div class="calm-panel" hidden></div>';
   }
   function calmSectionHtml(r) {
     var h = '<section class="card" id="guide-calm">';
     h += '<h2>こわい言葉を言われたら</h2>';
-    h += '<p class="note">占いの場で、きつい言い方をされることがあります。言葉そのものは、段階や役割の名前であることがほとんどです。気になる言葉を押すと、やさしい意味と、こわがらなくてよい理由が出ます。</p>';
-    var inChart = chartWordsOf(r);
-    var all = (T.calmWords || []).map(function (c) { return c.name; });
-    if (inChart.length) h += chipRowHtml(inChart, 'あなたの命式にある言葉｜やさしく読みかえると');
-    h += chipRowHtml(all, 'そのほかの言葉');
-    h += '<p class="note"><a href="#sec-calm">用語ずかんの「こわい言葉を言われたら」</a>でも、同じ説明を読めます。</p>';
+    h += '<p class="note">命式に出てくる言葉には、段階や役割を表す名前があります。気になる言葉を押すと、やさしい意味を読めます。</p>';
+    h += chipRowHtml(chartWordsOf(r));
+    h += '<p class="note">ほかの言葉は<a href="#sec-calm">用語ずかんの「こわい言葉を言われたら」</a>から探せます。</p>';
     return h + '</section>';
   }
   function reassureHtml() {
@@ -914,17 +966,13 @@
   }
   function openCalm(name, btn) {
     var c = calmByName(name);
-    var root = btn && btn.closest('section, .card, #guide-calm, #out, #outA');
-    var panel = root ? root.querySelector('.calm-panel') : null;
-    if (!panel && btn) {
-      var row = btn.closest('.chip-row');
-      panel = row && row.nextElementSibling && row.nextElementSibling.classList.contains('calm-panel') ? row.nextElementSibling : null;
-    }
+    var section = btn.closest('#guide-calm');
+    var panel = section && section.querySelector('.calm-panel');
     if (!panel) return;
     if (!c) { panel.hidden = true; return; }
     var href = '#' + (c.z || ('t-' + c.name));
     panel.hidden = false;
-    panel.innerHTML = '<p><b>' + ty(c.name) + '</b>　' + esc(c.blurb) + '</p><p>' + esc(c.why) + '</p><p class="note"><a href="' + href + '">用語ずかんで見る</a></p>';
+    panel.innerHTML = '<p><b>' + esc(calmLabel(c.name)) + '</b>　' + esc(c.blurb) + '</p><p>' + esc(c.why) + '</p><p class="note"><a href="' + href + '">用語ずかんで見る</a></p>';
   }
 
   function periodRelMap(r, label, star) {
@@ -1180,7 +1228,6 @@
   }
   function printChart() { window.print(); }
   function render(r) {
-    var P = r.pillars;
     var h = '';
     lastK = r;
 
@@ -1198,8 +1245,6 @@
     h += '</div>';
     h += '<div class="actions"><button type="button" id="saveChartImage">命式を画像で保存</button><button type="button" id="saveChartPdf">鑑定結果をPDFで保存</button><button type="button" id="printChart">印刷する</button></div><p id="saveChartStatus" role="status"></p>';
     h += '<p class="note">漢字をタップすると、用語ずかんでやさしい説明を見られます。「死」「絶」「墓」や「傷官」などは、段階や役割の名前で、人生の出来事を決める言葉ではありません。</p>';
-    var inChart = chartWordsOf(r);
-    if (inChart.length) h += chipRowHtml(inChart, 'あなたの命式にある言葉｜やさしく読みかえると');
     h += '</section>';
 
     h += '<section class="card text featured" id="guide-honmei"><h2>' + ty('本命') + 'の鑑定</h2>';
@@ -1230,7 +1275,7 @@
         }
         if (c.ryunen) {
           h += '<div class="unki-block"><h3>' + unkiHeading('year', c.ryunen, r) + qTip('ryunen', '流年') + '</h3>' + unkiBody(c.ryunen.stemStar, c.ryunen.juniun);
-          h += luckRelHtml(r, '流年', c.ryunen, '今年（' + (r.input && r.input.target ? r.input.target.y : '') + (c.ryunen.name ? ' ' + c.ryunen.name : '') + '）');
+          h += luckRelHtml(r, '流年', c.ryunen, '今年（' + ryunenYear(r) + (c.ryunen.name ? ' ' + c.ryunen.name : '') + '）');
           h += '</div>';
         }
         if (c.ryugetsu) {
@@ -1250,20 +1295,17 @@
         h += '<div class="unki-table"><h3>' + ty('大運') + 'のながれ（およそ100歳まで）</h3>';
         if (r.daiunInfo.replaced) h += '<p class="note">節入りまでの日数から求めた値が範囲外のため、10年運としています。</p>';
         h += '<p class="note">数え歳は、生まれたときを1歳と数える、占いでよく使う年齢です。大運の区切りは人によって6〜10年ほど。色のついた行が、いまの大運です。</p>';
-        h += '<div class="stars-wrap"><table class="stars"><tr><th>年齢<br>（数え）</th><th>' + ty('干支') + '</th><th>' + ty('通変星') + '</th><th>' + ty('十二運') + '</th><th>' + ty('地支') + '<br>' + ty('通変星') + '</th></tr>';
-        list.forEach(function (d) {
-          var isCur = cur && cur.daiun && cur.daiun.from === d.from;
-          h += '<tr class="' + (isCur ? 'cur' : '') + '"><td>' + d.from + '〜' + d.to + '歳</td><td>' + kanshiYomi(d.name) + '</td><td>' + tyCell(d.stemStar) + '</td><td>' + tyCell(d.juniun) + '</td><td>' + tyCell(d.branchStar) + '</td></tr>';
+        var rows = list.map(function (d) {
+          return { label: d.from + '〜' + d.to + '歳', star: d, current: cur && cur.daiun && cur.daiun.from === d.from };
         });
-        h += '</table></div></div>';
+        h += periodTable('年齢<br>（数え）', rows, r) + '</div>';
       }
+      if (r.current) h += ryunenTable(r);
       h += '</section></div>';
     }
 
     h += '<details class="more" id="guide-detail"><summary>命式のポイントを見る</summary>';
-    h += '<section class="card" id="guide-points"><h2>' + ty('命式') + 'のポイント</h2>' + pointsKv(r) +
-      '<p class="note">' + ty('節入り') + ': ' + esc(r.setsu.prevName) + ' ' + fmtD(r.setsu.prevDate) + ' ／ 次 ' + esc(r.setsu.nextName) + ' ' + fmtD(r.setsu.nextDate) +
-      '　' + ty('蔵干') + '判定日数: ' + r.zokanDays + '日' + (P.hour ? '' : '　（時刻不明のため' + ty('時柱') + 'なし）') + '</p></section>';
+    h += '<section class="card" id="guide-points"><h2>' + ty('命式') + 'のポイント</h2>' + pointsKv(r) + '</section>';
     h += '</details>';
 
     $('out').innerHTML = h;

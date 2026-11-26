@@ -42,6 +42,11 @@ table.meishiki th:first-child,table.meishiki td:first-child{width:4.4em;padding:
 }
 .kv{display:grid;grid-template-columns:7em 1fr;gap:4px 10px;font-size:.92rem}
 .kv div:nth-child(odd){color:var(--sub)}
+.kv.points-kv{grid-template-columns:max-content minmax(0,1fr)}
+.point-label,.point-date,.calm-sources>span{white-space:nowrap}
+.point-date,.calm-sources>span{display:inline-block}
+.meishiki-kubou{margin:8px 0 0;font-weight:700}
+.kubou-mark{display:block;width:max-content;margin:2px auto 0;padding:0 5px;border-radius:8px;background:#f0e7fa;color:#614a76;font-size:.7rem}
 .bar{display:flex;align-items:center;gap:8px;font-size:.9rem;margin:4px 0}
 .bar span.b{display:inline-block;height:14px;background:linear-gradient(90deg,#f7a8c6,#c8b2f0);border-radius:999px}
 .note{font-size:.8rem;color:var(--sub)}
@@ -185,7 +190,8 @@ details.more[open]>summary{margin-bottom:12px;color:#c45a86;border-color:var(--a
 .zokan-layers li{margin:4px 0}
 .zokan-layers li.on{font-weight:700}
 .zokan-layers .now{display:inline-block;margin-left:4px;font-size:.72rem;font-weight:700;color:#c45a86;background:#ffe3ee;border-radius:999px;padding:1px 8px}
-.chip-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0 4px}
+.calm-words{display:grid;gap:6px;list-style:none;padding:0;margin:6px 0 10px}
+.calm-words li{display:grid;grid-template-columns:max-content minmax(0,1fr);align-items:center;gap:8px;font-size:.8rem;color:var(--sub)}
 .chip-label{font-size:.78rem;color:#a0708c;font-weight:700;margin-right:4px}
 .calm-chip{background:#fff;color:#8a4a6c;border:2px solid var(--line);box-shadow:none;padding:4px 12px;font-size:.82rem;letter-spacing:0}
 .calm-chip:hover,.calm-chip:focus{border-color:var(--acc);color:#c45a86}
@@ -344,7 +350,7 @@ body.zukan-open{overflow:hidden}
   <a class="back zukan-close-link" href="#kantei-top">♡ 無料鑑定にもどる</a>
 </header>
 <div class="navwrap">
-  <nav class="chips" aria-label="ずかんの目次"><a href="#sec-calm">こわい言葉を言われたら</a><a href="#sec-jikkan">十干（10）</a><a href="#sec-junishi">十二支（12）</a><a href="#sec-gogyo">五行（7）</a><a href="#sec-tsuhen">通変星（11）</a><a href="#sec-juniun">十二運（12）</a><a href="#sec-gou">合と冲（9）</a><a href="#sec-nayin">納音（30）</a><a href="#sec-other">その他（11）</a></nav>
+  <nav class="chips" aria-label="ずかんの目次"><a href="#sec-calm">こわい言葉を言われたら</a><a href="#sec-jikkan">十干（10）</a><a href="#sec-junishi">十二支（12）</a><a href="#sec-gogyo">五行（7）</a><a href="#sec-tsuhen">通変星（11）</a><a href="#sec-juniun">十二運（12）</a><a href="#sec-gou">合と冲（9）</a><a href="#sec-nayin">納音（30）</a><a href="#sec-other">その他（17）</a></nav>
 </div>
 <main>
 <section class="sec" id="sec-calm"><h2>こわい言葉を言われたら</h2>
@@ -457,8 +463,14 @@ body.zukan-open{overflow:hidden}
 <article class="term" id="t-流月"><div class="illust"><svg viewBox="0 0 120 120" width="120" height="120" aria-hidden="true"><defs><clipPath id="c"><circle cx="60" cy="60" r="56"/></clipPath></defs><circle cx="60" cy="60" r="56" fill="#fff0f5"/><g clip-path="url(#c)"><circle cx="50" cy="54" r="22" fill="#ffe08a"/><circle cx="60" cy="46" r="18" fill="#fff0f5"/><circle cx="40" cy="44" r="2" fill="#fff"/><circle cx="34" cy="60" r="1.5" fill="#fff"/><path d="M88 24.5 L89.1 26.9 L91.5 28 L89.1 29.1 L88 31.5 L86.9 29.1 L84.5 28 L86.9 26.9 Z" fill="#fff"/><rect x="68" y="70" width="28" height="24" rx="5" fill="#fff" stroke="#f3d6e2" stroke-width="2"/><rect x="68" y="70" width="28" height="7" fill="#c3a6ee"/><text x="82" y="90" text-anchor="middle" font-size="9" fill="#7a4a66" font-family="sans-serif">月</text></g><circle cx="60" cy="60" r="56" fill="none" stroke="#f3d6e2" stroke-width="3"/></svg></div><h3>流月<span class="yomi">りゅうげつ</span></h3><div class="tags"><span class="tag">運の流れ</span></div><p>その月ごとの流れです。一年のテーマを、もっと細かいペースで見るときの指標です。今月の干支が、いまの気分や動きやすさのヒントになります。</p></article>
 <article class="term" id="t-蔵干"><div class="illust"><svg viewBox="0 0 120 120" width="120" height="120" aria-hidden="true"><defs><clipPath id="c"><circle cx="60" cy="60" r="56"/></clipPath></defs><circle cx="60" cy="60" r="56" fill="#fff6e8"/><g clip-path="url(#c)"><rect x="30" y="50" width="60" height="40" rx="6" fill="#e8c49a"/><path d="M30 50 L60 32 L90 50 Z" fill="#f3d9a8"/><rect x="44" y="60" width="32" height="22" rx="4" fill="#fff6ea"/><circle cx="60" cy="72" r="8" fill="#c3a6ee"/><path d="M60 68 L61.1 70.9 L64 72 L61.1 73.1 L60 76 L58.9 73.1 L56 72 L58.9 70.9 Z" fill="#ffe08a"/><path d="M28 29 L29.1 30.9 L31 32 L29.1 33.1 L28 35 L26.9 33.1 L25 32 L26.9 30.9 Z" fill="#fff"/></g><circle cx="60" cy="60" r="56" fill="none" stroke="#f0d8b0" stroke-width="3"/></svg></div><h3>蔵干<span class="yomi">ぞうかん</span></h3><div class="tags"><span class="tag">基本</span></div><p>地支の「中に蔵されている」天干のことです。表面には見えないけれど、内側に持っている性質や、隠れた支えをあらわします。時間の経過とともに、表に出てくる力でもあります。</p></article>
 <article class="term" id="t-納音"><div class="illust"><svg viewBox="0 0 120 120" width="120" height="120" aria-hidden="true"><defs><clipPath id="c"><circle cx="60" cy="60" r="56"/></clipPath></defs><circle cx="60" cy="60" r="56" fill="#f6eefc"/><g clip-path="url(#c)"><circle cx="46" cy="80" r="12" fill="#c3a6ee"/><circle cx="76" cy="70" r="10" fill="#f7a8c6"/><rect x="54" y="36" width="6" height="46" rx="2" fill="#c3a6ee"/><rect x="82" y="30" width="5" height="42" rx="2" fill="#f7a8c6"/><path d="M60 36 Q80 24 87 30" fill="#c3a6ee"/><path d="M24 96 Q44 86 60 96 T96 96" fill="none" stroke="#b9a3e3" stroke-width="3" stroke-linecap="round"/><path d="M32 29 L33.1 30.9 L35 32 L33.1 33.1 L32 35 L30.9 33.1 L29 32 L30.9 30.9 Z" fill="#ffe08a"/></g><circle cx="60" cy="60" r="56" fill="none" stroke="#e0d0f0" stroke-width="3"/></svg></div><h3>納音<span class="yomi">なっちん</span></h3><div class="tags"><span class="tag">基本</span></div><p>年柱などの干支の組み合わせに与えられた、古い音の名前です。その柱の持つ雰囲気や質感を、ひとことであらわすラベルのようなものです。細かい判断の補助として参考にします。</p></article>
-<article class="term" id="t-空亡"><div class="illust"><svg viewBox="0 0 120 120" width="120" height="120" aria-hidden="true"><defs><clipPath id="c"><circle cx="60" cy="60" r="56"/></clipPath></defs><circle cx="60" cy="60" r="56" fill="#f4eefe"/><g clip-path="url(#c)"><circle cx="60" cy="60" r="28" fill="none" stroke="#c3a6ee" stroke-width="5" stroke-dasharray="6 5"/><path d="M44 58 Q60 44 76 58 Q60 52 44 58 Z" fill="#f7a8c6"/><path d="M60 52 Q70 40 84 40" fill="none" stroke="#c3a6ee" stroke-width="2" stroke-linecap="round"/><path d="M60 56 L61.1 58.9 L64 60 L61.1 61.1 L60 64 L58.9 61.1 L56 60 L58.9 58.9 Z" fill="#ffe08a"/><path d="M88 29 L89.1 30.9 L91 32 L89.1 33.1 L88 35 L86.9 33.1 L85 32 L86.9 30.9 Z" fill="#fff"/></g><circle cx="60" cy="60" r="56" fill="none" stroke="#e0d0f0" stroke-width="3"/></svg></div><h3>空亡<span class="yomi">くうぼう</span></h3><div class="tags"><span class="tag">基本</span></div><p>その日干支から見て、十二支のうち「空き」になる2つの支のことです。欠けという意味より、「とらわれにくい」「自由な余白」として見ることもできます。その分野では、こだわりすぎず軽やかに関わるのが向いています。</p></article>
+<article class="term" id="t-空亡"><div class="illust"><svg viewBox="0 0 120 120" width="120" height="120" aria-hidden="true"><defs><clipPath id="c"><circle cx="60" cy="60" r="56"/></clipPath></defs><circle cx="60" cy="60" r="56" fill="#f4eefe"/><g clip-path="url(#c)"><circle cx="60" cy="60" r="28" fill="none" stroke="#c3a6ee" stroke-width="5" stroke-dasharray="6 5"/><path d="M44 58 Q60 44 76 58 Q60 52 44 58 Z" fill="#f7a8c6"/><path d="M60 52 Q70 40 84 40" fill="none" stroke="#c3a6ee" stroke-width="2" stroke-linecap="round"/><path d="M60 56 L61.1 58.9 L64 60 L61.1 61.1 L60 64 L58.9 61.1 L56 60 L58.9 58.9 Z" fill="#ffe08a"/><path d="M88 29 L89.1 30.9 L91 32 L89.1 33.1 L88 35 L86.9 33.1 L85 32 L86.9 30.9 Z" fill="#fff"/></g><circle cx="60" cy="60" r="56" fill="none" stroke="#e0d0f0" stroke-width="3"/></svg></div><h3>空亡<span class="yomi">くうぼう</span></h3><div class="tags"><span class="tag">基本</span></div><p>日柱の干支から見て、十二支のうち「空き」になる2つの支です。天中殺とも呼ばれます。欠けという意味より、「とらわれにくい」「自由な余白」として見ることもできます。その分野では、こだわりすぎず軽やかに関わるのが向いています。</p></article>
 <article class="term" id="t-月令"><div class="illust"><svg viewBox="0 0 120 120" width="120" height="120" aria-hidden="true"><defs><clipPath id="c"><circle cx="60" cy="60" r="56"/></clipPath></defs><circle cx="60" cy="60" r="56" fill="#fff8ee"/><g clip-path="url(#c)"><circle cx="60" cy="60" r="14" fill="#ffe08a"/><ellipse cx="60" cy="32" rx="8" ry="14" fill="#9fdc9a"/><ellipse cx="60" cy="88" rx="8" ry="14" fill="#f5cf94"/><ellipse cx="32" cy="60" rx="14" ry="8" fill="#a8cdf2"/><ellipse cx="88" cy="60" rx="14" ry="8" fill="#f7a3bf"/><path d="M60 55 L61.1 58.9 L65 60 L61.1 61.1 L60 65 L58.9 61.1 L55 60 L58.9 58.9 Z" fill="#fff"/></g><circle cx="60" cy="60" r="56" fill="none" stroke="#f0e0c8" stroke-width="3"/></svg></div><h3>月令<span class="yomi">げつれい</span></h3><div class="tags"><span class="tag">基本</span></div><p>生まれた月の地支が示す、季節の司令です。命式全体の気候のようなもので、どの五行が本来の季節の力を持っているかを見ます。五行図では、季節の印として表されることがあります。</p></article>
+<article class="term" id="t-天乙貴人"><h3>天乙貴人<span class="yomi">てんおつきじん</span></h3><p>人や環境からの助けに目を向けるときの目印です。このサイトでは日干に対応する二つの地支を表示します。</p></article>
+<article class="term" id="t-天徳貴人"><h3>天徳貴人<span class="yomi">てんとくきじん</span></h3><p>生まれた月の地支に対応する天干または地支です。物事を穏やかに進める支えに目を向けるときの目印です。ポイント欄の「天徳（合）」には、天徳貴人と<a href="#t-天徳合">天徳合</a>をこの順で表示します。</p></article>
+<article class="term" id="t-天徳合"><h3>天徳合<span class="yomi">てんとくごう</span></h3><p>天徳貴人に対して、干合または支合で組になる天干・地支です。天徳貴人とあわせて、穏やかに進めるための支えを読む手がかりにします。</p></article>
+<article class="term" id="t-命宮"><h3>命宮<span class="yomi">めいきゅう</span></h3><p>生まれた年の天干と、月・時の地支から求める補助の干支です。命式とあわせて、その人の持ち味を読む手がかりにします。表示には出生時刻が必要です。</p></article>
+<article class="term" id="t-節入り"><h3>節入り<span class="yomi">せついり</span></h3><p>二十四節気のうち、立春や立夏など、四柱推命で月が切り替わる節目のことです。立春は年の切り替わりでもあります。ポイント欄では、出生時点の前後の節入りを表示します。</p></article>
+<article class="term" id="t-蔵干判定日数"><h3>蔵干判定日数<span class="yomi">ぞうかんはんていにっすう</span></h3><p>地支に含まれる天干のうち、どの<a href="#t-蔵干">蔵干</a>を使うかを選ぶための日数です。通常は直前の節入り日を1日目として数えます。表計算互換の設定では、次の節入り日までの日数を出生当日を含めて数えます。</p></article>
 <article class="term" id="t-元命"><div class="illust"><svg viewBox="0 0 120 120" width="120" height="120" aria-hidden="true"><defs><clipPath id="c"><circle cx="60" cy="60" r="56"/></clipPath></defs><circle cx="60" cy="60" r="56" fill="#fff0f5"/><g clip-path="url(#c)"><rect x="44" y="28" width="32" height="68" rx="6" fill="#fff" stroke="#f3d6e2" stroke-width="3"/><rect x="44" y="28" width="32" height="14" fill="#fdeef4"/><text x="60" y="39" text-anchor="middle" font-size="8" fill="#a0708c" font-family="sans-serif">月</text><circle cx="60" cy="68" r="14" fill="#c3a6ee"/><path d="M60 62 L61.1 66.9 L66 68 L61.1 69.1 L60 74 L58.9 69.1 L54 68 L58.9 66.9 Z" fill="#ffe08a"/></g><circle cx="60" cy="60" r="56" fill="none" stroke="#f3d6e2" stroke-width="3"/></svg></div><h3>元命<span class="yomi">げんめい</span></h3><div class="tags"><span class="tag">基本</span></div><p>月支の蔵干から見た通変星のことで、命式の中心テーマのひとつです。あなたが生まれ持った「生き方の方向」を知る手がかりになります。格局とあわせて、人生の主な流れを読みます。</p></article>
 <article class="term" id="t-格局"><div class="illust"><svg viewBox="0 0 120 120" width="120" height="120" aria-hidden="true"><defs><clipPath id="c"><circle cx="60" cy="60" r="56"/></clipPath></defs><circle cx="60" cy="60" r="56" fill="#fff0f5"/><g clip-path="url(#c)"><rect x="26" y="28" width="68" height="68" rx="10" fill="#fff" stroke="#e87fa6" stroke-width="4"/><rect x="34" y="36" width="52" height="52" rx="8" fill="#fff0f5"/><circle cx="60" cy="62" r="14" fill="#c3a6ee"/><circle cx="60" cy="62" r="7" fill="#f7a8c6"/><path d="M60 58 L61.1 60.9 L64 62 L61.1 63.1 L60 66 L58.9 63.1 L56 62 L58.9 60.9 Z" fill="#ffe08a"/></g><circle cx="60" cy="60" r="56" fill="none" stroke="#f3d6e2" stroke-width="3"/></svg></div><h3>格局<span class="yomi">かくきょく</span></h3><div class="tags"><span class="tag">基本</span></div><p>命式全体の「型」やテーマの名前です。月の通変星などから、建禄格・偏官格などの呼び方がつきます。良い悪いではなく、その人が力を発揮しやすい生き方のスタイルを示す枠組みです。</p></article>
 </div></section>
@@ -1571,7 +1583,7 @@ var SHICHU_TEXTS = {
     比肩: 'ひけん', 劫財: 'ごうざい', 敗財: 'はいざい', 食神: 'しょくじん', 傷官: 'しょうかん', 偏財: 'へんざい', 正財: 'せいざい', 偏官: 'へんかん', 正官: 'せいかん', 偏印: 'へんいん', 印綬: 'いんじゅ',
     長生: 'ちょうせい', 沐浴: 'もくよく', 冠帯: 'かんたい', 建禄: 'けんろく', 帝旺: 'ていおう', 衰: 'すい', 病: 'びょう', 死: 'し', 墓: 'ぼ', 絶: 'ぜつ', 胎: 'たい', 養: 'よう',
     干合: 'かんごう', 支合: 'しごう', 半会: 'はんかい', 三局: 'さんきょく', 三合局: 'さんごうきょく', 冲: 'ちゅう', 刑: 'けい', 害: 'がい', 破: 'は', 天戦地冲: 'てんせんちちゅう', 合: 'ごう',
-    命式: 'めいしき', 日干: 'にっかん', 元命: 'げんめい', 格局: 'かっきょく', 蔵干: 'ぞうかん', 納音: 'なっちん', 空亡: 'くうぼう', 大運: 'たいうん', 流年: 'りゅうねん', 流月: 'りゅうげつ', 月令: 'げつれい', 命宮: 'めいきゅう', 天乙貴人: 'てんおつきじん', 羊刃: 'ようじん', 天徳: 'てんとく', 節入り: 'せついり', 七殺: 'しちさつ', 大殺界: 'だいかつがい', 余気: 'よき', 中気: 'ちゅうき', 本気: 'ほんき', 帰宿: 'きしゅく', 相生: 'そうしょう', 相剋: 'そうこく', 比和: 'ひわ',
+    命式: 'めいしき', 日干: 'にっかん', 元命: 'げんめい', 格局: 'かっきょく', 蔵干: 'ぞうかん', 納音: 'なっちん', 空亡: 'くうぼう', 大運: 'たいうん', 流年: 'りゅうねん', 流月: 'りゅうげつ', 月令: 'げつれい', 命宮: 'めいきゅう', 天乙貴人: 'てんおつきじん', 羊刃: 'ようじん', 天徳: 'てんとく', 天徳貴人: 'てんとくきじん', 天徳合: 'てんとくごう', 節入り: 'せついり', 蔵干判定日数: 'ぞうかんはんていにっすう', 七殺: 'しちさつ', 大殺界: 'だいかつがい', 余気: 'よき', 中気: 'ちゅうき', 本気: 'ほんき', 帰宿: 'きしゅく', 相生: 'そうしょう', 相剋: 'そうこく', 比和: 'ひわ',
     天干: 'てんかん', 地支: 'ちし', 通変星: 'つうへんせい', 十二運: 'じゅうにうん', 時柱: 'じちゅう', 日柱: 'にっちゅう', 月柱: 'げっちゅう', 年柱: 'ねんちゅう', 流日: 'りゅうじつ', 月運: 'げつうん', 五行: 'ごぎょう', 本命: 'ほんめい', 干支: 'かんし', 順行: 'じゅんこう', 逆行: 'ぎゃっこう', 年運: 'ねんうん', 日主: 'にっしゅ', 比劫: 'ひごう', 食傷: 'しょくしょう', 財星: 'ざいせい', 官星: 'かんせい', 印星: 'いんせい',
     旺令: 'おうれい', 休令: 'きゅうれい', 囚令: 'しゅうれい', 死令: 'しれい', 相令: 'そうれい', 倒食: 'とうしょく', 月刃: 'げつじん'
   },
@@ -1758,7 +1770,6 @@ SHICHU_TEXTS.compatReading = function (c, rA, rB, nameA, nameB) {
 };
 
 if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
-
 </script>
 <script>
 /* 画面処理（バックエンドなし）。計算は shichu.js、文章は texts.js */
@@ -1899,13 +1910,45 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     if (relHas(rel, 'ha') && ex.ha) h += '<p>' + ty('破') + 'は、' + esc(ex.ha) + '</p>';
     return h + '</div>';
   }
+  function ryunenYear(r) {
+    var t = r.input.target;
+    return S.serial(t.y, t.m, t.d) < S.setsuPoint(t.y, 2, r.mode) ? t.y - 1 : t.y;
+  }
+  function periodTable(head, rows, r, id) {
+    var h = '<div class="stars-wrap"><table class="stars"' + (id ? ' id="' + id + '"' : '') +
+      '><tr><th>' + head + '</th><th>' + ty('干支') + '</th><th>' + ty('通変星') + '</th><th>' + ty('十二運') + '</th><th>' + ty('地支') + '<br>' + ty('通変星') + '</th></tr>';
+    var hasKubou = false;
+    rows.forEach(function (row) {
+      var d = row.star;
+      var kubou = r.kubou && r.kubou.indexOf(d.name.charAt(1)) >= 0;
+      if (kubou) hasKubou = true;
+      h += '<tr' + (row.current ? ' class="cur" aria-current="true"' : '') + '><td>' + row.label +
+        '</td><td>' + kanshiYomi(d.name) + (kubou ? '<span class="kubou-mark">空亡</span>' : '') + '</td><td>' +
+        tyCell(d.stemStar) + '</td><td>' + tyCell(d.juniun) + '</td><td>' + tyCell(d.branchStar) + '</td></tr>';
+    });
+    h += '</table></div>';
+    if (hasKubou) h += '<p class="note">「空亡」の印は、日柱から見た空亡の地支がめぐる時期です。ひと息ついて、自分のペースや日々の習慣を見直す目安にできます。</p>';
+    return h;
+  }
+  function ryunenTable(r) {
+    var first = ryunenYear(r), rows = [];
+    for (var y = first; y < first + 12; y++) {
+      // 6月1日はその年の立春後。年の干支・星・数え歳は鑑定と同じ関数で求める。
+      var current = y === first;
+      var c = current ? r.current : S.compute(Object.assign({}, r.input, { target: { y: y, m: 6, d: 1 } })).current;
+      rows.push({ label: y + '年<br>（数え' + c.age + '歳）', star: c.ryunen, current: current });
+    }
+    return '<div class="unki-table" id="guide-ryunen"><h3>' + ty('流年') + 'のながれ</h3>' +
+      '<p class="note">流年は立春で切り替わります。色のついた行が、鑑定する日を含む流年です。</p>' +
+      periodTable('年<br>（数え歳）', rows, r, 'ryunen-table') + '</div>';
+  }
   function unkiHeading(kind, item, r) {
     var ks = item ? kanshiYomi(item.name) : '';
     if (kind === 'daiun') {
       return 'この10年（' + ty('大運') + '）';
     }
     var tg = r.input && r.input.target;
-    if (kind === 'year') return '今年（' + (tg ? tg.y + '年' : '') + (ks ? '・' + ks : '') + '）';
+    if (kind === 'year') return '今年（' + (tg ? ryunenYear(r) + '年' : '') + (ks ? '・' + ks : '') + '）';
     if (kind === 'month') return '今月' + (tg ? '（' + tg.m + '月' : '（') + (ks ? (tg ? '・' : '') + ks : '') + '）';
     if (kind === 'day') return '今日' + (tg ? '（' + tg.d + '日' : '（') + (ks ? (tg ? '・' : '') + ks : '') + '）';
     return '';
@@ -2272,13 +2315,13 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     return _termKeys;
   }
   function termOf(kanji) { return (T.termYomi && T.termYomi[kanji]) || (T.nayinYomi && T.nayinYomi[kanji]) || ''; }
-  function ty(term) {
-    var y = termOf(term);
+  function ty(term, entry) {
+    var y = termOf(term) || termOf(entry);
     if (!term) return '';
     if (!y) return esc(term);
     var nayin = !!(T.nayinYomi && T.nayinYomi[term]);
     var cls = 'term-yomi' + (nayin ? ' ty-nayin' : '') + (y.length >= 6 ? ' ty-long' : y.length >= 4 ? ' ty-mid' : '');
-    return '<a class="' + cls + '" href="#t-' + encodeURIComponent(term) + '" title="' + esc(term) + '（' + esc(y) + '）"><span class="ty-k">' + esc(term) + '</span><span class="ty-y">' + esc(y) + '</span></a>';
+    return '<a class="' + cls + '" href="#t-' + encodeURIComponent(entry || term) + '" title="' + esc(term) + '（' + esc(y) + '）"><span class="ty-k">' + esc(term) + '</span><span class="ty-y">' + esc(y) + '</span></a>';
   }
   function tyWrap(s) {
     s = String(s == null ? '' : s);
@@ -2316,20 +2359,33 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     h += row(ty('地支') + '<br>' + ty('通変星') + qTip('tsuhen', '通変星'), function (p) { return '<span class="cell-unit">' + tyCell(p.branchStar) + '</span>'; });
     h += row(qText('zokan', '蔵干'), function (p) { return '<span class="cell-stack">' + kanYomi(p.zokan) + '<span class="cell-unit">' + tyCell(p.zokanStar) + '</span></span>'; });
     h += row(qText('nayin', '納音'), function (p) { return '<span class="cell-unit">' + tyCell(p.nayin) + '</span>'; });
-    h += '</table>';
+    h += '</table><p class="meishiki-kubou">' + ty('空亡（天中殺）', '空亡') + '　' + kanshiYomi(r.kubou) + '</p>';
     return h;
+  }
+  function pointRow(label, value) {
+    return '<div class="point-label">' + label + '</div><div>' + value + '</div>';
+  }
+  function pointDates(r) {
+    return pointRow(ty('節入り'), '<span class="point-date">' + esc(r.setsu.prevName) + ' ' + fmtD(r.setsu.prevDate) +
+      '</span> ／ <span class="point-date">次 ' + esc(r.setsu.nextName) + ' ' + fmtD(r.setsu.nextDate) + '</span>') +
+      pointRow(ty('蔵干判定日数'), r.zokanDays + '日');
   }
   function pointsKv(r) {
     var mk = r.meikyu ? kanshiYomi(r.meikyu.name) + '（' + tyCell(r.meikyu.stemStar) + '・' + tyCell(r.meikyu.juniun) + '）' : '— （時刻が必要）';
-    return '<div class="kv">' +
-      '<div>' + qText('nikkan', '日干') + '</div><div>' + kanYomi(r.dayStem) + '（' + esc(T.nikkan[r.dayStem].img) + '）</div>' +
-      '<div>' + ty('月令') + '</div><div>' + tyCell(r.getsurei.name) + '（' + esc(r.getsurei.season) + '生まれ）</div>' +
-      '<div>' + ty('空亡') + '</div><div>' + kanshiYomi(r.kubou) + '</div>' +
-      '<div>' + ty('天乙貴人') + '</div><div>' + kanshiYomi(r.tenotsu) + '</div>' +
-      '<div>' + ty('天徳') + '（' + ty('合') + '）</div><div>' + kanshiYomi(r.tentoku) + '</div>' +
-      '<div>' + ty('羊刃') + '</div><div>' + kanshiYomi(r.youjin) + '</div>' +
-      '<div>' + ty('納音') + '（' + ty('日柱') + '）' + qTip('nayin', '納音') + '</div><div>' + tyCell(r.nayinDay) + '</div>' +
-      '<div>' + ty('命宮') + '</div><div>' + mk + '</div></div>';
+    var h = '<div class="kv points-kv">' +
+      pointRow(ty('日干'), kanYomi(r.dayStem) + '（' + esc(T.nikkan[r.dayStem].img) + '）') +
+      pointRow(ty('月令'), ty(r.getsurei.name, '月令') + '（' + esc(r.getsurei.season) + '生まれ）') +
+      pointRow(ty('空亡'), kanshiYomi(r.kubou)) +
+      pointRow(ty('天乙貴人'), kanshiYomi(r.tenotsu)) +
+      pointRow(ty('天徳（合）', '天徳貴人'), kanshiYomi(r.tentoku)) +
+      pointRow(ty('羊刃'), kanshiYomi(r.youjin)) +
+      pointRow(ty('納音（日柱）', '納音'), tyCell(r.nayinDay)) +
+      pointRow(ty('命宮'), mk) + pointDates(r);
+    Object.keys(CALM_RELATIONS).forEach(function (key) {
+      var pairs = r.relations[key].map(function (item) { return natalPairSource(r, item); });
+      if (pairs.length) h += pointRow(ty(REL_NAMES[key]), esc(pairs.join('、')));
+    });
+    return h + '</div>';
   }
 
 
@@ -2623,53 +2679,60 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     return h;
   }
 
+  var CALM_RELATIONS = { chuu: true, kei: true, gai: true, ha: true, tensen: true };
+  function natalPairSource(r, item) {
+    var columns = { 時: 'hour', 日: 'day', 月: 'month', 年: 'year' };
+    var labels = parsePairLabels(item);
+    return labels ? labels.map(function (label) {
+      return label + '柱の' + r.pillars[columns[label]].branch;
+    }).join('と') : item;
+  }
   function chartWordsOf(r) {
-    var names = [];
-    function add(n) { if (n && names.indexOf(n) < 0) names.push(n); }
-    if (r.kubou) add('空亡');
-    var cols = ['year', 'month', 'day', 'hour'];
-    cols.forEach(function (c) {
-      var p = r.pillars[c];
+    var words = new Map();
+    function add(name, source) {
+      if (!words.has(name)) words.set(name, []);
+      words.get(name).push(source);
+    }
+    if (r.kubou) add('空亡', '命式のポイント（' + r.kubou + '）');
+    var columns = { year: '年柱', month: '月柱', day: '日柱', hour: '時柱' };
+    Object.keys(columns).forEach(function (c) {
+      var p = r.pillars[c], label = columns[c];
       if (!p) return;
-      if (p.juniun && ['死', '墓', '絶', '病'].indexOf(p.juniun) >= 0) add(p.juniun);
-      [p.stemStar, p.branchStar, p.zokanStar].forEach(function (st) {
-        if (!st) return;
-        if (st === '傷官' || st === '敗財' || st === '劫財' || st === '偏官') add(st);
+      if (['死', '墓', '絶', '病'].indexOf(p.juniun) >= 0) add(p.juniun, label + 'の十二運');
+      [['天干通変星', p.stemStar], ['地支通変星', p.branchStar], ['蔵干', p.zokanStar]].forEach(function (row) {
+        if (['傷官', '敗財', '劫財', '偏官'].indexOf(row[1]) >= 0) add(row[1], label + 'の' + row[0]);
       });
-      if (r.youjin && p.branch === r.youjin) add('羊刃');
+      if (p.branch === r.youjin) add('羊刃', '命式のポイント（' + label + 'の' + p.branch + '）');
     });
-    var rel = r.relations || {};
-    if (rel.chuu && rel.chuu.length) add('冲');
-    if (rel.kei && rel.kei.length) add('刑');
-    if (rel.gai && rel.gai.length) add('害');
-    if (rel.ha && rel.ha.length) add('破');
-    if (rel.tensen && rel.tensen.length) add('天戦地冲');
-    if (r.kakkyoku && String(r.kakkyoku).indexOf('七殺') >= 0) add('七殺');
-    return names;
+    Object.keys(CALM_RELATIONS).forEach(function (key) {
+      r.relations[key].forEach(function (item) { add(REL_NAMES[key], natalPairSource(r, item)); });
+    });
+    return words;
   }
   function calmByName(name) {
     var list = T.calmWords || [];
     for (var i = 0; i < list.length; i++) if (list[i].name === name) return list[i];
     return null;
   }
-  function chipRowHtml(names, title) {
-    if (!names || !names.length) return '';
-    var h = '<div class="chip-row"><span class="chip-label">' + esc(title) + '</span>';
-    names.forEach(function (n) {
-      var c = calmByName(n);
-      h += '<button type="button" class="calm-chip" data-calm="' + esc(n) + '">' + (c ? ty(c.name) : tyWrap(n)) + '</button>';
+  function calmLabel(name) {
+    return name === '偏官' ? '偏官（七殺）' : name;
+  }
+  function chipRowHtml(words) {
+    var h = '<p class="chip-label">あなたの命式にある言葉</p><ul class="calm-words">';
+    words.forEach(function (sources, name) {
+      h += '<li><button type="button" class="calm-chip" data-calm="' + esc(name) + '">' +
+        esc(calmLabel(name)) + '</button><span class="calm-sources">' + sources.map(function (source, i) {
+          return '<span>' + esc(source) + (i < sources.length - 1 ? '、' : '') + '</span>';
+        }).join('') + '</span></li>';
     });
-    return h + '</div><div class="calm-panel" hidden></div>';
+    return h + '</ul><div class="calm-panel" hidden></div>';
   }
   function calmSectionHtml(r) {
     var h = '<section class="card" id="guide-calm">';
     h += '<h2>こわい言葉を言われたら</h2>';
-    h += '<p class="note">占いの場で、きつい言い方をされることがあります。言葉そのものは、段階や役割の名前であることがほとんどです。気になる言葉を押すと、やさしい意味と、こわがらなくてよい理由が出ます。</p>';
-    var inChart = chartWordsOf(r);
-    var all = (T.calmWords || []).map(function (c) { return c.name; });
-    if (inChart.length) h += chipRowHtml(inChart, 'あなたの命式にある言葉｜やさしく読みかえると');
-    h += chipRowHtml(all, 'そのほかの言葉');
-    h += '<p class="note"><a href="#sec-calm">用語ずかんの「こわい言葉を言われたら」</a>でも、同じ説明を読めます。</p>';
+    h += '<p class="note">命式に出てくる言葉には、段階や役割を表す名前があります。気になる言葉を押すと、やさしい意味を読めます。</p>';
+    h += chipRowHtml(chartWordsOf(r));
+    h += '<p class="note">ほかの言葉は<a href="#sec-calm">用語ずかんの「こわい言葉を言われたら」</a>から探せます。</p>';
     return h + '</section>';
   }
   function reassureHtml() {
@@ -2677,17 +2740,13 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
   }
   function openCalm(name, btn) {
     var c = calmByName(name);
-    var root = btn && btn.closest('section, .card, #guide-calm, #out, #outA');
-    var panel = root ? root.querySelector('.calm-panel') : null;
-    if (!panel && btn) {
-      var row = btn.closest('.chip-row');
-      panel = row && row.nextElementSibling && row.nextElementSibling.classList.contains('calm-panel') ? row.nextElementSibling : null;
-    }
+    var section = btn.closest('#guide-calm');
+    var panel = section && section.querySelector('.calm-panel');
     if (!panel) return;
     if (!c) { panel.hidden = true; return; }
     var href = '#' + (c.z || ('t-' + c.name));
     panel.hidden = false;
-    panel.innerHTML = '<p><b>' + ty(c.name) + '</b>　' + esc(c.blurb) + '</p><p>' + esc(c.why) + '</p><p class="note"><a href="' + href + '">用語ずかんで見る</a></p>';
+    panel.innerHTML = '<p><b>' + esc(calmLabel(c.name)) + '</b>　' + esc(c.blurb) + '</p><p>' + esc(c.why) + '</p><p class="note"><a href="' + href + '">用語ずかんで見る</a></p>';
   }
 
   function periodRelMap(r, label, star) {
@@ -2943,7 +3002,6 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
   }
   function printChart() { window.print(); }
   function render(r) {
-    var P = r.pillars;
     var h = '';
     lastK = r;
 
@@ -2961,8 +3019,6 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     h += '</div>';
     h += '<div class="actions"><button type="button" id="saveChartImage">命式を画像で保存</button><button type="button" id="saveChartPdf">鑑定結果をPDFで保存</button><button type="button" id="printChart">印刷する</button></div><p id="saveChartStatus" role="status"></p>';
     h += '<p class="note">漢字をタップすると、用語ずかんでやさしい説明を見られます。「死」「絶」「墓」や「傷官」などは、段階や役割の名前で、人生の出来事を決める言葉ではありません。</p>';
-    var inChart = chartWordsOf(r);
-    if (inChart.length) h += chipRowHtml(inChart, 'あなたの命式にある言葉｜やさしく読みかえると');
     h += '</section>';
 
     h += '<section class="card text featured" id="guide-honmei"><h2>' + ty('本命') + 'の鑑定</h2>';
@@ -2993,7 +3049,7 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
         }
         if (c.ryunen) {
           h += '<div class="unki-block"><h3>' + unkiHeading('year', c.ryunen, r) + qTip('ryunen', '流年') + '</h3>' + unkiBody(c.ryunen.stemStar, c.ryunen.juniun);
-          h += luckRelHtml(r, '流年', c.ryunen, '今年（' + (r.input && r.input.target ? r.input.target.y : '') + (c.ryunen.name ? ' ' + c.ryunen.name : '') + '）');
+          h += luckRelHtml(r, '流年', c.ryunen, '今年（' + ryunenYear(r) + (c.ryunen.name ? ' ' + c.ryunen.name : '') + '）');
           h += '</div>';
         }
         if (c.ryugetsu) {
@@ -3013,20 +3069,17 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
         h += '<div class="unki-table"><h3>' + ty('大運') + 'のながれ（およそ100歳まで）</h3>';
         if (r.daiunInfo.replaced) h += '<p class="note">節入りまでの日数から求めた値が範囲外のため、10年運としています。</p>';
         h += '<p class="note">数え歳は、生まれたときを1歳と数える、占いでよく使う年齢です。大運の区切りは人によって6〜10年ほど。色のついた行が、いまの大運です。</p>';
-        h += '<div class="stars-wrap"><table class="stars"><tr><th>年齢<br>（数え）</th><th>' + ty('干支') + '</th><th>' + ty('通変星') + '</th><th>' + ty('十二運') + '</th><th>' + ty('地支') + '<br>' + ty('通変星') + '</th></tr>';
-        list.forEach(function (d) {
-          var isCur = cur && cur.daiun && cur.daiun.from === d.from;
-          h += '<tr class="' + (isCur ? 'cur' : '') + '"><td>' + d.from + '〜' + d.to + '歳</td><td>' + kanshiYomi(d.name) + '</td><td>' + tyCell(d.stemStar) + '</td><td>' + tyCell(d.juniun) + '</td><td>' + tyCell(d.branchStar) + '</td></tr>';
+        var rows = list.map(function (d) {
+          return { label: d.from + '〜' + d.to + '歳', star: d, current: cur && cur.daiun && cur.daiun.from === d.from };
         });
-        h += '</table></div></div>';
+        h += periodTable('年齢<br>（数え）', rows, r) + '</div>';
       }
+      if (r.current) h += ryunenTable(r);
       h += '</section></div>';
     }
 
     h += '<details class="more" id="guide-detail"><summary>命式のポイントを見る</summary>';
-    h += '<section class="card" id="guide-points"><h2>' + ty('命式') + 'のポイント</h2>' + pointsKv(r) +
-      '<p class="note">' + ty('節入り') + ': ' + esc(r.setsu.prevName) + ' ' + fmtD(r.setsu.prevDate) + ' ／ 次 ' + esc(r.setsu.nextName) + ' ' + fmtD(r.setsu.nextDate) +
-      '　' + ty('蔵干') + '判定日数: ' + r.zokanDays + '日' + (P.hour ? '' : '　（時刻不明のため' + ty('時柱') + 'なし）') + '</p></section>';
+    h += '<section class="card" id="guide-points"><h2>' + ty('命式') + 'のポイント</h2>' + pointsKv(r) + '</section>';
     h += '</details>';
 
     $('out').innerHTML = h;
@@ -3278,7 +3331,6 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
   });
   if (isZukanHash(location.hash)) openZukan(location.hash);
 })();
-
 </script>
 </body>
 </html>
