@@ -1023,13 +1023,14 @@
     } else {
       var traits = T.pillarTraits;
       var body = stg.body.replace('{stem}', traits.stem[p.stem]).replace('{branch}', traits.branch[p.branch]);
+      if (key === 'year') h += '<p class="stage-signs">若いころは、' + ty('年柱') + '（生まれた年の柱）を見ています。下に出てくる干支や星は、この' + ty('年柱') + 'のものです。</p>';
       h += '<h4>特徴</h4><p class="stage-signs">' + elements + esc(body);
       if (p.stemStar === p.zokanStar) {
         h += pillarStarHtml(p.stemStar) + 'の持ち味が、外にも内にも表れやすいでしょう。';
       } else {
         h += '表に出やすい' + pillarStarHtml(p.stemStar) + 'を、内側から' + pillarStarHtml(p.zokanStar) + 'が支えます。';
       }
-      h += '</p><p class="note stage-signs">十二運の' + tyCell(p.juniun) + 'は、' +
+      h += '</p><p class="stage-signs">十二運の' + tyCell(p.juniun) + 'は、' +
         esc(T.pillarStages[p.juniun][0]) + 'です。</p>';
     }
     h += '<p class="ikashi"><b>生かし方：</b>' + esc(pillarAction(p, key)) + '</p>';
