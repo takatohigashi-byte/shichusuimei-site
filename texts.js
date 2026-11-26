@@ -290,9 +290,9 @@ var SHICHU_TEXTS = {
   gouAdvice: {
     kangou: '干合は、ちがう性質どうしが出会って、新しい流れを生むエネルギーです。力を合わせる場面や、役割を分けて進めるときに活きやすいでしょう。',
     shigou: '支合は、生活のリズムや考え方が自然と寄り添いやすいサインです。いっしょに過ごす時間や、日常の小さな協力を大切にすると、関係がやわらかく育っていきます。',
-    hankai: '半会は、同じ方向のテーマを半分ずつ持ち寄る関係です。足りないところを補い合いながら、同じ目標に向かって歩けるでしょう。',
-    sankyoku: '三局は、力が一つに集まりやすいめぐりです。家族やチームなど、力を合わせる場で、そのまとまりを活かしていけます。',
-    chuu: '冲は、おたがいのペースがはっきりと見える関係です。ぶつかりというより、刺激し合って動き出すエネルギー。間合いを取り、役割を分けると、その力が前進に変わります。',
+    hankai: '半会は、同じ方向を向く三つの地支のうち、二つがそろう関係です。おふたりは、共通の目標を一つ決めると、それぞれの持ち味を持ち寄りやすいでしょう。',
+    sankyoku: '三合局は、同じ方向を向く三つの地支がそろい、一つの五行に力が集まりやすい組み合わせです。おふたりは、共通のやりたいことを一つ選ぶと、歩調を合わせやすいでしょう。',
+    chuu: '冲は、ちがうペースが刺激し合う関係です。ふたりで予定を立てるときは、互いに動きやすい時間や役割を伝え合うと進めやすいでしょう。',
     tensen: '天戦地冲は、変化の波が大きめに訪れる組み合わせです。話し合いの時間を意識して持つと、変化を成長のきっかけにしやすいでしょう。',
     kei: '刑は、おたがいの癖やこだわりが見えやすい関係です。相手のやり方を「ちがい」として受けとめると、学び合いの関係に育っていきます。',
     gai: '害は、感じ方のちがいが出やすいサインです。言葉を急がず、先に気持ちを確かめると、信頼がむしろ深まります。',
@@ -302,7 +302,7 @@ var SHICHU_TEXTS = {
     木: '木の合は、成長や新しい一歩をいっしょに育てる流れです。学びや計画を共有すると、力が伸びていきます。',
     火: '火の合は、情熱や表現が響き合う流れです。楽しいことを言葉にして分かち合うと、関係があたたかく広がります。',
     土: '土の合は、安心感や日常の土台をいっしょに築く流れです。暮らしのリズムを整えることが、信頼を育てます。',
-    金: '金の合は、目標を形にする力が出やすい流れです。役割をはっきり分けると、成果も関係もすっきり整います。',
+    金: '金の合では、おふたりで目標を決め、役割を分けると、考えていたことを形にしやすいでしょう。',
     水: '水の合は、知恵や気持ちがやわらかく通い合う流れです。対話や学びを重ねると、深い理解が育っていきます。'
   },
   // 無料鑑定（本人の命式・行運）向け。相性の gouAdvice / gouElem とは別。
@@ -334,16 +334,53 @@ var SHICHU_TEXTS = {
   }
 };
 
-function _elemManyFew(g) {
-  var E = ['木', '火', '土', '金', '水'];
-  var mx = Math.max.apply(null, E.map(function (e) { return g[e] || 0; }));
-  var many = E.filter(function (e) { return (g[e] || 0) >= 3; });
-  if (!many.length) many = E.filter(function (e) { return (g[e] || 0) === mx; }).slice(0, 2);
-  var few = E.filter(function (e) { return (g[e] || 0) === 0; });
-  return { many: many, few: few };
-}
+// 個人・相性の要約と、相性の五行鑑定で同じ集計を使う。
+SHICHU_TEXTS.elemManyFew = function (g, order) {
+  var ranked = order.map(function (e) { return { e: e, n: g[e] || 0 }; })
+    .sort(function (a, b) { return b.n - a.n || order.indexOf(a.e) - order.indexOf(b.e); });
+  var many = ranked.filter(function (x) { return x.n >= 3; });
+  if (!many.length) many = ranked.filter(function (x) { return x.n === ranked[0].n; }).slice(0, 2);
+  return {
+    many: many.map(function (x) { return x.e; }),
+    few: ranked.filter(function (x) { return x.n === 0; }).map(function (x) { return x.e; })
+  };
+};
 
-// 相性の鑑定文（書き下ろし、約1,000〜2,000字。吉凶や断定はしない）
+SHICHU_TEXTS.gogyoCompatReading = function (gA, gB, nameA, nameB, order) {
+  var a = SHICHU_TEXTS.elemManyFew(gA, order).many;
+  var b = SHICHU_TEXTS.elemManyFew(gB, order).many;
+  var elemA = a[0], elemB = b[0];
+  var result = nameA + 'の五行で存在感があるのは' + a.join('・') + '、' + nameB + 'では' + b.join('・') + 'です。';
+  if (a.length > 1 || b.length > 1) {
+    result += 'ここでは' + nameA + 'の' + elemA + 'と' + nameB + 'の' + elemB + 'を見てみます。';
+  }
+
+  // Shichu.ELEMS は相生の順。一つ先を生み、二つ先を剋す。
+  var step = (order.indexOf(elemB) - order.indexOf(elemA) + order.length) % order.length;
+  if (!step) {
+    result += 'ふたりの' + elemA + 'の気は比和です。' + SHICHU_TEXTS.gogyoPlain.glossShort[elemA] + 'という持ち味を共有しているので、話し合うときもお互いの感覚をつかみやすいでしょう。';
+  } else {
+    var fromA = step <= 2;
+    var from = fromA ? elemA : elemB, to = fromA ? elemB : elemA;
+    var giver = (fromA ? nameA : nameB) + 'の' + from;
+    var receiver = (fromA ? nameB : nameA) + 'の' + to;
+    var gloss = SHICHU_TEXTS.gogyoPlain.glossShort;
+    if (step === 1 || step === 4) {
+      result += giver + 'が' + receiver + 'を生む相生（' + from + '生' + to + '）です。' + giver + 'の持ち味（' + gloss[from] + '）が、' + receiver + 'の持ち味（' + gloss[to] + '）を引き出すきっかけになりそうです。';
+    } else {
+      result += giver + 'が' + receiver + 'を引きしめる相剋（' + from + '剋' + to + '）です。' + giver + 'の持ち味（' + gloss[from] + '）が、' + receiver + 'の持ち味（' + gloss[to] + '）に刺激を添えます。気の使い方が違うぶん、予定や役割を相談すると、互いの視点を取り入れやすいでしょう。';
+    }
+  }
+
+  [[gA, gB, nameA, nameB], [gB, gA, nameB, nameA]].forEach(function (pair) {
+    var supplied = order.filter(function (elem) { return (pair[0][elem] || 0) <= 1 && pair[1][elem] >= 2; });
+    if (supplied.length) {
+      result += pair[2] + 'の命式で控えめな' + supplied.join('・') + 'の気は、' + pair[3] + 'の持ち味から取り入れやすいでしょう。';
+    }
+  });
+  return result;
+};
+
 // 合のやさしい説明（画面用。既存の鑑定文オブジェクトは変えない）
 SHICHU_TEXTS.relExplain = {
   kangou: 'ふたつの「天のきぶん（天干）」が手をつないで、ひとつの五行にとけ合うこと。ちがう持ち味が混ざって、新しい流れが生まれやすいサインです。',
@@ -395,10 +432,6 @@ SHICHU_TEXTS.compatReading = function (c, rA, rB, nameA, nameB) {
   var imgA = T.nikkan[rA.dayStem] ? T.nikkan[rA.dayStem].img : rA.dayStem;
   var imgB = T.nikkan[rB.dayStem] ? T.nikkan[rB.dayStem].img : rB.dayStem;
   var dayKey = dr.kind === '比和' ? '比和' : (dr.kind === '相生' ? (dr.code === 1 ? '相生_A' : '相生_B') : (dr.code === 2 ? '相剋_A' : '相剋_B'));
-  var bt = c.between || {};
-  var gouN = (bt.kangou || []).length + (bt.shigou || []).length + (bt.hankai || []).length + (bt.sankyoku || []).length;
-  var sparkN = (bt.chuu || []).length + (bt.tensen || []).length + (bt.kei || []).length + (bt.gai || []).length + (bt.ha || []).length;
-  var ba = _elemManyFew(c.gogyoA), bb = _elemManyFew(c.gogyoB);
   var paras = [];
 
   paras.push(nameA + 'の日干は「' + rA.dayStem + '」（' + imgA + '）、' + nameB + 'の日干は「' + rB.dayStem + '」（' + imgB + '）です。日干は、その人らしいエネルギーの中心。おふたりの関係も、この中心どうしの流れから見ると、活かし方がわかりやすくなります。命式は未来を縛るものではなく、今ある力の使い方を知らせてくれる地図です。どう生かすかは、おふたりの選択にゆだねられています。');
@@ -413,43 +446,6 @@ SHICHU_TEXTS.compatReading = function (c, rA, rB, nameA, nameB) {
     p2 += '日支には冲の関係も見えます。生活のペースがちがって見えやすいぶん、予定の確認や「ひとりの時間」を大切にすると、刺激が前向きな活力に変わります。';
   }
   paras.push(p2);
-
-  var p3 = '';
-  if (gouN) {
-    p3 += 'おふたりの命式を重ねると、';
-    var parts = [];
-    if (bt.kangou && bt.kangou.length) parts.push('干合');
-    if (bt.shigou && bt.shigou.length) parts.push('支合');
-    if (bt.hankai && bt.hankai.length) parts.push('半会');
-    if (bt.sankyoku && bt.sankyoku.length) parts.push('三局');
-    p3 += parts.join('・') + 'が見られます。力を合わせたり、役割を分けたりするときに、このつながりが自然と働きます。';
-    if (bt.kangou && bt.kangou.length) p3 += T.gouAdvice.kangou;
-    if (bt.shigou && bt.shigou.length) p3 += T.gouAdvice.shigou;
-    if (bt.hankai && bt.hankai.length) p3 += T.gouAdvice.hankai;
-    if (bt.sankyoku && bt.sankyoku.length) p3 += T.gouAdvice.sankyoku;
-  } else {
-    p3 += 'おふたりの命式を重ねたとき、目立つ合は少なめです。結びつきが弱いという意味ではなく、おたがいの個性を保ったまま、ちょうどよい距離で歩ける組み合わせと見ることもできます。無理に合わせすぎず、尊重し合う時間を大切にしてみてください。';
-  }
-  if (sparkN) {
-    p3 += '一方で、冲や刑など、リズムのちがいが見える箇所もあります。それは「うまくいかない」印ではなく、おたがいの輪郭がはっきりしていることの表れです。間合いを取り、言葉を急がない工夫をすると、その刺激は関係を前進させる力になります。';
-  }
-  paras.push(p3);
-
-  var p4 = nameA + 'の五行で存在感があるのは' + ba.many.join('・') + '、' + nameB + 'では' + bb.many.join('・') + 'です。';
-  if (ba.many.join() !== bb.many.join()) {
-    p4 += '得意な気が少しずつちがうので、一方が伸ばし、一方が整える、という役割が自然と生まれやすいでしょう。相手の得意を「自分にないもの」として歓迎すると、ふたりのバランスはよりゆたかに巡ります。';
-  } else {
-    p4 += '得意な気が近いので、同じ方向を向きやすい関係です。似ているからこそ、ときどき違う趣味や場所に触れてみると、関係に新しい風が入ります。';
-  }
-  if (ba.few.length || bb.few.length) {
-    p4 += '五行は「ない＝足りない」ではありません。今ある力の活かし方が基本で、暮らしの中でとり入れたい気は、色や習慣、過ごし方のヒントとして使うとよいでしょう。';
-    if (ba.few.length) p4 += nameA + 'は' + ba.few.join('・') + 'を暮らしにそっと足してみると、リズムがさらに整いやすく、';
-    if (bb.few.length) p4 += nameB + 'は' + bb.few.join('・') + 'に触れる時間が、心の幅を広げてくれます。';
-    else p4 = p4.replace(/整いやすく、$/, '整いやすいでしょう。');
-  } else {
-    p4 += 'おふたりとも五行がひととおりそろっており、暮らしの中で必要な気を自分たちでめぐらせやすい組み合わせです。';
-  }
-  paras.push(p4);
 
   paras.push('相性は、決まった答えを出すものではありません。日干を中心に、お互いのエネルギーをどう生かすか。それが関係を育てるいちばんの鍵です。相手を変えようとするより、自分の力の使い方を整えること。感謝を伝え、間合いを大切にし、楽しい時間を意識して持つこと。その積み重ねが、おふたりらしい調和をつくっていきます。今日からできる小さな選択が、関係の流れをやわらかく、豊かにしてくれるでしょう。');
 

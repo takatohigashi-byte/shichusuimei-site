@@ -83,20 +83,17 @@
   function gogyoSummaryLine(r) {
     var g = r.gogyo, E = ['木', '火', '土', '金', '水'];
     var P = T.gogyoPlain || {};
-    var ranked = E.map(function (e) { return { e: e, n: g[e] || 0 }; }).sort(function (a, b) { return b.n - a.n || E.indexOf(a.e) - E.indexOf(b.e); });
-    var many = ranked.filter(function (x) { return x.n >= 3; });
-    if (!many.length) many = ranked.filter(function (x) { return x.n === ranked[0].n; }).slice(0, 2);
-    var zero = ranked.filter(function (x) { return x.n === 0; });
+    var balance = T.elemManyFew(g, E), many = balance.many, zero = balance.few;
     function shortG(e) { return (P.glossShort && P.glossShort[e]) || (P.gloss && P.gloss[e]) || ''; }
     var s = '';
     if (many.length >= 2) {
-      s = many[0].e + 'と' + many[1].e + 'の気（' + shortG(many[0].e) + 'と' + shortG(many[1].e) + '）が多め。';
+      s = many[0] + 'と' + many[1] + 'の気（' + shortG(many[0]) + 'と' + shortG(many[1]) + '）が多め。';
     } else if (many.length === 1) {
-      s = many[0].e + 'の気（' + shortG(many[0].e) + '）が多め。';
+      s = many[0] + 'の気（' + shortG(many[0]) + '）が多め。';
     }
     if (zero.length) {
-      var z = zero[0].e;
-      s += zero.map(function (x) { return x.e + 'の気（' + shortG(x.e) + '）'; }).join('・') + 'は少なめです。';
+      var z = zero[0];
+      s += zero.map(function (x) { return x + 'の気（' + shortG(x) + '）'; }).join('・') + 'は少なめです。';
       var people = (P.people && P.people[z]) || (z + 'の気を持つ人との付き合い');
       var life = (P.life && P.life[z]) || '';
       var lifeBit = life.split('、').slice(0, 2).join('、');
@@ -121,20 +118,6 @@
     var i = t.indexOf('恋愛では');
     if (i > 0) return '<h4>日柱の特徴</h4>' + parasHtml(t.slice(0, i)) + '<h4>恋愛</h4>' + parasHtml(t.slice(i));
     return parasHtml(t);
-  }
-  function relHas(rel, k) { return rel && rel[k] && rel[k].length; }
-  function relExplainHtml(rel) {
-    var ex = T.relExplain || {};
-    var h = '<div class="explain">';
-    if (ex.kangou) h += '<p>' + ty('干合') + 'は、' + esc(ex.kangou) + '</p>';
-    if (ex.shigou) h += '<p>' + ty('支合') + 'は、' + esc(ex.shigou) + '</p>';
-    if (relHas(rel, 'hankai') && ex.hankai) h += '<p>' + ty('半会') + 'は、' + esc(ex.hankai) + '</p>';
-    if (relHas(rel, 'sankyoku') && ex.sankyoku) h += '<p>' + ty('三合局') + 'は、' + esc(ex.sankyoku) + '</p>';
-    if (relHas(rel, 'chuu') && ex.chuu) h += '<p>' + ty('冲') + 'は、' + esc(ex.chuu) + '</p>';
-    if (relHas(rel, 'kei') && ex.kei) h += '<p>' + ty('刑') + 'は、' + esc(ex.kei) + '</p>';
-    if (relHas(rel, 'gai') && ex.gai) h += '<p>' + ty('害') + 'は、' + esc(ex.gai) + '</p>';
-    if (relHas(rel, 'ha') && ex.ha) h += '<p>' + ty('破') + 'は、' + esc(ex.ha) + '</p>';
-    return h + '</div>';
   }
   function ryunenYear(r) {
     var t = r.input.target;
@@ -440,13 +423,6 @@
   }
 
   var REL_NAMES = { kangou: '干合', shigou: '支合', hankai: '半会', sankyoku: '三合局', chuu: '冲', tensen: '天戦地冲', kei: '刑', gai: '害', ha: '破' };
-  function relList(rel) {
-    var s = '';
-    Object.keys(REL_NAMES).forEach(function (k) {
-      if (rel[k] && rel[k].length) s += '<div><b>' + ty(REL_NAMES[k]) + '</b>：' + rel[k].map(function (x) { return '<span class="tag">' + esc(x) + '</span>'; }).join('') + '</div>';
-    });
-    return s || '<div class="note">該当なし</div>';
-  }
   function rolePhrase(lab) {
     var r = T.pillarRole && T.pillarRole[lab];
     if (!r) return lab;
@@ -494,30 +470,6 @@
     });
     return s;
   }
-  function relAdvice(rel, mode) {
-    var self = mode === 'self';
-    var advice = self ? T.gouAdviceSelf : T.gouAdvice;
-    var elemTx = self ? T.gouElemSelf : T.gouElem;
-    var s = '', seen = {};
-    Object.keys(REL_NAMES).forEach(function (k) {
-      if (!(rel[k] && rel[k].length) || !advice[k]) return;
-      s += '<p>' + esc(advice[k]) + '</p>';
-      if (self) {
-        rel[k].forEach(function (x) {
-          var line = selfPairLine(k, x);
-          if (line) s += '<p>' + esc(line) + '</p>';
-        });
-      }
-      if (k === 'kangou' || k === 'shigou' || k === 'hankai' || k === 'sankyoku') {
-        rel[k].forEach(function (x) {
-          var m = String(x).match(/→([木火土金水])/) || String(x).match(/（([木火土金水])局/);
-          if (m && elemTx[m[1]] && !seen[m[1]]) { seen[m[1]] = 1; s += '<p>' + esc(elemTx[m[1]]) + '</p>'; }
-        });
-      }
-    });
-    return s;
-  }
-
   function yomiOf(ch) { return (T.yomi && T.yomi[ch]) || ''; }
   function kanYomi(ch) {
     var y = yomiOf(ch);
@@ -1324,22 +1276,56 @@
     return h + '</div>';
   }
 
+  function compatRelDetails(item, nameA, nameB) {
+    // compat の固定ラベルを読んでから氏名を入れる。
+    var pair = item.match(/^Aの([時日月年])・Bの([時日月年])（(.+)）$/);
+    if (!pair) {
+      var branches = item.match(/^(.+)\(Aの([時日月年])\)－(.+)\(Bの([時日月年])\)$/);
+      if (!branches) return item.replace(/（(.+)）$/, '・$1');
+      pair = [item, branches[2], branches[4], branches[1] + branches[3]];
+    }
+    var detail = pair[3].replace(/→([木火土金水])$/, '・$1の合');
+    return detail + '、' + nameA + 'の' + pair[1] + '柱と' + nameB + 'の' + pair[2] + '柱';
+  }
+
+  function compatRelsHtml(rel, nameA, nameB) {
+    var html = '', links = [];
+    Object.keys(REL_NAMES).forEach(function (key) {
+      var matches = rel[key];
+      if (!matches.length) return;
+      var kind = REL_NAMES[key];
+      var details = matches.map(function (item) { return compatRelDetails(item, nameA, nameB); });
+      var intro = nameA + 'と' + nameB + 'の間には、' + kind + '（' + details.join('／') + '）があります。';
+      var elems = S.ELEMS.filter(function (elem) {
+        return matches.some(function (item) { return item.includes('→' + elem + '）') || item.includes('（' + elem + '局'); });
+      });
+      html += '<article class="rel-card"><p><strong>' + esc(intro) + '</strong></p><p>' + esc(T.gouAdvice[key]) + '</p>';
+      elems.forEach(function (elem) { html += '<p>' + esc(T.gouElem[elem]) + '</p>'; });
+      html += '</article>';
+      links.push('<a href="#t-' + encodeURIComponent(key === 'sankyoku' ? '三局' : kind) + '">' + esc(kind) + '</a>');
+    });
+    if (!html) {
+      return '<p>' + esc(nameA + 'と' + nameB + 'の柱どうしには、ここで見る特別な組み合わせは見られませんでした。おふたりの心地よいペースは、日々のやりとりの中で見つけていけます。') + '</p>';
+    }
+    return html + '<p class="note">用語ずかんで読む　' + links.join('・') + '</p>';
+  }
+
   function renderCompat(rA, rB, nameA, nameB) {
     nameA = nameA || 'あなた'; nameB = nameB || 'お相手';
     lastA = { rA: rA, rB: rB, na: nameA, nb: nameB };
-    var c = S.compat(rA, rB, nameA, nameB);
+    var c = S.compat(rA, rB, 'A', 'B');
     var dr = c.dayRel;
     var imgA = T.nikkan[rA.dayStem] ? T.nikkan[rA.dayStem].img : rA.dayStem;
     var imgB = T.nikkan[rB.dayStem] ? T.nikkan[rB.dayStem].img : rB.dayStem;
     var text = T.compatReading(c, rA, rB, nameA, nameB);
     var paras = text.split('\n\n').filter(Boolean);
-    var heads = ['おふたりの中心', '日干の流れ', '結びつき', '五行のバランス', '大切にしたいこと'];
-    var gouN = ((c.between.kangou || []).length + (c.between.shigou || []).length + (c.between.hankai || []).length + (c.between.sankyoku || []).length);
+    var heads = ['おふたりの中心', '日干の流れ', '大切にしたいこと'];
+    var joins = ['kangou', 'shigou', 'hankai', 'sankyoku'].filter(function (key) { return c.between[key].length; });
     var h = '';
     h += '<section class="card summary" id="guide-a-sum"><h2>ふたりの相性</h2><div class="sum-lines">';
     h += '<div class="sum-item"><span class="lbl">' + ty('日干') + 'の関係</span><p>' + esc(nameA) + 'は' + kanYomi(rA.dayStem) + '（' + esc(imgA) + '）、' + esc(nameB) + 'は' + kanYomi(rB.dayStem) + '（' + esc(imgB) + '）。' + tyCell(dr.kind) + '（' + esc(dr.dir) + '）です。</p></div>';
     h += '<div class="sum-item"><span class="lbl">五行の特徴</span><p>' + esc(nameA) + 'は' + esc(gogyoSummaryLine(rA)) + '　' + esc(nameB) + 'は' + esc(gogyoSummaryLine(rB)) + '</p></div>';
-    h += '<div class="sum-item"><span class="lbl">ひとこと</span><p>' + (gouN ? 'おふたりの命式には、干合や支合などの結びつきが見られます。力を合わせるときに、自然とつながりやすい組み合わせです。' : '目立つ合は少なめです。個性を保ったまま、ちょうどよい距離で歩ける組み合わせと見ることもできます。') + '</p></div>';
+    h += '<div class="sum-item"><span class="lbl">ひとこと</span><p>' + (joins.length ? 'おふたりの命式には、' + joins.map(function (key) { return REL_NAMES[key]; }).join('・') + 'が見られます。力を合わせるときに、自然とつながりやすい組み合わせです。' : '目立つ合は少なめです。個性を保ったまま、ちょうどよい距離で歩ける組み合わせと見ることもできます。') + '</p></div>';
     h += '</div></section>';
 
     var setsuiriNames = [];
@@ -1366,16 +1352,16 @@
       (c.dayShigou ? '　日支の' + ty('支合') + '→' + esc(c.dayShigou) : '') +
       (c.dayChuu ? '　日支の' + ty('冲') + '（' + esc(c.dayChuu) + '）' : '') + '</p></section>';
 
-    h += '<section class="card" id="guide-a-rels"><h2>ふたりの結びつき' + qTip('gou', '合') + ' ' + ty('合') + qTip('chuu', '冲') + ' ' + ty('冲') + '</h2>';
-    h += relExplainHtml(c.between);
-    h += relList(c.between) + relAdvice(c.between);
+    h += '<section class="card" id="guide-a-rels"><h2>ふたりの結びつき</h2>';
+    h += compatRelsHtml(c.between, nameA, nameB);
     h += '</section>';
 
     h += '<section class="card" id="guide-a-gogyo"><h2>' + ty('五行') + 'のバランス比較' + qTip('gogyo', '五行') + qTip('anata', 'あなた') + '</h2>';
     h += '<p class="lead">組み合わせも含めて見ると、おふたりの五行はこんなバランスです。</p>';
-    h += '<div class="two">' + gogyoSvg(rA, 'ga', 'あなた') + gogyoSvg(rB, 'gb', 'お相手') + '</div>';
+    h += '<div class="gogyo-comparison"><div class="two">' + gogyoSvg(rA, 'ga', 'あなた') + gogyoSvg(rB, 'gb', 'お相手') + '</div>';
     h += legendHtml();
-    h += gogyoCompare(rA.gogyo, rB.gogyo, nameA, nameB);
+    h += gogyoCompare(c.gogyoA, c.gogyoB, nameA, nameB) + '</div>';
+    h += '<p class="gogyo-reading">' + esc(T.gogyoCompatReading(c.gogyoA, c.gogyoB, nameA, nameB, S.ELEMS)) + '</p>';
     h += '<p class="note">五行は数をそろえることが目的ではありません。お互いの得意な気を活かし、その気を持つ人との関わりや暮らしの色・習慣、大運や年のめぐりで補う、という見方です。いちばん上は、その人の日干の五行（比劫）です。</p></section>';
 
     h += '<details class="more" id="guide-a-detail"><summary>命式のポイントを見る</summary>';
