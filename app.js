@@ -727,7 +727,7 @@
     h += row(ty('地支') + '<br>' + ty('通変星') + qTip('tsuhen', '通変星'), function (p) { return '<span class="cell-unit">' + tyCell(p.branchStar) + '</span>'; });
     h += row(qText('zokan', '蔵干'), function (p) { return '<span class="cell-stack">' + kanYomi(p.zokan) + '<span class="cell-unit meishiki-star">' + tyCell(p.zokanStar) + '</span></span>'; });
     h += row(qText('nayin', '納音'), function (p) { return '<span class="cell-unit">' + tyCell(p.nayin) + '</span>'; });
-    h += '</table><p class="meishiki-kubou">' + ty('空亡（天中殺）', '空亡') + '　' + kanshiYomi(r.kubou) + '</p>';
+    h += '</table><p class="meishiki-kubou">' + ty('空亡', '空亡') + '　' + kanshiYomi(r.kubou) + '</p>';
     return h;
   }
   function pointRow(label, value) {
