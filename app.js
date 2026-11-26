@@ -1011,6 +1011,26 @@
       esc(order.concat(order[0]).join(' → ')) + ' とめぐります。丸の大きさと●は、命式にある五行の数を表します。</p>';
   }
 
+  function gogyoAdjustmentHtml(gogyo) {
+    var items = [];
+    GEL.forEach(function (elem) {
+      var count = gogyo[elem];
+      if (count < 2) {
+        var source = GEL.find(function (e) { return SHENG_NEXT[e] === elem; });
+        items.push({ title: elem + '（' + T.cycleAmount(count) + '）を補う',
+          advice: T.gogyoSupportAdvice(elem, source, gogyo[source] >= 2) });
+      } else if (count >= 3) {
+        var controller = KE_PAIRS.find(function (pair) { return pair[1] === elem; })[0];
+        items.push({ title: elem + '（' + T.cycleAmount(count) + '）を整える',
+          advice: T.gogyoBalanceAdvice(elem, controller, SHENG_NEXT[elem]) });
+      }
+    });
+    if (!items.length) return '';
+    return '<div id="individual-gogyo-adjustment"><h3>五行の整え方</h3>' + items.map(function (item) {
+      return '<p><strong>' + esc(item.title) + '</strong><br>' + esc(item.advice) + '</p>';
+    }).join('') + '</div>';
+  }
+
   function gogyoSectionHtml(r, sid, who) {
     sid = sid || 'g1';
     var h = '<section class="card text" id="guide-gogyo"><h2>' + ty('五行') + 'のバランス' + qTip('gogyo', '五行') + qTip('marks', '記号') + qTip('anata', 'あなた') + '</h2>';
@@ -1020,6 +1040,7 @@
     h += cycleGuideHtml(r.groups);
     T.individualCycleReading(r).forEach(function (paragraph) { h += '<p>' + esc(paragraph) + '</p>'; });
     h += '</div>';
+    h += gogyoAdjustmentHtml(r.gogyo);
     var bal = gogyoBalanceItems(r);
     h+='<details class="more inner"><summary>もっと読む</summary>';
     h+=bal.map(function(a){return '<h4>'+tyWrap(a.title)+'</h4><p>'+esc(a.text)+'</p>';}).join('');
@@ -1402,7 +1423,8 @@
     cycle.rows.forEach(function (reading) {
       h += '<p><strong>' + esc(reading.group) + '</strong><br><span class="note">' + esc(reading.counts) + '</span><br>' + esc(reading.detail) + '</p>';
     });
-    var tension = pairs.find(function (pair) { return pair.kind === '相剋'; });
+    var opposing = pairs.filter(function (pair) { return pair.kind === '相剋'; });
+    var tension = opposing.find(function (pair) { return pair.to.count >= 3; }) || opposing[0];
     if (tension) h += '<h4>お互いを高めるひと工夫</h4><p id="aisho-star-reading">' + esc(T.starCompatReading(tension)) + '</p>';
     h += '</div>' + cycleGuideHtml(rA.groups);
     h += '<div id="aisho-element-reading"><h3>五行ごとの内訳</h3>';

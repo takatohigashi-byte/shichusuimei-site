@@ -1829,14 +1829,42 @@ SHICHU_TEXTS.individualCycleReading = function (r) {
   return [start, bottleneck];
 };
 
+SHICHU_TEXTS.gogyoActions = {
+  木: '興味のあることを一つ選び、5分だけ取り組む',
+  火: '大事にしたい思いを、相手にひと言伝える',
+  土: '無理なく続けられる予定を一つ決める',
+  金: 'やることを一つに絞り、締め切りを決める',
+  水: 'いったん手を止め、気づいたことを一行書き留める'
+};
+
+SHICHU_TEXTS.gogyoSupportAdvice = function (elem, source, sourcePresent) {
+  var actions = SHICHU_TEXTS.gogyoActions;
+  var direct = elem + 'の気を取り入れるなら、' + actions[elem] + 'ところから始めてみましょう。';
+  if (!sourcePresent) return direct;
+  return source + 'は' + elem + 'を育てます（' + source + '生' + elem + '）。' +
+    source + 'の持ち味を借りて、' + actions[source] + 'のも一つの手です。' + direct;
+};
+
+SHICHU_TEXTS.gogyoBalanceAdvice = function (elem, controller, next) {
+  var actions = SHICHU_TEXTS.gogyoActions;
+  return elem + 'の勢いを少しゆるめたいときは、' + controller + 'の気を借りて（' +
+    controller + '剋' + elem + '）、' + actions[controller] + 'とペースを整えやすくなります。' +
+    elem + 'から' + next + 'に力をつなぐなら（' + elem + '生' + next + '）、' +
+    actions[next] + 'ことも試せます。';
+};
+
 SHICHU_TEXTS.starCompatReading = function (pair) {
   function label(entry) {
     var star = entry.person.stars[entry.group][0];
     return entry.person.name + 'の' + (star ? star : entry.group) + '（' + entry.elem + '）';
   }
   return label(pair.from) + 'と、' + label(pair.to) + 'は' + pair.label +
-    'で、お互い刺激し合って高め合う関係です。' + pair.from.person.name +
-    'と' + pair.to.person.name + 'がそれぞれの案を一つずつ出し、相手の案から取り入れたいところを伝え合ってみましょう。';
+    'で、お互い刺激し合って高め合う関係です。' +
+    (pair.to.count >= 3 ?
+      pair.to.person.name + 'の' + pair.to.elem + 'に勢いがあるときは、' +
+      pair.from.person.name + 'が' + pair.from.elem + 'の持ち味を活かし、' +
+      SHICHU_TEXTS.gogyoActions[pair.from.elem] + 'と、ふたりのペースを整えやすくなります。' :
+      'それぞれの案を一つずつ出し、相手の案から取り入れたいところを伝え合ってみましょう。');
 };
 
 // 合のやさしい説明（画面用。既存の鑑定文オブジェクトは変えない）
@@ -2923,6 +2951,26 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
       esc(order.concat(order[0]).join(' → ')) + ' とめぐります。丸の大きさと●は、命式にある五行の数を表します。</p>';
   }
 
+  function gogyoAdjustmentHtml(gogyo) {
+    var items = [];
+    GEL.forEach(function (elem) {
+      var count = gogyo[elem];
+      if (count < 2) {
+        var source = GEL.find(function (e) { return SHENG_NEXT[e] === elem; });
+        items.push({ title: elem + '（' + T.cycleAmount(count) + '）を補う',
+          advice: T.gogyoSupportAdvice(elem, source, gogyo[source] >= 2) });
+      } else if (count >= 3) {
+        var controller = KE_PAIRS.find(function (pair) { return pair[1] === elem; })[0];
+        items.push({ title: elem + '（' + T.cycleAmount(count) + '）を整える',
+          advice: T.gogyoBalanceAdvice(elem, controller, SHENG_NEXT[elem]) });
+      }
+    });
+    if (!items.length) return '';
+    return '<div id="individual-gogyo-adjustment"><h3>五行の整え方</h3>' + items.map(function (item) {
+      return '<p><strong>' + esc(item.title) + '</strong><br>' + esc(item.advice) + '</p>';
+    }).join('') + '</div>';
+  }
+
   function gogyoSectionHtml(r, sid, who) {
     sid = sid || 'g1';
     var h = '<section class="card text" id="guide-gogyo"><h2>' + ty('五行') + 'のバランス' + qTip('gogyo', '五行') + qTip('marks', '記号') + qTip('anata', 'あなた') + '</h2>';
@@ -2932,6 +2980,7 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     h += cycleGuideHtml(r.groups);
     T.individualCycleReading(r).forEach(function (paragraph) { h += '<p>' + esc(paragraph) + '</p>'; });
     h += '</div>';
+    h += gogyoAdjustmentHtml(r.gogyo);
     var bal = gogyoBalanceItems(r);
     h+='<details class="more inner"><summary>もっと読む</summary>';
     h+=bal.map(function(a){return '<h4>'+tyWrap(a.title)+'</h4><p>'+esc(a.text)+'</p>';}).join('');
@@ -3314,7 +3363,8 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     cycle.rows.forEach(function (reading) {
       h += '<p><strong>' + esc(reading.group) + '</strong><br><span class="note">' + esc(reading.counts) + '</span><br>' + esc(reading.detail) + '</p>';
     });
-    var tension = pairs.find(function (pair) { return pair.kind === '相剋'; });
+    var opposing = pairs.filter(function (pair) { return pair.kind === '相剋'; });
+    var tension = opposing.find(function (pair) { return pair.to.count >= 3; }) || opposing[0];
     if (tension) h += '<h4>お互いを高めるひと工夫</h4><p id="aisho-star-reading">' + esc(T.starCompatReading(tension)) + '</p>';
     h += '</div>' + cycleGuideHtml(rA.groups);
     h += '<div id="aisho-element-reading"><h3>五行ごとの内訳</h3>';

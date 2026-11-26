@@ -518,14 +518,42 @@ SHICHU_TEXTS.individualCycleReading = function (r) {
   return [start, bottleneck];
 };
 
+SHICHU_TEXTS.gogyoActions = {
+  木: '興味のあることを一つ選び、5分だけ取り組む',
+  火: '大事にしたい思いを、相手にひと言伝える',
+  土: '無理なく続けられる予定を一つ決める',
+  金: 'やることを一つに絞り、締め切りを決める',
+  水: 'いったん手を止め、気づいたことを一行書き留める'
+};
+
+SHICHU_TEXTS.gogyoSupportAdvice = function (elem, source, sourcePresent) {
+  var actions = SHICHU_TEXTS.gogyoActions;
+  var direct = elem + 'の気を取り入れるなら、' + actions[elem] + 'ところから始めてみましょう。';
+  if (!sourcePresent) return direct;
+  return source + 'は' + elem + 'を育てます（' + source + '生' + elem + '）。' +
+    source + 'の持ち味を借りて、' + actions[source] + 'のも一つの手です。' + direct;
+};
+
+SHICHU_TEXTS.gogyoBalanceAdvice = function (elem, controller, next) {
+  var actions = SHICHU_TEXTS.gogyoActions;
+  return elem + 'の勢いを少しゆるめたいときは、' + controller + 'の気を借りて（' +
+    controller + '剋' + elem + '）、' + actions[controller] + 'とペースを整えやすくなります。' +
+    elem + 'から' + next + 'に力をつなぐなら（' + elem + '生' + next + '）、' +
+    actions[next] + 'ことも試せます。';
+};
+
 SHICHU_TEXTS.starCompatReading = function (pair) {
   function label(entry) {
     var star = entry.person.stars[entry.group][0];
     return entry.person.name + 'の' + (star ? star : entry.group) + '（' + entry.elem + '）';
   }
   return label(pair.from) + 'と、' + label(pair.to) + 'は' + pair.label +
-    'で、お互い刺激し合って高め合う関係です。' + pair.from.person.name +
-    'と' + pair.to.person.name + 'がそれぞれの案を一つずつ出し、相手の案から取り入れたいところを伝え合ってみましょう。';
+    'で、お互い刺激し合って高め合う関係です。' +
+    (pair.to.count >= 3 ?
+      pair.to.person.name + 'の' + pair.to.elem + 'に勢いがあるときは、' +
+      pair.from.person.name + 'が' + pair.from.elem + 'の持ち味を活かし、' +
+      SHICHU_TEXTS.gogyoActions[pair.from.elem] + 'と、ふたりのペースを整えやすくなります。' :
+      'それぞれの案を一つずつ出し、相手の案から取り入れたいところを伝え合ってみましょう。');
 };
 
 // 合のやさしい説明（画面用。既存の鑑定文オブジェクトは変えない）
