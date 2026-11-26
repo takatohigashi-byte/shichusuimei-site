@@ -115,12 +115,6 @@
       '<div class="sum-item"><span class="lbl">今年のひとこと</span><p>' + esc(yearLine) + '</p></div>' +
       '</div></section>';
   }
-  function nicchuHtml(name) {
-    var t = T.nicchu[name] || '';
-    var i = t.indexOf('恋愛では');
-    if (i > 0) return '<h4>日柱の特徴</h4>' + parasHtml(t.slice(0, i)) + '<h4>恋愛</h4>' + parasHtml(t.slice(i));
-    return parasHtml(t);
-  }
   function ryunenYear(r) {
     var t = r.input.target;
     return S.serial(t.y, t.m, t.d) < S.setsuPoint(t.y, 2, r.mode) ? t.y - 1 : t.y;
@@ -806,6 +800,20 @@
     return h + '</section>';
   }
 
+  function dayStageBody(p, elements) {
+    var reading = T.nicchu[p.name];
+    var romanceStart = reading.search(/恋愛で[はも]/);
+    var features = romanceStart < 0 ? reading : reading.slice(0, romanceStart);
+    var romance = romanceStart < 0 ? T.dayRomance[p.name] :
+      reading.slice(romanceStart).split('仕事では')[0];
+    var stage = T.pillarStages[p.juniun];
+    return '<h4>特徴</h4><p class="stage-signs">' + elements + esc(splitSentences(features).slice(0, 2).join('')) +
+      '内側では、蔵干の' + pillarStarHtml(p.zokanStar) + 'が持ち味を支えます。</p>' +
+      '<h4>恋愛</h4><p>' + esc(romance) + '</p>' +
+      '<h4>十二運</h4><p class="stage-signs">' + tyCell(p.juniun) + 'は、' + esc(stage[0]) +
+      'です。' + esc(stage[2]) + '</p>';
+  }
+
   function pillarStageCard(r, key) {
     var stg = (T.lifeStages || {})[key] || {};
     var p = r.pillars[key];
@@ -815,25 +823,22 @@
       h += '<p>' + esc(T.lifeStages.noHour || '') + '</p></article>';
       return h;
     }
-    var traits = T.pillarTraits;
-    var body = stg.body.replace('{stem}', traits.stem[p.stem]).replace('{branch}', traits.branch[p.branch]);
-    h += '<p>' + kanshiYomi(p.name) + '（' + esc(p.stemElem + 'と' + p.branchElem) + '）。' + esc(body) + '</p>';
-    var signs = [];
-    if (T.pillarStars[p.stemStar]) signs.push('表に出やすいのは' + pillarStarHtml(p.stemStar) + '。');
-    if (p.zokan && T.pillarStars[p.zokanStar]) {
-      signs.push('内側では' + kanYomi(p.zokan) + 'の' + pillarStarHtml(p.zokanStar) + 'が支えに。');
-    }
-    if (p.juniun) {
-      signs.push('十二運の' + tyCell(p.juniun) + 'は、' + esc(T.pillarStages[p.juniun][0]) + 'です。');
-    }
-    h += '<p class="note stage-signs">' + signs.join('') + '</p>';
-    h += '<p class="ikashi"><b>生かし方：</b>' + esc(pillarAction(p, key)) + '</p>';
+    var elements = kanshiYomi(p.name) + '（' + esc(p.stemElem + 'と' + p.branchElem) + '）。';
     if (key === 'day') {
-      h += '<details class="more inner"><summary>日柱のくわしい特徴</summary>';
-      h += nicchuHtml(p.name);
-      if (p.juniun) h += '<h4>' + ty('十二運') + '（' + tyCell(p.juniun) + '）</h4>' + parasHtml(junText(p.juniun));
-      h += '</details>';
+      h += dayStageBody(p, elements);
+    } else {
+      var traits = T.pillarTraits;
+      var body = stg.body.replace('{stem}', traits.stem[p.stem]).replace('{branch}', traits.branch[p.branch]);
+      h += '<h4>特徴</h4><p class="stage-signs">' + elements + esc(body);
+      if (p.stemStar === p.zokanStar) {
+        h += pillarStarHtml(p.stemStar) + 'の持ち味が、外にも内にも表れやすいでしょう。';
+      } else {
+        h += '表に出やすい' + pillarStarHtml(p.stemStar) + 'を、内側から' + pillarStarHtml(p.zokanStar) + 'が支えます。';
+      }
+      h += '</p><p class="note stage-signs">十二運の' + tyCell(p.juniun) + 'は、' +
+        esc(T.pillarStages[p.juniun][0]) + 'です。</p>';
     }
+    h += '<p class="ikashi"><b>生かし方：</b>' + esc(pillarAction(p, key)) + '</p>';
     h += '</article>';
     return h;
   }

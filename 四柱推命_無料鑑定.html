@@ -1902,7 +1902,7 @@ SHICHU_TEXTS.lifeStages = {
   note: '四つの柱を、人生の流れの目安として並べています。年齢の区切りは人それぞれなので、大まかな物語として読んでみてください。細かく見るときは、あとから出てくる大運や今年の流れもあわせて見てください。',
   year: { title: '若いころ', age: '幼少〜青年期', body: '家や学校では、{stem}と{branch}が、好きなことや得意なことを見つける手がかりになりそうです。' },
   month: { title: '成年期', age: '働き盛り・人生の中心', body: '仕事や人と協力する場面でまず出やすいのは、{stem}です。そこに{branch}も加わります。' },
-  day: { title: '人生を通じて', age: '自分自身・パートナー', body: '自分で何かを選ぶときや、身近な人と過ごすときには、{stem}に{branch}が重なります。' },
+  day: { title: '人生を通じて', age: '自分自身・パートナー' },
   hour: { title: '晩年', age: '', body: '経験を重ねた先で、{stem}と{branch}が、これからも大切にしたいことを選ぶ助けになりそうです。' },
   noHour: '生まれた時間がわからないため、晩年の読みは、ここではお出しできません。時間が分かれば、この欄にあなたの時の柱が入ります。'
 };
@@ -1940,19 +1940,23 @@ SHICHU_TEXTS.pillarStars = {
   印綬: ['学んだことを理解して伝える星', '調べたことを自分の言葉で書く', '初めて聞く人にも分かるか']
 };
 
+SHICHU_TEXTS.dayRomance = {
+  辛未: '身近な人を思いやる気持ちが、ふだんの気づかいに表れやすい人です。うれしかったことを言葉で伝えると、相手にもあなたの気持ちが届きやすくなります。'
+};
+
 SHICHU_TEXTS.pillarStages = {
-  長生: ['新しい力が育ち始める段階', 'まず一度やってみて'],
-  沐浴: ['新しい環境にふれて視野が広がる段階', 'いつもと違うやり方で'],
-  冠帯: ['育ててきたものを人前に出す段階', '人に見せられるところまで進めて'],
-  建禄: ['自分で進める力が安定する段階', '自分で続けられる手順を意識して'],
-  帝旺: ['持ち味を十分に発揮しやすい段階', '力を注ぐことを一つに決めて'],
-  衰: ['経験を落ち着いて生かす段階', '前にうまくいった方法を手がかりに'],
-  病: ['小さな変化や気持ちに気づきやすい段階', '小さな違いにも目を向けて'],
-  死: ['一つのことにじっくり集中する段階', '一つに絞ってじっくり'],
-  墓: ['経験や知識を蓄える段階', 'あとで見返せる形を意識して'],
-  絶: ['気持ちを切り替えて新しく始める段階', '以前のやり方を一つ見直して'],
-  胎: ['新しい考えが芽生える段階', '手をつける前に下書きを用意して'],
-  養: ['助けを受けながら力を育てる段階', '身近な人に手を借りながら']
+  長生: ['新しい力が育ち始める段階', 'まず一度やってみて', '気になることを教わり、試しながら自分のやり方を見つけていけます。'],
+  沐浴: ['新しい環境にふれて視野が広がる段階', 'いつもと違うやり方で', '初めての場所や人との出会いから、好きなことの幅が広がりそうです。'],
+  冠帯: ['育ててきたものを人前に出す段階', '人に見せられるところまで進めて', '練習してきたことを発表する場で、持ち味が伝わりやすいでしょう。'],
+  建禄: ['自分で進める力が安定する段階', '自分で続けられる手順を意識して', '日々の工夫を積み重ねて、任されたことを着実に進める力が持ち味です。'],
+  帝旺: ['持ち味を十分に発揮しやすい段階', '力を注ぐことを一つに決めて', '自分から動いて方向を示すと、周りの人も一歩を踏み出しやすくなりそうです。'],
+  衰: ['経験を落ち着いて生かす段階', '前にうまくいった方法を手がかりに', '仕事や暮らしで迷っている人に、経験から得た工夫を伝える場で力を発揮しそうです。'],
+  病: ['小さな変化や気持ちに気づきやすい段階', '小さな違いにも目を向けて', '人の言葉や表情の小さな変化に気づき、気持ちに寄り添えるところが持ち味です。'],
+  死: ['一つのことにじっくり集中する段階', '一つに絞ってじっくり', '一度決めたことをこつこつ続ける力があり、研究やものづくりなど、深く掘り下げる場面で持ち味が出やすいでしょう。'],
+  墓: ['経験や知識を蓄える段階', 'あとで見返せる形を意識して', '調べたことや続けてきた工夫を記録すると、後から自分や身近な人の助けになります。'],
+  絶: ['気持ちを切り替えて新しく始める段階', '以前のやり方を一つ見直して', '環境が変わったときにも、今の暮らしに合うやり方を見つけていけそうです。'],
+  胎: ['新しい考えが芽生える段階', '手をつける前に下書きを用意して', '思い浮かんだことをノートに残しておくと、あとから企画や作品に育てやすくなります。'],
+  養: ['助けを受けながら力を育てる段階', '身近な人に手を借りながら', '身近な人に相談したり教わったりしながら、好きなことを長く続けられそうです。']
 };
 
 SHICHU_TEXTS.monthCoreIntro = '月の柱は、仕事や人との関わりで出やすい持ち味を見る場所です。表に出やすい一面と、自分の中で支えになる一面を分けて読んでみましょう。';
@@ -2103,12 +2107,6 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
       '<div class="sum-item"><span class="lbl">' + ty('五行') + 'の特徴</span><p>' + esc(gogyoSummaryLine(r)) + '</p></div>' +
       '<div class="sum-item"><span class="lbl">今年のひとこと</span><p>' + esc(yearLine) + '</p></div>' +
       '</div></section>';
-  }
-  function nicchuHtml(name) {
-    var t = T.nicchu[name] || '';
-    var i = t.indexOf('恋愛では');
-    if (i > 0) return '<h4>日柱の特徴</h4>' + parasHtml(t.slice(0, i)) + '<h4>恋愛</h4>' + parasHtml(t.slice(i));
-    return parasHtml(t);
   }
   function ryunenYear(r) {
     var t = r.input.target;
@@ -2795,6 +2793,20 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     return h + '</section>';
   }
 
+  function dayStageBody(p, elements) {
+    var reading = T.nicchu[p.name];
+    var romanceStart = reading.search(/恋愛で[はも]/);
+    var features = romanceStart < 0 ? reading : reading.slice(0, romanceStart);
+    var romance = romanceStart < 0 ? T.dayRomance[p.name] :
+      reading.slice(romanceStart).split('仕事では')[0];
+    var stage = T.pillarStages[p.juniun];
+    return '<h4>特徴</h4><p class="stage-signs">' + elements + esc(splitSentences(features).slice(0, 2).join('')) +
+      '内側では、蔵干の' + pillarStarHtml(p.zokanStar) + 'が持ち味を支えます。</p>' +
+      '<h4>恋愛</h4><p>' + esc(romance) + '</p>' +
+      '<h4>十二運</h4><p class="stage-signs">' + tyCell(p.juniun) + 'は、' + esc(stage[0]) +
+      'です。' + esc(stage[2]) + '</p>';
+  }
+
   function pillarStageCard(r, key) {
     var stg = (T.lifeStages || {})[key] || {};
     var p = r.pillars[key];
@@ -2804,25 +2816,22 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
       h += '<p>' + esc(T.lifeStages.noHour || '') + '</p></article>';
       return h;
     }
-    var traits = T.pillarTraits;
-    var body = stg.body.replace('{stem}', traits.stem[p.stem]).replace('{branch}', traits.branch[p.branch]);
-    h += '<p>' + kanshiYomi(p.name) + '（' + esc(p.stemElem + 'と' + p.branchElem) + '）。' + esc(body) + '</p>';
-    var signs = [];
-    if (T.pillarStars[p.stemStar]) signs.push('表に出やすいのは' + pillarStarHtml(p.stemStar) + '。');
-    if (p.zokan && T.pillarStars[p.zokanStar]) {
-      signs.push('内側では' + kanYomi(p.zokan) + 'の' + pillarStarHtml(p.zokanStar) + 'が支えに。');
-    }
-    if (p.juniun) {
-      signs.push('十二運の' + tyCell(p.juniun) + 'は、' + esc(T.pillarStages[p.juniun][0]) + 'です。');
-    }
-    h += '<p class="note stage-signs">' + signs.join('') + '</p>';
-    h += '<p class="ikashi"><b>生かし方：</b>' + esc(pillarAction(p, key)) + '</p>';
+    var elements = kanshiYomi(p.name) + '（' + esc(p.stemElem + 'と' + p.branchElem) + '）。';
     if (key === 'day') {
-      h += '<details class="more inner"><summary>日柱のくわしい特徴</summary>';
-      h += nicchuHtml(p.name);
-      if (p.juniun) h += '<h4>' + ty('十二運') + '（' + tyCell(p.juniun) + '）</h4>' + parasHtml(junText(p.juniun));
-      h += '</details>';
+      h += dayStageBody(p, elements);
+    } else {
+      var traits = T.pillarTraits;
+      var body = stg.body.replace('{stem}', traits.stem[p.stem]).replace('{branch}', traits.branch[p.branch]);
+      h += '<h4>特徴</h4><p class="stage-signs">' + elements + esc(body);
+      if (p.stemStar === p.zokanStar) {
+        h += pillarStarHtml(p.stemStar) + 'の持ち味が、外にも内にも表れやすいでしょう。';
+      } else {
+        h += '表に出やすい' + pillarStarHtml(p.stemStar) + 'を、内側から' + pillarStarHtml(p.zokanStar) + 'が支えます。';
+      }
+      h += '</p><p class="note stage-signs">十二運の' + tyCell(p.juniun) + 'は、' +
+        esc(T.pillarStages[p.juniun][0]) + 'です。</p>';
     }
+    h += '<p class="ikashi"><b>生かし方：</b>' + esc(pillarAction(p, key)) + '</p>';
     h += '</article>';
     return h;
   }
