@@ -217,11 +217,31 @@ details.more[open]>summary{margin-bottom:12px;color:#c45a86;border-color:var(--a
 .fortune-phase-guide dt{font-weight:bold;color:#834b61}
 .fortune-phase-guide dd{margin:0}
 .fortune-phase-active{background:#fbe0e9;border-radius:8px}
+#guide-fortune-ryunen{margin-top:16px}
+#guide-fortune-ryunen h3{margin:0 0 8px;color:#834b61}
+.fortune-ryunen-list{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:0;margin:0;list-style:none}
+.fortune-ryunen-card{min-width:0;padding:9px 10px;border:1px solid #ebd8df;border-radius:12px;background:#fffaf7;color:#624752;font-size:.8rem;line-height:1.45}
+.fortune-ryunen-card[aria-current]{background:#fbe0e9;border-color:#c9537b}
+.fortune-ryunen-date,.fortune-ryunen-pillar,.fortune-ryunen-stars,.fortune-ryunen-details,.fortune-ryunen-tags{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 6px}
+.fortune-ryunen-date{color:#834b61}
+.fortune-ryunen-date strong,.fortune-ryunen-pillar strong{font-size:1rem}
+.fortune-ryunen-date span{font-weight:bold;color:#9d345c}
+.fortune-ryunen-details{margin-top:4px}
+.fortune-ryunen-tags{margin-top:6px;gap:3px}
+.fortune-ryunen-tags span{padding:1px 5px;border-radius:6px;font-size:.72rem;white-space:nowrap}
+.fortune-ryunen-phase[data-phase="0"]{background:#f4e8fa}
+.fortune-ryunen-phase[data-phase="1"]{background:#dff1e9}
+.fortune-ryunen-phase[data-phase="2"]{background:#e5e9fa}
+.fortune-ryunen-phase[data-phase="3"]{background:#ffedce}
+.fortune-ryunen-selection{background:#e7d9ef;color:#60446e}
+.fortune-ryunen-kubou{background:#e4e0e5;color:#504954}
+@media(max-width:850px){.fortune-ryunen-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:1050px){.fortune-scroll-hint{display:block}}
 @media(max-width:600px){
   .fortune-figure{padding:12px 8px}
   .fortune-cycle{flex-direction:column;gap:2px}
   .fortune-reading{grid-template-columns:1fr;gap:8px}
+  .fortune-ryunen-list{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 .card.featured{border:2px solid #f4b4cc;box-shadow:0 6px 20px rgba(232,127,166,.22)}
 .card.featured h2:before{content:"\2665 "}

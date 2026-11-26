@@ -122,6 +122,11 @@
     var t = r.input.target;
     return S.serial(t.y, t.m, t.d) < S.setsuPoint(t.y, 2, r.mode) ? t.y - 1 : t.y;
   }
+  function currentForRyunenYear(r, year, currentYear) {
+    // 6月1日はその年の立春後。
+    return year === currentYear ? r.current :
+      S.compute(Object.assign({}, r.input, { target: { y: year, m: 6, d: 1 } })).current;
+  }
   function fortuneTimeline(bands, birthYear, year, harvest, pinLines) {
     var first = Math.min(year, bands.length ? birthYear + bands[0].from - 1 : year - 10);
     var last = Math.max(year + 14, bands.length ? birthYear + bands[bands.length - 1].to : year + 14);
@@ -213,14 +218,46 @@
     return `<ol class="fortune-phases" aria-label="今年を含む12年の流れ" role="list">${blocks}</ol>
       <dl class="fortune-phase-guide">${explanations}</dl>`;
   }
+  function fortuneCycleOffset(branch, kubou) {
+    return (S.BRANCHES.indexOf(branch) - S.BRANCHES.indexOf(kubou.charAt(0)) + 12) % 12;
+  }
+  function fortunePhaseIndex(offset) {
+    return (Math.floor(offset / 3) + 3) % 4;
+  }
+  function yearKubou(kanshi) {
+    return ['戌亥', '申酉', '午未', '辰巳', '寅卯', '子丑'][Math.floor((S.kanshiIndex(kanshi) - 1) / 10)];
+  }
+  function fortuneRyunen(r, year) {
+    var cards = '';
+    for (var y = year - 3; y <= year + 6; y++) {
+      var c = currentForRyunenYear(r, y, year), star = c.ryunen;
+      var offset = fortuneCycleOffset(star.name.charAt(1), r.kubou);
+      var phase = fortunePhaseIndex(offset);
+      cards += `<li class="fortune-ryunen-card"${y === year ? ' aria-current="date"' : ''}>
+        <div class="fortune-ryunen-date"><strong>${y}年</strong>${y === year ? '<span>今年</span>' : ''}</div>
+        <div class="fortune-ryunen-pillar"><strong>${esc(star.name)}</strong><span>${c.age >= 1 ? '数え' + c.age + '歳' : '生年より前'}</span></div>
+        <div class="fortune-ryunen-stars"><strong>${ty(star.stemStar)}</strong><span>年支 ${ty(star.branchStar)}</span></div>
+        <div class="fortune-ryunen-details"><span>大運 ${c.age >= 1 && c.daiun ? esc(c.daiun.name) : '—'}</span>
+          <span>年の空亡: ${yearKubou(star.name)}</span></div>
+        <div class="fortune-ryunen-tags">
+          <span class="fortune-ryunen-phase" data-phase="${phase}">${fortunePhases[phase][0]}</span>
+          ${offset < 2 ? '<span class="fortune-ryunen-selection">選別</span><span class="fortune-ryunen-kubou">空亡</span>' : ''}
+        </div>
+      </li>`;
+    }
+    return `<section id="guide-fortune-ryunen" aria-labelledby="fortune-ryunen-title">
+      <h3 id="fortune-ryunen-title">年ごとの${ty('流年')}</h3>
+      <ol class="fortune-ryunen-list" role="list">${cards}</ol>
+    </section>`;
+  }
   function fortuneHtml(r) {
     var c = r.current, info = r.daiunInfo;
     var year = ryunenYear(r), birthYear = year - c.age + 1;
     var branch = c.ryunen.name.charAt(1);
-    var offset = (S.BRANCHES.indexOf(branch) - S.BRANCHES.indexOf(r.kubou.charAt(0)) + 12) % 12;
+    var offset = fortuneCycleOffset(branch, r.kubou);
     var harvest = year - offset;
     var cycleStart = offset < 3 ? harvest - 9 : harvest + 3;
-    var phase = Math.floor((year - cycleStart) / 3), phaseYear = offset % 3 + 1;
+    var phase = fortunePhaseIndex(offset), phaseYear = offset % 3 + 1;
     var phaseText = fortunePhases[phase][0] + 'の' + phaseYear + '年目';
     var nextPhase = fortunePhases[(phase + 1) % 4][0];
     var span = function (start, end) { return '<span class="fortune-years">' + start + '〜' + end + '年</span>'; };
@@ -252,7 +289,9 @@
         <p><strong>${phaseText}</strong>。${phaseYear === 3 ? '来年' : (year + 4 - phaseYear) + '年'}から${nextPhase}。</p>
         ${fortunePhaseGuide(cycleStart, year, phase, offset < 2)}
         <p>${offset < 2 ? '今の空亡' : '前回の空亡'}は${span(harvest, harvest + 1)}。次は${span(harvest + 12, harvest + 13)}。</p>
-      </div></div></section>`;
+      </div></div>
+      ${fortuneRyunen(r, year)}
+    </section>`;
     return h;
   }
   function periodTable(head, rows, r, id) {
@@ -274,9 +313,8 @@
   function ryunenTable(r) {
     var first = ryunenYear(r), rows = [];
     for (var y = first; y < first + 12; y++) {
-      // 6月1日はその年の立春後。年の干支・星・数え歳は鑑定と同じ関数で求める。
       var current = y === first;
-      var c = current ? r.current : S.compute(Object.assign({}, r.input, { target: { y: y, m: 6, d: 1 } })).current;
+      var c = currentForRyunenYear(r, y, first);
       rows.push({ label: y + '年<br>（数え' + c.age + '歳）', star: c.ryunen, current: current });
     }
     return '<div class="unki-table" id="guide-ryunen"><h3>' + ty('流年') + 'のながれ</h3>' +
