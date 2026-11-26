@@ -181,6 +181,33 @@ details.more[open]>summary{margin-bottom:12px;color:#c45a86;border-color:var(--a
 
 .reassure{background:#fff0f5;border:1px solid #f3d6e2;border-radius:16px;padding:12px 14px;margin:8px 0 0;font-size:.92rem;line-height:1.7;color:#6a4a5c}
 .ch-label{margin:20px 4px 4px;font-size:.78rem;font-weight:700;letter-spacing:.12em;color:#c45a86}
+.fortune-figure{margin:0;padding:18px 14px 12px;border:1px solid #f0d4de;border-radius:18px;background:#fffaf7;color:#624752}
+.fortune-figure figcaption{font-size:clamp(1rem,2.4vw,1.35rem);font-weight:bold;color:#834b61;text-align:center;overflow-wrap:anywhere}
+.fortune-note{margin:4px 0 12px;text-align:center;color:#765765;font-size:.82rem}
+.fortune-scroll{overflow-x:auto;border-radius:10px;background:#fff5f3;scrollbar-color:#c988a2 #f9e8e9}
+.fortune-scroll:focus-visible{outline:2px solid #be416c;outline-offset:2px}
+.fortune-timeline{display:block;width:100%;min-width:var(--fortune-width);height:auto}
+.fortune-scroll-hint{display:none;margin:6px 0 0}
+.fortune-cycle{display:flex;align-items:center;justify-content:center;gap:clamp(12px,5vw,55px);margin-top:12px}
+.fortune-wheel{text-align:center;width:min(100%,290px)}
+.fortune-wheel h3{margin:0;color:#834b61}
+.fortune-clock{display:block;width:100%;height:auto}
+.fortune-legend{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px 16px;font-size:.85rem}
+.fortune-legend li{display:flex;gap:6px;align-items:center}
+.fortune-legend i{width:13px;height:13px;border-radius:4px}
+.fortune-pink{background:#be416c}
+.fortune-gray{background:#c4bec9}
+.fortune-reading{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.fortune-reading>div{background:#fff1f5;border-radius:14px;padding:12px 14px}
+.fortune-reading h3{margin:0;color:#834b61}
+.fortune-reading p{margin:4px 0;font-size:.9rem}
+.fortune-years{white-space:nowrap}
+@media(max-width:1050px){.fortune-scroll-hint{display:block}}
+@media(max-width:600px){
+  .fortune-figure{padding:12px 8px}
+  .fortune-cycle{flex-direction:column;gap:2px}
+  .fortune-reading{grid-template-columns:1fr;gap:8px}
+}
 .card.featured{border:2px solid #f4b4cc;box-shadow:0 6px 20px rgba(232,127,166,.22)}
 .card.featured h2:before{content:"\2665 "}
 .lead{font-size:.95rem;margin:0 0 10px;line-height:1.75}

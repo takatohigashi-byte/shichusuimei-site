@@ -61,22 +61,25 @@
   }
   var BRANCH_BODY_STEM = { 子: '壬', 丑: '己', 寅: '甲', 卯: '乙', 辰: '戊', 巳: '丁', 午: '丙', 未: '己', 申: '庚', 酉: '辛', 戌: '戊', 亥: '癸' };
   function mod60app(x) { var m = ((x % 60) + 60) % 60; return m === 0 ? 60 : m; }
-  function daiunTo100(r) {
+  function daiunTo100(r, fromAge, toAge) {
     var info = r.daiunInfo, mon = r.pillars && r.pillars.month;
     if (!info || !mon) return r.daiun || [];
     var un = info.un, forward = info.forward, D = r.dayIdx, M = mon.idx;
-    var out = [], k = 0, to = 0;
-    while (to < 100 && k < 30) {
+    var out = [], k = fromAge == null ? 0 : Math.max(0, Math.floor((fromAge - 1) / un));
+    var end = toAge == null ? Math.min(30, Math.ceil(100 / un)) : Math.ceil(toAge / un);
+    for (; k < end; k++) {
+      if (r.daiun[k]) {
+        out.push(r.daiun[k]);
+        continue;
+      }
       var di = mod60app(forward ? M + k : M - k);
       var dk = S.kanshi(di);
-      to = (k + 1) * un;
       out.push({
-        from: k * un + 1, to: to, idx: di, name: dk,
+        from: k * un + 1, to: (k + 1) * un, idx: di, name: dk,
         stemStar: S.tsuhen(D, dk.charAt(0)),
         juniun: S.juniun(D, dk.charAt(1)),
         branchStar: S.tsuhen(D, BRANCH_BODY_STEM[dk.charAt(1)])
       });
-      k++;
     }
     return out;
   }
@@ -118,6 +121,113 @@
   function ryunenYear(r) {
     var t = r.input.target;
     return S.serial(t.y, t.m, t.d) < S.setsuPoint(t.y, 2, r.mode) ? t.y - 1 : t.y;
+  }
+  function fortuneTimeline(bands, birthYear, year, harvest, pinLines) {
+    var first = Math.min(year, bands.length ? birthYear + bands[0].from - 1 : year - 10);
+    var last = Math.max(year + 14, bands.length ? birthYear + bands[bands.length - 1].to : year + 14);
+    var step = 25, margin = 33, width = (last - first) * step + margin * 2;
+    var x = function (y) { return margin + (y - first) * step; };
+    var now = x(year + 0.5);
+    var palette = ['#f4dff1', '#dceceb', '#ffedce', '#e5e4fa', '#eaf0d9'];
+    var rects = '', labels = '', cycles = '';
+    bands.forEach(function (d) {
+      var start = birthYear + d.from - 1, end = birthYear + d.to;
+      var active = start <= year && year < end;
+      var fill = active ? '#ffd7e4' : palette[Math.floor((d.from - 1) / (d.to - d.from + 1)) % palette.length];
+      rects += `<rect x="${x(start) + 1}" y="103" width="${x(end) - x(start) - 2}" height="73" rx="10" fill="${fill}" stroke="${active ? '#c9537b' : '#e6cdd6'}"/>`;
+      labels += `<text x="${x((start + end) / 2)}" y="126" font-size="17" font-weight="bold">${esc(d.name)}</text>
+        <text x="${x((start + end) / 2)}" y="147" font-size="13">${esc(d.stemStar)}</text>
+        <text x="${x((start + end) / 2)}" y="166" font-size="12">${d.from}〜${d.to}歳</text>`;
+    });
+    for (var k = harvest + Math.floor((first - harvest) / 12) * 12; k < last; k += 12) {
+      var left = Math.max(first, k), right = Math.min(last, k + 12);
+      var middle = x((left + right) / 2);
+      cycles += `<path d="M${x(left)},96 Q${middle},63 ${x(right)},96" fill="none" stroke="#df9eb2" stroke-width="1.5"/>`;
+      if (right - left >= 6) labels += `<text x="${middle}" y="73" font-size="12" fill="#835464" stroke="#fff5f3" stroke-width="4" stroke-linejoin="round" paint-order="stroke">12年のひと回り</text>`;
+      if (k + 2 <= first) continue;
+      var end = Math.min(last, k + 2);
+      var center = x((left + end) / 2);
+      rects += `<rect x="${x(left)}" y="98" width="${x(end) - x(left)}" height="85" rx="5" fill="#77727e" opacity=".23"/>`;
+      labels += `<text x="${center}" y="198" font-size="13" font-weight="bold">空亡</text>
+        <text x="${center}" y="215" font-size="11">${left}${end - left === 2 ? '・' + (left + 1) : ''}</text>`;
+    }
+    var axis = `<path d="M${x(first)},229 H${x(last)}" stroke="#c8a8b4"/>`;
+    for (var y = first; y < last; y++) {
+      if (y !== first && (y % 5 !== 0 || y - first < 3)) continue;
+      axis += `<path d="M${x(y)},225 v8" stroke="#c8a8b4"/><text x="${x(y)}" y="248" font-size="12">${y}年</text>`;
+    }
+    var pinLeft = Math.max(100, Math.min(width - 100, now));
+    return `<div class="fortune-scroll" role="region" tabindex="0" aria-label="大運の年表（横にスクロールできます）">
+      <svg class="fortune-timeline" role="img" aria-label="${esc(pinLines.join('、'))}" width="${width}" height="258" viewBox="0 0 ${width} 258" style="--fortune-width:${width}px" text-anchor="middle" fill="#624752">
+        ${cycles}${rects}
+        <path d="M${now},55 V110 M${now},170 V226" fill="none" stroke="#c24470" stroke-width="2"/>
+        ${labels}${axis}
+        <text x="${pinLeft}" y="16" font-size="14" font-weight="bold" fill="#9d345c">${esc(pinLines[0])}</text>
+        <text x="${pinLeft}" y="34" font-size="12" fill="#9d345c">${esc(pinLines[1])}</text>
+        <circle class="fortune-pin" cx="${now}" cy="53" r="13" fill="#be416c"/>
+        <text x="${now}" y="58" font-size="13" font-weight="bold" fill="#fff">今</text>
+      </svg></div>`;
+  }
+  function fortuneClock(year, branch, kubou) {
+    var first = year - S.BRANCHES.indexOf(branch);
+    var point = function (radius, angle) {
+      return [145 + radius * Math.cos(angle), 145 + radius * Math.sin(angle)];
+    };
+    var h = `<svg class="fortune-clock" viewBox="0 0 290 290" role="img" aria-label="12年の時計。今は${year}年の${branch}、空亡の地支は${kubou}" text-anchor="middle" dominant-baseline="central" fill="#624752">`;
+    Array.from(S.BRANCHES).forEach(function (b, i) {
+      var angle = i * Math.PI / 6 - Math.PI / 2, a = angle - Math.PI / 12, z = angle + Math.PI / 12;
+      var active = b === branch, empty = kubou.includes(b);
+      var inner = 46, outer = 105;
+      var label = point(75, angle), date = point(123, angle);
+      h += `<path d="M${point(inner, a)} L${point(outer, a)} A${outer},${outer} 0 0 1 ${point(outer, z)}
+        L${point(inner, z)} A${inner},${inner} 0 0 0 ${point(inner, a)} Z"
+        fill="${empty ? '#c4bec9' : active ? '#be416c' : '#fae0e8'}" stroke="${active && empty ? '#be416c' : '#fffaf7'}" stroke-width="${active && empty ? 4 : 2}"/>
+        <text x="${label[0]}" y="${label[1]}" font-size="18" font-weight="bold" fill="${active && !empty ? '#fff' : '#624752'}">${b}</text>
+        <text x="${date[0]}" y="${date[1]}" font-size="11" ${active ? 'font-weight="bold" fill="#9d345c"' : ''}>${first + i}</text>`;
+    });
+    return h + `<text x="145" y="137" font-size="17" font-weight="bold">${year}年</text>
+      <text x="145" y="157" font-size="13">${branch}年</text></svg>`;
+  }
+  function fortuneHtml(r) {
+    var c = r.current, info = r.daiunInfo;
+    var year = ryunenYear(r), birthYear = year - c.age + 1;
+    var branch = c.ryunen.name.charAt(1);
+    var offset = (S.BRANCHES.indexOf(branch) - S.BRANCHES.indexOf(r.kubou.charAt(0)) + 12) % 12;
+    var harvest = year - offset;
+    var phases = ['収穫', '仕込み', '育成', '伸長'];
+    var phase = Math.floor(offset / 3), phaseYear = offset % 3 + 1;
+    var phaseText = phases[phase] + 'の' + phaseYear + '年目';
+    var nextPhase = phases[(phase + 1) % phases.length];
+    var span = function (start, end) { return '<span class="fortune-years">' + start + '〜' + end + '年</span>'; };
+    var current = c.age >= 1 && c.daiun;
+    var bands = info && c.age + 14 >= 1 ? daiunTo100(r, c.age - 10, c.age + 14) : [];
+    var next = bands.find(function (d) { return current ? d.from === current.to + 1 : d.from === 1; });
+    var step = current ? c.age - current.from + 1 : 0;
+    var number = current ? (current.from - 1) / info.un + 1 : 0;
+    var pinLines = [year + '年' + (c.age >= 1 ? '（数え' + c.age + '歳）' : ''), current ?
+      number + '番目の大運・' + step + '年目' : c.age < 1 ? '生年より前' : '大運の表示なし'];
+    var name = r.displayName ? esc(r.displayName) + 'さん' : 'あなた';
+    var h = `<section class="card" id="guide-fortune"><h2>運勢</h2>
+      <figure class="fortune-figure">
+        <figcaption>${name}の大運と空亡サイクル</figcaption>
+        <p class="fortune-note">${info ? '大運は' + info.un + '年ごと。' : ''}年と数え歳は立春で切り替わります。</p>
+        ${fortuneTimeline(bands, birthYear, year, harvest, pinLines)}
+        <p class="fortune-scroll-hint fortune-note">年表は左右にスクロールできます。</p>
+        <div class="fortune-cycle">
+          <div class="fortune-wheel"><h3>12年の時計</h3>${fortuneClock(year, branch, r.kubou)}</div>
+          <ul class="fortune-legend"><li><i class="fortune-pink"></i>今の年・大運</li>
+            <li><i class="fortune-gray"></i>空亡（${esc(r.kubou.split('').join('・'))}）</li></ul>
+        </div>
+      </figure>
+      <div class="fortune-reading"><div><h3>今の大運</h3>
+        <p>${current ? '<strong>' + esc(current.name + '・' + current.stemStar + '・' + step + '年目') + '</strong>（' +
+          span(birthYear + current.from - 1, birthYear + current.to - 1) + '）' : pinLines[1]}</p>
+        ${next ? '<p>' + (current ? '次の大運' : '最初の大運') + ' <strong>' + esc(next.name) + '</strong> は ' + (birthYear + next.from - 1) + '年から。</p>' : ''}
+      </div><div><h3>空亡サイクル</h3>
+        <p><strong>${phaseText}</strong>。${phaseYear === 3 ? '来年' : (year + 4 - phaseYear) + '年'}から${nextPhase}。</p>
+        <p>${offset < 2 ? '今の空亡' : '前回の空亡'}は${span(harvest, harvest + 1)}。次は${span(harvest + 12, harvest + 13)}。${offset < 2 ? '今は選別も重なる年。手放すものや続けたいことを選び直す目安です。' : ''}</p>
+      </div></div></section>`;
+    return h;
   }
   function periodTable(head, rows, r, id) {
     var h = '<div class="stars-wrap"><table class="stars"' + (id ? ' id="' + id + '"' : '') +
@@ -1259,6 +1369,7 @@
 
     if (r.daiunInfo || r.current) {
       h += '<div class="chapter" id="ch3">' + chapterHead('3', 'この10年・今年・今月');
+      if (r.current) h += fortuneHtml(r);
       h += '<section class="card text" id="guide-unki"><h2>' + ty('大運') + qTip('daiun', '大運') + '・今年・今月</h2>';
       if (r.current) {
         var c = r.current;
@@ -1303,6 +1414,11 @@
     h += '</details>';
 
     $('out').innerHTML = h;
+    var pin = $('out').querySelector('.fortune-pin');
+    if (pin) {
+      var timeline = pin.closest('svg'), scroll = timeline.parentElement;
+      scroll.scrollLeft = pin.cx.baseVal.value * timeline.clientWidth / timeline.viewBox.baseVal.width - scroll.clientWidth / 2;
+    }
     if ($('saveChartImage')) $('saveChartImage').onclick = function () { saveChartImage(); };
     if ($('saveChartPdf')) $('saveChartPdf').onclick = function () { saveChartPdf(); };
     if ($('printChart')) $('printChart').onclick = function () { printChart(); };
