@@ -116,6 +116,13 @@ h2 { font-size:1.14rem; }
 .next { margin:0; font-weight:bold; color:#75445e; }
 .present-month { margin:6px 0 10px; color:#75445e; }
 .month-branch { color:#705a6b; font-size:.82rem; }
+.month-reason { margin:4px 0 6px; }
+.month-actions { margin:0; padding:0; list-style:none; }
+.month-actions li { position:relative; margin:2px 0; padding-left:1em; line-height:1.6; }
+.month-actions li::before {
+  content:""; position:absolute; left:.2em; top:.68em;
+  width:5px; height:5px; border-radius:50%; background:var(--phase-color);
+}
 
 .phases { display:grid; gap:8px; margin:10px 0; padding:0; list-style:none; }
 .phase {
