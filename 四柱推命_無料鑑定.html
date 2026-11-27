@@ -1954,6 +1954,97 @@ SHICHU_TEXTS.individualCycleReading = function (r) {
   return [start, bottleneck];
 };
 
+SHICHU_TEXTS.individualGogyo = {
+  比劫: {
+    role: '自分で選び、仲間と力を合わせる力',
+    support: '比劫を上げて補うには、今日の小さな選択で、自分はどうしたいかを一つ書き出してみましょう。比劫を生む印星を上げるなら、話しやすい人の助言を聞き、自分の希望を考える手がかりにできます。印星（○）の気は比劫（△）の気を生みます。',
+    balance: '比劫の勢いを抑えるには、官星を上げて、意見が分かれたときの決め方をみんなで確認してみましょう。比劫が生む食傷を上げて気を抜くなら、自分の考えを短い提案にまとめて伝えてみましょう。官星（○）の気は比劫（△）の気を剋し、比劫（△）の気は食傷（□）の気を生みます。',
+    few: '命式では、自分で選ぶ力に当たる比劫が1個です。小さな選択から、自分の希望を確かめてみてください。',
+    both: '命式では、自分で選ぶ力に当たる比劫が1個です。今の大運と今年の流れには比劫に当たる○があるので、自分の希望を言葉にするきっかけにできます。'
+  },
+  食傷: {
+    role: '思いや才能を表現し、形にする力',
+    support: '食傷を上げて補うには、気になっていることを短いメモや下書きにしてみましょう。食傷を生む比劫を上げるなら、身近な話題の中から、自分が言葉にしたいことを一つ選んでみましょう。比劫（○）の気は食傷（△）の気を生みます。',
+    balance: '食傷の勢いを抑えるには、印星を上げて、広がった案の一つについて信頼できる人の意見を聞いてみましょう。食傷が生む財星を上げて気を抜くなら、案を必要としている人を思い浮かべ、実際に届ける手はずを考えてみましょう。印星（○）の気は食傷（△）の気を剋し、食傷（△）の気は財星（□）の気を生みます。',
+    zero: '命式の図では食傷は0個です。思いや才能をどんな形で表現すると心地よいか、短いメモから試すヒントにしてみてください。',
+    year: '命式では、思いを形にする力に当たる食傷が1個です。今年の流れにも食傷に当たる○があるので、短い下書きを試すきっかけにできます。',
+    zeroSummary: '図で0個の{group}は、思いをどんな形で表すと心地よいかを探るヒントです。気になることを短い下書きにしてみると、表現のきっかけになります。'
+  },
+  財星: {
+    role: 'お金や実務を動かし、人の用事や世話を引き受ける力',
+    support: '財星を上げて補うには、進めたい用事を一つ選び、使える時間とお金をメモしてみましょう。財星を生む食傷を上げるなら、その用事をどう進めたいか、思いついた案を短い下書きにしてみましょう。食傷（○）の気は財星（△）の気を生みます。',
+    balance: '財星の勢いを抑えるには、比劫を上げて、自分が無理なく引き受けられる範囲を伝え、残りは仲間と分け合ってみましょう。財星が生む官星を上げて気を抜くなら、引き受けた用事について、誰が何をいつまでにするかを関係する人と約束してみましょう。比劫（○）の気は財星（△）の気を剋し、財星（△）の気は官星（□）の気を生みます。',
+    many: '命式では、お金や実務を動かし、人の用事を引き受ける財星が{count}個です。引き受けることが重なったら、比劫を上げて仲間と分け合うか、官星を上げて役割を約束し、財星の気を抜く方法があります。',
+    decade: '命式では、計画を実際に動かす力に当たる財星が1個です。今の大運にも財星に当たる○があるので、予算や協力の頼み方を考えるきっかけにできます。',
+    summaryRole: 'お金や実務を動かす力'
+  },
+  官星: {
+    role: '役割や約束を引き受け、信頼をつくる力',
+    support: '官星を上げて補うには、身近な予定を一つ選び、誰が何をいつまでにするかを確認してみましょう。官星を生む財星を上げるなら、その予定に使える時間やお金、協力を頼める人を確かめてみましょう。財星（○）の気は官星（△）の気を生みます。',
+    balance: '官星の勢いを抑えるには、食傷を上げて、負担が重い役割の進め方を変える案を一つ言葉にしてみましょう。官星が生む印星を上げて気を抜くなら、役割を通じて気づいたことを一行書き留め、次に活かせる学びとして受け取ってみましょう。食傷（○）の気は官星（△）の気を剋し、官星（△）の気は印星（□）の気を生みます。',
+    few: '命式では、役割や約束を支える官星が1個です。身近な予定で、担当と期限を決める場面を一つ選んでみてください。',
+    fewWithMissing: '命式では、役割や約束を支える官星が1個です。抱えている予定の中から、担当と期限を決めたいものを一つ選んでみてください。'
+  },
+  印星: {
+    role: '学びや人からの支えを受け取り、活かす力',
+    support: '印星を上げて補うには、気になっていることを一つ、話しやすい人に聞いてみましょう。印星を生む官星を上げるなら、質問や相談の時間を相手と約束してみましょう。官星（○）の気は印星（△）の気を生みます。',
+    balance: '印星の勢いを抑えるには、財星を上げて、集めた情報の中から今ある時間や予算で試せることを一つ進めてみましょう。印星が生む比劫を上げて気を抜くなら、人から聞いた助言をふまえて、自分の希望に合うものを一つ選んでみましょう。財星（○）の気は印星（△）の気を剋し、印星（△）の気は比劫（□）の気を生みます。',
+    few: '命式では、学びや支えを受け取る印星が1個です。知りたいことを一つ選んで、人に聞いてみるところから始められます。',
+    use: '最近の気づきを一行メモして、次にやってみたいことを考えてみましょう。'
+  }
+};
+
+SHICHU_TEXTS.individualGogyoReason = function (groups, template) {
+  return template.replace(/(比劫|食傷|財星|官星|印星)（[○△□]）/g, function (_, group) {
+    return groups[group].elem;
+  }).replace('の気を剋し、', 'の気を剋します。');
+};
+
+SHICHU_TEXTS.individualGogyoAdvice = function (groups, group, level) {
+  var template = SHICHU_TEXTS.individualGogyo[group][level];
+  var reasonStart = template.lastIndexOf('。', template.length - 2) + 1;
+  return {
+    action: template.slice(0, reasonStart),
+    reason: SHICHU_TEXTS.individualGogyoReason(groups, template.slice(reasonStart))
+  };
+};
+
+SHICHU_TEXTS.individualGogyoDetail = function (groups, group, luck, hasMissing) {
+  var entry = groups[group], count = entry.count, elem = entry.elem;
+  var copy = SHICHU_TEXTS.individualGogyo[group];
+  var advice = SHICHU_TEXTS.individualGogyoAdvice(groups, group, count < 2 ? 'support' : 'balance');
+  var text;
+  if (count >= 3) {
+    text = copy.many || '命式では、' + copy.role + 'に当たる' + group + 'が{count}個です。' + advice.action;
+  } else {
+    var decade = luck.daiun[elem], year = luck.ryunen[elem];
+    var timing = decade && year ? '今の大運と今年の流れ' : decade ? '今の大運' : year ? '今年の流れ' : '';
+    var timedCopy = count === 1 && (decade && year ? copy.both : decade ? copy.decade : year ? copy.year : '');
+    var basic = count === 0 ? copy.zero : hasMissing && copy.fewWithMissing || copy.few;
+    text = timedCopy || basic || '命式では、' + copy.role + 'に当たる' + group + 'が{count}個です。' + advice.action.split('。')[0] + '。';
+    if (timing && !timedCopy) {
+      text += timing + 'にも' + group + 'に当たる' + elem + 'があるので、この行動を試すきっかけにできます。';
+    }
+  }
+  return text.replace('{count}', count).replace('○', elem) + advice.reason;
+};
+
+SHICHU_TEXTS.individualGogyoKeReading = function (from, to, groups) {
+  var intro = '図では' + SHICHU_TEXTS.individualGogyoReason(groups, from + '（○）の気は' + to + '（△）の気を剋します。')
+    .replace('の気は', 'の気が');
+  if (from === '財星' && to === '印星') {
+    return intro + 'お金や用事を扱う時間が増えると、学びや人からの支えを受け取る時間が少なくなる、という読み方ができます。';
+  }
+  var copy = SHICHU_TEXTS.individualGogyo;
+  return intro + from + 'の「' + copy[from].role + '」を使う場面が増えたら、' + to + 'の「' + copy[to].role + '」を使う時間も取ってみましょう。';
+};
+
+SHICHU_TEXTS.individualGogyoPower = {
+  strong: '自分の希望を確かめたうえで、役立ちそうな助言を一つ選んでみましょう。',
+  mid: '一人で考えがまとまらないときは、話しやすい人の意見を聞いてから選ぶ方法もあります。',
+  soft: '誰かの助言を聞いてから自分が試したいことを選ぶと、まわりの支えを活かしやすくなります。'
+};
+
 SHICHU_TEXTS.gogyoActions = {
   木: '興味のあることを一つ選び、5分だけ取り組む',
   火: '大事にしたい思いを、相手にひと言伝える',
@@ -2464,7 +2555,6 @@ SHICHU_TEXTS.compatReading = function (c, rA, rB, nameA, nameB) {
 };
 
 if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
-
 </script>
 <script>
 (function () {
@@ -2829,7 +2919,38 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     }
     return out;
   }
+  function orderedGogyoGroups(groups) {
+    return Object.keys(groups).sort(function (a, b) {
+      return GEL.indexOf(groups[a].elem) - GEL.indexOf(groups[b].elem);
+    });
+  }
+  function gogyoGroupLabel(groups, group) {
+    return group + '（' + groups[group].elem + '）';
+  }
+  function individualGogyoSummary(r) {
+    var groups = r.groups, order = orderedGogyoGroups(groups), copy = T.individualGogyo;
+    var ranked = order.slice().sort(function (a, b) { return groups[b].count - groups[a].count; });
+    var top = ranked[0];
+    var missing = order.find(function (group) { return groups[group].count === 0; });
+    var many = order.filter(function (group) { return groups[group].count >= 3; });
+    var few = order.filter(function (group) { return groups[group].count < 2; });
+    function label(group) { return gogyoGroupLabel(groups, group); }
+    if (!missing && !many.length) {
+      return '命式には五つの力がひととおり表れています。数がいちばん多い' + label(top) + 'を手がかりにするなら、' +
+        (copy[top].use || T.cycleStages[top].support);
+    }
+    var summary = many.map(function (group) {
+      return label(group) + 'に存在感があり、' + (copy[group].summaryRole || copy[group].role) + 'がこの図で目に留まります。';
+    }).join('');
+    if (missing) {
+      if (copy[missing].zeroSummary) return summary + copy[missing].zeroSummary.replace('{group}', label(missing));
+      var action = T.individualGogyoAdvice(groups, missing, 'support').action;
+      return summary + '図で0個の' + label(missing) + 'は控えめです。' + firstSentence(action);
+    }
+    return summary + (few.length ? few.map(label).join('・') + 'は控えめです。' : '');
+  }
   function gogyoSummaryLine(r, forCompat) {
+    if (!forCompat) return individualGogyoSummary(r);
     var g = r.gogyo, E = ['木', '火', '土', '金', '水'];
     var P = T.gogyoPlain || {};
     var balance = T.elemManyFew(g, E), many = balance.many, zero = balance.few;
@@ -2841,13 +2962,7 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
       s = many[0] + 'の気（' + shortG(many[0]) + '）が多め。';
     }
     if (zero.length) {
-      var z = zero[0];
       s += zero.map(function (x) { return x + 'の気（' + shortG(x) + '）'; }).join('・') + 'は少なめです。';
-      if (forCompat) return s;
-      var people = (P.people && P.people[z]) || (z + 'の気を持つ人との付き合い');
-      var life = (P.life && P.life[z]) || '';
-      var lifeBit = life.split('、').slice(0, 2).join('、');
-      s += people + (lifeBit ? 'や、' + lifeBit : '') + 'で補えます。';
     } else {
       s += '五行の気がひととおりそろっていて、バランスのとりやすい命式です。';
     }
@@ -3113,66 +3228,52 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     return { daiun: daiun, ryunen: ryunen };
   }
   var SHENG_NEXT = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' };
-  var PARENT_ELEM = { 木: '水', 火: '木', 土: '火', 金: '土', 水: '金' };
   var KE_PAIRS = [['木', '土'], ['土', '水'], ['水', '火'], ['火', '金'], ['金', '木']];
   function isShengAdj(a, b) { return SHENG_NEXT[a] === b || SHENG_NEXT[b] === a; }
-  function isKePair(a, b) { return SHENG_NEXT[SHENG_NEXT[a]] === b || SHENG_NEXT[SHENG_NEXT[b]] === a; }
-  function fillNowLine(e, luck, B) {
-    var parts = [];
-    if (luck.daiun[e]) parts.push(String(B.fillNowDaiun).replace(/○の気/g, e + 'の気').replace(/○/g, e));
-    if (luck.ryunen[e]) parts.push(String(B.fillNowRyunen).replace(/○の気/g, e + 'の気').replace(/○/g, e));
-    return parts.join('');
-  }
   function gogyoBalanceItems(r) {
-    var B = T.gogyoBalance, g = r.gogyo, E = GEL, luck = luckElemSets(r), items = [];
-    if (!B) return items;
-    E.forEach(function (e) {
-      var n = g[e] || 0;
-      var level = n === 0 ? 'zero' : n === 1 ? 'few' : n >= 3 ? 'many' : null;
-      if (!level) return;
-      var title = e + 'の気' + (level === 'zero' ? 'が少なめ' : level === 'few' ? 'が少なめ' : 'が多い');
-      var text = B.elem[e][level];
-      if (level === 'zero' || level === 'few') text += fillNowLine(e, luck, B);
-      items.push({ title: title, text: text, pattern: title });
+    var groups = r.groups, order = orderedGogyoGroups(groups), luck = luckElemSets(r), items = [];
+    var zeroCount = order.filter(function (group) { return groups[group].count === 0; }).length;
+    function label(group) { return gogyoGroupLabel(groups, group); }
+    function add(title, text) { items.push({ title: title, text: text }); }
+    order.forEach(function (group) {
+      var count = groups[group].count;
+      if (count === 2) return;
+      add(label(group) + (count < 2 ? 'が控えめ' : 'に存在感がある'),
+        T.individualGogyoDetail(groups, group, luck, zeroCount > 0));
     });
-    var ranked = E.map(function (e) { return { e: e, n: g[e] || 0 }; });
-    ranked.sort(function (a, b) { return b.n - a.n || E.indexOf(a.e) - E.indexOf(b.e); });
-    var maxn = ranked[0].n, zeroN = E.filter(function (e) { return (g[e] || 0) === 0; }).length;
-    var allPresent = E.every(function (e) { return (g[e] || 0) >= 1; });
-    var overall = null;
-    if (maxn >= 4) {
-      overall = { title: '全体の傾向：1つに強くかたよる', pattern: '1つに強くかたよる', text: String(B.overall.strongBias).replace(/○の気/g, ranked[0].e + 'の気').replace(/○/g, ranked[0].e) };
-    } else {
-      var e1 = ranked[0].e, e2 = ranked[1].e, sum2 = ranked[0].n + ranked[1].n;
-      if (sum2 >= 5 && isShengAdj(e1, e2)) {
-        overall = { title: '全体の傾向：相生で隣り合う2つに集中', pattern: '相生で隣り合う2つに集中', text: String(B.overall.shoseiFocus).replace(/○の気/g, e1 + 'の気').replace(/△の気/g, e2 + 'の気').replace(/○/g, e1).replace(/△/g, e2) };
-      } else if (sum2 >= 5 && isKePair(e1, e2)) {
-        overall = { title: '全体の傾向：相剋する2つに集中', pattern: '相剋する2つに集中', text: String(B.overall.shokokuFocus).replace(/○の気/g, e1 + 'の気').replace(/△の気/g, e2 + 'の気').replace(/○/g, e1).replace(/△/g, e2) };
-      } else if (zeroN >= 2) {
-        overall = { title: '全体の傾向：2つ以上の気が欠けている', pattern: '2つ以上欠け', text: B.overall.multiMissing };
-      } else if (allPresent) {
-        overall = { title: '全体の傾向：全部そろう', pattern: '全部そろう', text: B.overall.allPresent };
-      }
+    var ranked = order.slice().sort(function (a, b) { return groups[b].count - groups[a].count; });
+    var first = ranked[0], second = ranked[1], top = groups[first], next = groups[second];
+    var copy = T.individualGogyo;
+    if (top.count >= 4) {
+      add('全体の傾向：一つの力に数が集まる', label(first) + 'は' + top.count + '個あり、' + copy[first].role + 'が表れています。');
+    } else if (top.count + next.count >= 5) {
+      var relation = isShengAdj(top.elem, next.elem) ? '相生で隣り合う' : '相剋する';
+      add('全体の傾向：' + relation + '二つの力に数が集まる',
+        label(first) + 'の「' + copy[first].role + '」と、' + label(second) + 'の「' + copy[second].role + '」が表れています。');
+    } else if (zeroCount >= 2) {
+      var missing = order.filter(function (group) { return groups[group].count === 0; }).map(label);
+      add('全体の傾向：0個の力が二つ以上ある', '命式の図では' + missing.join('・') + 'が0個です。試しやすい行動から取り入れてみてください。');
+    } else if (!zeroCount) {
+      add('全体の傾向：五つの力がそろう', '命式の図には五つの力がひととおり表れています。やりたいことに合わせて、使いやすい力から取り入れてみてください。');
     }
-    if (overall) items.push(overall);
+    var byElem = {};
+    order.forEach(function (group) { byElem[groups[group].elem] = group; });
     var kokuBest = null;
     KE_PAIRS.forEach(function (pair) {
-      var a = pair[0], b = pair[1], na = g[a] || 0, nb = g[b] || 0;
-      if (na >= 3 && nb <= 1) {
-        var gap = na - nb;
-        if (!kokuBest || gap > kokuBest.gap) kokuBest = { a: a, b: b, gap: gap };
+      var from = byElem[pair[0]], to = byElem[pair[1]];
+      var strong = groups[from].count, weak = groups[to].count;
+      if (strong >= 3 && weak <= 1 && (!kokuBest || strong - weak > kokuBest.gap)) {
+        kokuBest = { from: from, to: to, gap: strong - weak };
       }
     });
     if (kokuBest) {
-      var kk = kokuBest.a + kokuBest.b;
-      items.push({ title: '相剋の流れ：' + kokuBest.a + 'の気と' + kokuBest.b + 'の気', pattern: kokuBest.a + '剋' + kokuBest.b, text: B.koku[kk] });
+      add('相剋の流れ：' + label(kokuBest.from) + 'と' + label(kokuBest.to),
+        T.individualGogyoKeReading(kokuBest.from, kokuBest.to, groups));
     }
-    var dayElem = S.STEM_ELEM[r.dayStem];
-    var power = (g[dayElem] || 0) + (g[PARENT_ELEM[dayElem]] || 0);
-    var nk = power >= 5 ? 'strong' : power >= 3 ? 'mid' : 'soft';
-    var ntitle = nk === 'strong' ? '日干の力：強め' : nk === 'mid' ? '日干の力：中くらい' : '日干の力：まわりの力で伸びる';
-    var npat = nk === 'strong' ? '日干が強め' : nk === 'mid' ? '日干が中くらい' : '日干はまわりの力で伸びる';
-    items.push({ title: ntitle, pattern: npat, text: B.nikkan[nk] });
+    var power = groups['比劫'].count + groups['印星'].count;
+    var level = power >= 5 ? 'strong' : power >= 3 ? 'mid' : 'soft';
+    var title = level === 'strong' ? '強め' : level === 'mid' ? '中くらい' : 'まわりの力を活かす';
+    add('日干の力：' + title, '自分で選ぶ比劫と支えを受け取る印星は、合わせて' + power + '個です。' + T.individualGogyoPower[level]);
     return items;
   }
 
@@ -3970,19 +4071,17 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
       '<p>自分の力（比劫）が思いを形にする力（食傷）を生み、それが人やお金とのご縁（財星）を呼び、ご縁が役割や信頼（官星）を育て、役割から得た学びや支え（印星）が、またあなた自身の力に戻ってきます。図の矢印は、そんなめぐりを表しています。</p>';
   }
 
-  function gogyoAdjustmentHtml(gogyo) {
+  function gogyoAdjustmentHtml(groups) {
     var items = [];
-    GEL.forEach(function (elem) {
-      var count = gogyo[elem];
-      if (count < 2) {
-        var source = GEL.find(function (e) { return SHENG_NEXT[e] === elem; });
-        items.push({ title: elem + '（' + T.cycleAmount(count) + '）を補う',
-          advice: T.gogyoSupportAdvice(elem, source, gogyo[source] >= 2) });
-      } else if (count >= 3) {
-        var controller = KE_PAIRS.find(function (pair) { return pair[1] === elem; })[0];
-        items.push({ title: elem + '（' + T.cycleAmount(count) + '）を整える',
-          advice: T.gogyoBalanceAdvice(elem, controller, SHENG_NEXT[elem]) });
-      }
+    orderedGogyoGroups(groups).forEach(function (group) {
+      var count = groups[group].count;
+      if (count === 2) return;
+      var support = count < 2;
+      var advice = T.individualGogyoAdvice(groups, group, support ? 'support' : 'balance');
+      items.push({
+        title: gogyoGroupLabel(groups, group) + 'の力を' + (support ? '補う' : '整える'),
+        advice: advice.action + advice.reason
+      });
     });
     if (!items.length) return '';
     return '<div id="individual-gogyo-adjustment"><h3>五行の整え方</h3>' + items.map(function (item) {
@@ -3999,11 +4098,11 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     h += cycleGuideHtml(r.groups);
     T.individualCycleReading(r).forEach(function (paragraph) { h += '<p>' + esc(paragraph) + '</p>'; });
     h += '</div>';
-    h += gogyoAdjustmentHtml(r.gogyo);
+    h += gogyoAdjustmentHtml(r.groups);
     var bal = gogyoBalanceItems(r);
     h+='<details class="more inner"><summary>もっと読む</summary>';
     h+=bal.map(function(a){return '<h4>'+tyWrap(a.title)+'</h4><p>'+esc(a.text)+'</p>';}).join('');
-    h+='<p class="note">●は生まれ持った柱の数です。生まれ月の季節や組み合わせの記号とは分けて見てください。</p></details>';
+    h+='<p class="note">●は命式の天干と地支を数えたものです。ほかの記号は、組み合わせや今の流れを示します。</p></details>';
     h+='<h3>今の流れ</h3><p>＋はこの10年、⊕は今年のテーマです。生まれ持った数が増減したわけではありません。下の「大運・今年・今月」で、いま試したいことを一つ選んでみましょう。</p></section>';
     return h;
   }
@@ -4616,7 +4715,6 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
   });
   if (isZukanHash(location.hash)) openZukan(location.hash);
 })();
-
 </script>
 </body>
 </html>
