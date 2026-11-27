@@ -1219,7 +1219,8 @@
   function cycleGuideHtml(groups) {
     var order = Object.keys(groups);
     return '<p class="note">上の丸が日干の五行（比劫）です。図の相生の矢印は ' +
-      esc(order.concat(order[0]).join(' → ')) + ' とめぐります。丸の大きさと●は、命式にある五行の数を表します。</p>';
+      esc(order.concat(order[0]).join(' → ')) + ' とめぐります。丸の大きさと●は、命式にある五行の数を表します。</p>' +
+      '<p>自分の力（比劫）が思いを形にする力（食傷）を生み、それが人やお金とのご縁（財星）を呼び、ご縁が役割や信頼（官星）を育て、役割から得た学びや支え（印星）が、またあなた自身の力に戻ってきます。図の矢印は、そんなめぐりを表しています。</p>';
   }
 
   function gogyoAdjustmentHtml(gogyo) {
