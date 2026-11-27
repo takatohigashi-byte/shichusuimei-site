@@ -3,21 +3,24 @@
 
   var S = (typeof globalThis !== 'undefined' && globalThis.Shichu) || (typeof window !== 'undefined' && window.Shichu);
   var phases = [
-    { name: '選別', from: 0, length: 2, stars: '比肩・敗財', style: 'sort',
-      summary: '物語は、空亡の2年から始まります。いったん立ち止まって自分の星をふり返り、これからも持っていきたいものを選び直す時期です。',
-      advice: '自分の星をふり返り、今も大事にしたいことを書き出してみましょう。続けたいことに、少し時間を取ってみてもよさそうです。' },
-    { name: '仕込み', from: 2, length: 2, stars: '食神・傷官', style: 'prepare',
-      summary: '選び直したものを手に、アイデアや好きなことを少しずつ形にし始めます。まだ小さくても大丈夫な時期です。',
-      advice: '気になっていたアイデアを、小さな形にしてみましょう。好きなことに手を動かしながら、続けやすいやり方を探してみてください。' },
-    { name: '育成', from: 4, length: 3, stars: '偏財・正財', style: 'nurture',
-      summary: '形になり始めたものが、人やお金とのご縁を呼んでくれます。出会ったご縁を、無理のないペースで育てていく時期です。',
-      advice: '身近なご縁のなかで、これからも大事にしたい関わりを見つけてみましょう。時間やお金は、無理なく続けられる使い方を考えてみてください。' },
-    { name: '伸長', from: 7, length: 3, stars: '偏官・正官', style: 'extend',
-      summary: '育ったご縁に支えられて、責任や挑戦を引き受ける場面が増えます。できることが、ぐんと広がる時期です。',
-      advice: '関心のある役割や挑戦があれば、自分のペースで手を挙げてみましょう。抱えることが増えたら、周りと分け合えることを考えてみてください。' },
-    { name: '実り', from: 10, length: 2, stars: '偏印・印綬', style: 'reflect',
-      summary: '広げてきたことを仕組みにまとめ、学びを深めます。ここで得たものを抱えて、また次の空亡で選び直しへ向かいます。',
-      advice: '続けてきた工夫をメモにまとめ、あとから見返せるようにしてみましょう。もう少し知りたいことがあれば、調べたり話を聞いたりしてみてください。' }
+    { name: '旅立ち', from: 0, length: 2, stars: '比肩・敗財', style: 'depart',
+      summary: '学んだことを手に、自分の足で歩き出す2年です。まだ形は見えなくても大丈夫。人の声より自分の感覚を信じて、「次は何を大事にするか」を決めていきます。',
+      advice: '「これからやってみたいこと」を一つ書き出して、今週できる小さな一歩を決めてみてください。' },
+    { name: '挑戦と広がり', from: 2, length: 2, stars: '食神・傷官', style: 'challenge',
+      summary: 'いろいろな流れがやってきて、あれこれ試してみる2年です。うまくいくかより、気になったことに手を出してみることが、次の時期の手がかりになります。',
+      advice: '気になる誘いや場所があれば、まず一度だけ試してみてください。やってみた感想を短くメモしておくと、あとで選ぶときの手がかりになります。' },
+    { name: '選択と集中', from: 4, length: 2, stars: '偏財・正財', style: 'focus',
+      summary: '試してきたものの中から「これ」と決めて、人・モノ・カネを注ぎこむ2年です。広げることより、しぼって育てることを意識してみてください。',
+      advice: '続けたいことを一つ選び、そのために使う時間や予算を先に決めてみてください。ほかのことは、少しお休みしても大丈夫です。' },
+    { name: '成長と成果', from: 6, length: 2, stars: '偏官・正官', style: 'growth',
+      summary: '注いできたものが大きく伸びて、外からも声がかかる2年です。成果が見えやすいぶん忙しくなるので、ひとりで抱えこまず、まわりと分け合っていきましょう。',
+      advice: '新しく引き受ける前に、今の予定に入るかを一度確かめてみてください。任せられることは、早めにまわりに頼んでみましょう。' },
+    { name: '整理と継承', from: 8, length: 2, stars: '偏印・印綬', style: 'inherit',
+      summary: '伸びがひと段落して、やってきたことを振り返る2年です。体験を整理して言葉にし、人に教えたり渡したりすることで、それが次の人の力になります。',
+      advice: 'うまくいったやり方を、人に伝わる言葉でまとめてみてください。仲間や後輩に話してみると、自分の学びもはっきりします。' },
+    { name: '手放しと新たな学び', from: 10, length: 2, stars: '', style: 'release', kubou: true,
+      summary: '12年の巡りの区切りの2年です。これまでの成果を味わいながら、次に持っていくものと、ここで終わりにするものを選びます。自分から押すより、人にゆだねたほうがうまく運びやすい時期です。そのぶん、次の12年に使える新しいことを学んでおきましょう。',
+      advice: '終わりにしてよいことを一つ決めて、空いた時間で前から気になっていた分野を学んでみてください。迷うときは、信頼できる人の考えを聞いてみましょう。' }
   ];
 
   function toInt(value) {
@@ -70,7 +73,7 @@
     var firstBranch = S.BRANCHES.indexOf(result.kubou.charAt(0));
 
     function offsetOf(branch) {
-      return (S.BRANCHES.indexOf(branch) - firstBranch + 12) % 12;
+      return (S.BRANCHES.indexOf(branch) - firstBranch - 2 + 24) % 12;
     }
 
     var offset = offsetOf(result.current.ryunen.name.charAt(1));
@@ -123,7 +126,7 @@
     }).join('');
     var legend = phases.map(function (phase) {
       return '<li><span class="swatch ' + esc(phase.style) + '"></span>' +
-        esc(phase.name) + (phase.from === 0 ? '（空亡）' : '') + '</li>';
+        esc(phase.name) + (phase.kubou ? '（空亡）' : '') + '</li>';
     }).join('');
 
     return '<svg viewBox="0 0 340 340" role="img" aria-labelledby="diagram-title diagram-desc">' +
@@ -144,7 +147,7 @@
     document.getElementById('present').innerHTML =
       '<h2 id="present-title">' + esc(cycle.year) + '年のフェーズ</h2>' +
       '<p class="present-phase"><strong>' + esc(current.name) + '</strong> ' +
-      esc(cycle.phaseYear) + '年目</p><p class="note">象徴の十神　' + esc(current.stars) + '</p>' +
+      esc(cycle.phaseYear) + '年目</p>' +
       '<p>' + esc(current.advice) + '</p><p class="next">次の「' + esc(cycle.next.name) + '」は' +
       esc(cycle.nextYear) + '年から</p>';
 
@@ -156,7 +159,7 @@
         (active ? '<span class="now">今</span>' : '') + '</div><div>' + esc(phase.summary) + '</div></li>';
     }).join('');
     document.getElementById('loop').innerHTML =
-      '次の巡りは ' + range(cycle.start + 12, phases[0].length) + 'の選別から始まります。';
+      '次の巡りは ' + range(cycle.start + 12, phases[0].length) + 'の旅立ちから始まります。';
 
     document.getElementById('years').innerHTML = cycle.years.map(function (row) {
       var active = row.year === cycle.year;
@@ -164,7 +167,6 @@
         esc(row.year) + '年' + (active ? ' <span class="now">今</span>' : '') + '</th>' +
         '<td data-label="年干支">' + esc(row.name) + '</td>' +
         '<td data-label="フェーズ">' + esc(row.phase.name) + '</td>' +
-        '<td data-label="象徴の十神">' + esc(row.phase.stars) + '</td>' +
         '<td class="annual-star" data-label="流年通変星">' + esc(row.star) + '</td>' +
         '<td data-label="空亡">' + (row.kubou ? '<span class="kubou">空亡</span>' : '—') + '</td></tr>';
     }).join('');

@@ -203,24 +203,23 @@ details.more[open]>summary{margin-bottom:12px;color:#c45a86;border-color:var(--a
 .fortune-reading h3{margin:0;color:#834b61}
 .fortune-reading p{margin:4px 0;font-size:.9rem}
 .fortune-years{white-space:nowrap}
-.fortune-phases{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px;list-style:none;padding:0;margin:10px 0;text-align:center;color:#624752}
-.fortune-phases li{padding:5px 3px 3px;border-radius:8px;font-size:.82rem;line-height:1.4;min-width:0}
-.fortune-phases li.span-2{grid-column:span 2}
-.fortune-phases li.span-3{grid-column:span 3}
-.fortune-phases li.sort{background:#e4e0e5}
-.fortune-phases li.prepare{background:#fde4ee}
-.fortune-phases li.nurture{background:#dff1e9}
-.fortune-phases li.extend{background:#ffedce}
-.fortune-phases li.reflect{background:#efe6fb}
+.fortune-phases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;list-style:none;padding:0;margin:10px 0;text-align:center;color:#624752}
+.fortune-phases li{padding:5px 3px 3px;border-radius:8px;font-size:.82rem;line-height:1.4;min-width:0;word-break:normal;overflow-wrap:anywhere}
+.fortune-phases li.depart{background:#fde4ee}
+.fortune-phases li.challenge{background:#feeadb}
+.fortune-phases li.focus{background:#ffedce}
+.fortune-phases li.growth{background:#dff1e9}
+.fortune-phases li.inherit{background:#efe6fb}
+.fortune-phases li.release{background:#e4e0e5}
 .fortune-phases li[aria-current]{box-shadow:0 0 0 2px #be416c}
 .fortune-phase-range{display:block;font-size:.69rem;font-variant-numeric:tabular-nums}
 .fortune-phase-track{display:grid;grid-template-rows:17px;gap:2px;margin-top:4px;font-size:.67rem;line-height:16px}
 .fortune-phase-track.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
-.fortune-phase-track.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .fortune-phase-track>span{background:#ffffffa0;border-radius:4px;min-height:16px}
 .fortune-phase-track>[aria-current]{background:#be416c;color:#fff;font-weight:bold}
+.fortune-reading .fortune-preface{margin:0 0 4px}
 .fortune-phase-guide{display:grid;gap:3px;margin:0 0 10px;font-size:.85rem}
-.fortune-phase-guide>div{display:grid;grid-template-columns:3.25em 1fr;gap:4px;padding:2px 5px}
+.fortune-phase-guide>div{display:block;padding:2px 5px}
 .fortune-phase-guide dt{font-weight:bold;color:#834b61}
 .fortune-phase-guide dd{margin:0}
 .fortune-phase-active{background:#fbe0e9;border-radius:8px}
@@ -236,17 +235,19 @@ details.more[open]>summary{margin-bottom:12px;color:#c45a86;border-color:var(--a
 .fortune-ryunen-details{margin-top:4px}
 .fortune-ryunen-tags{margin-top:6px;gap:3px}
 .fortune-ryunen-tags span{padding:1px 5px;border-radius:6px;font-size:.72rem;white-space:nowrap}
-.fortune-ryunen-phase[data-phase="sort"]{background:#e4e0e5}
-.fortune-ryunen-phase[data-phase="prepare"]{background:#fde4ee}
-.fortune-ryunen-phase[data-phase="nurture"]{background:#dff1e9}
-.fortune-ryunen-phase[data-phase="extend"]{background:#ffedce}
-.fortune-ryunen-phase[data-phase="reflect"]{background:#efe6fb}
+.fortune-ryunen-phase[data-phase="depart"]{background:#fde4ee}
+.fortune-ryunen-phase[data-phase="challenge"]{background:#feeadb}
+.fortune-ryunen-phase[data-phase="focus"]{background:#ffedce}
+.fortune-ryunen-phase[data-phase="growth"]{background:#dff1e9}
+.fortune-ryunen-phase[data-phase="inherit"]{background:#efe6fb}
+.fortune-ryunen-phase[data-phase="release"]{background:#e4e0e5}
 .fortune-ryunen-kubou{background:#e4e0e5;color:#504954}
-.fortune-legend i.phase-sort{background:#d9d5dc}
-.fortune-legend i.phase-prepare{background:#f8d0de}
-.fortune-legend i.phase-nurture{background:#d8f3ec}
-.fortune-legend i.phase-extend{background:#f9e6b8}
-.fortune-legend i.phase-reflect{background:#e4d7f6}
+.fortune-legend i.phase-depart{background:#f8d0de}
+.fortune-legend i.phase-challenge{background:#fddcc4}
+.fortune-legend i.phase-focus{background:#f9e6b8}
+.fortune-legend i.phase-growth{background:#d8f3ec}
+.fortune-legend i.phase-inherit{background:#e4d7f6}
+.fortune-legend i.phase-release{background:#d9d5dc}
 .hoshi-bar{margin:14px 0 0;text-align:center}
 .hoshi-btn{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:.92rem;font-weight:bold;color:#fff;text-decoration:none;background:linear-gradient(135deg,#f49bbd,#c3a6ee);border-radius:999px;padding:8px 20px;box-shadow:0 4px 12px rgba(232,127,166,.35)}
 .hoshi-btn:hover,.hoshi-btn:focus{outline:none;filter:brightness(1.05)}
@@ -258,7 +259,6 @@ details.more[open]>summary{margin-bottom:12px;color:#c45a86;border-color:var(--a
   .fortune-reading{grid-template-columns:1fr;gap:8px}
   .fortune-ryunen-list{grid-template-columns:repeat(2,minmax(0,1fr))}
   .fortune-phases{grid-template-columns:1fr}
-  .fortune-phases li.span-2,.fortune-phases li.span-3{grid-column:auto}
 }
 .card.featured{border:2px solid #f4b4cc;box-shadow:0 6px 20px rgba(232,127,166,.22)}
 .card.featured h2:before{content:"\2665 "}
@@ -592,7 +592,7 @@ body.zukan-open{overflow:hidden}
 <script src="tables.js?v=20261127b"></script>
 <script src="shichu.js?v=20261127b"></script>
 <script src="texts.js?v=20261127b"></script>
-<script src="hoshi.js?v=20261127m"></script>
-<script src="app.js?v=20261127n"></script>
+<script src="hoshi.js?v=20261127o"></script>
+<script src="app.js?v=20261127o"></script>
 </body>
 </html>

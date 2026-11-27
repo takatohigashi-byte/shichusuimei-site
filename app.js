@@ -153,7 +153,7 @@
       var end = Math.min(last, k + 2);
       var center = x((left + end) / 2);
       rects += `<rect x="${x(left)}" y="98" width="${x(end) - x(left)}" height="85" rx="5" fill="#77727e" opacity=".23"/>`;
-      labels += `<text x="${center}" y="198" font-size="13" font-weight="bold">選別</text>
+      labels += `<text x="${center}" y="198" font-size="13" font-weight="bold">空亡</text>
         <text x="${center}" y="215" font-size="11">${left}${end - left === 2 ? '・' + (left + 1) : ''}</text>`;
     }
     var axis = `<path d="M${x(first)},229 H${x(last)}" stroke="#c8a8b4"/>`;
@@ -175,16 +175,15 @@
   }
   function fortuneClock(year, branch, kubou) {
     var first = year - S.BRANCHES.indexOf(branch);
-    var firstKubou = S.BRANCHES.indexOf(kubou.charAt(0));
-    var fills = { sort: '#d9d5dc', prepare: '#f8d0de', nurture: '#d8f3ec', extend: '#f9e6b8', reflect: '#e4d7f6' };
+    var fills = { depart: '#f8d0de', challenge: '#fddcc4', focus: '#f9e6b8', growth: '#d8f3ec', inherit: '#e4d7f6', release: '#d9d5dc' };
     var point = function (radius, angle) {
       return [145 + radius * Math.cos(angle), 145 + radius * Math.sin(angle)];
     };
     var h = `<svg class="fortune-clock" viewBox="0 0 290 290" role="img" aria-label="12年の時計。今は${year}年の${branch}、空亡の地支は${kubou}" text-anchor="middle" dominant-baseline="central" fill="#624752">`;
     Array.from(S.BRANCHES).forEach(function (b, i) {
       var angle = i * Math.PI / 6 - Math.PI / 2, a = angle - Math.PI / 12, z = angle + Math.PI / 12;
-      var active = b === branch, empty = kubou.includes(b);
-      var phase = fortunePhaseAt((i - firstKubou + 12) % 12);
+      var active = b === branch;
+      var phase = fortunePhaseAt(fortuneCycleOffset(b, kubou));
       var fill = active ? '#be416c' : (fills[phase.style] || '#fae0e8');
       var inner = 46, outer = 105;
       var label = point(75, angle), date = point(123, angle);
@@ -198,11 +197,12 @@
       <text x="145" y="157" font-size="13">${branch}年</text></svg>`;
   }
   var fortunePhaseTexts = {
-    '選別': ['物語は、空亡の2年から始まります。いったん立ち止まって自分の星をふり返り、これからも持っていきたいものを選び直す時期です。', '今も大事にしたいことを、自分のペースで書き出してみてください。'],
-    '仕込み': ['選び直したものを手に、アイデアや好きなことを少しずつ形にし始めます。まだ小さくても大丈夫な時期です。', '気になることがあれば、小さな一歩から始めてみてください。'],
-    '育成': ['形になり始めたものが、人やお金とのご縁を呼んでくれます。出会ったご縁を、無理のないペースで育てていく時期です。', '無理なく続けられる関わり方や使い方を、考えてみてください。'],
-    '伸長': ['育ったご縁に支えられて、責任や挑戦を引き受ける場面が増えます。できることが、ぐんと広がる時期です。', '関心のあることに、自分のペースで手を挙げてみてください。'],
-    '実り': ['広げてきたことを仕組みにまとめ、学びを深めます。ここで得たものを抱えて、また次の空亡で選び直しへ向かいます。', '続けてきた工夫を振り返り、あとから見返せるようにしてみてください。']
+    '旅立ち': ['学んだことを手に、自分の足で歩き出す2年です。まだ形は見えなくても大丈夫。人の声より自分の感覚を信じて、「次は何を大事にするか」を決めていきます。', '「これからやってみたいこと」を一つ書き出して、今週できる小さな一歩を決めてみてください。'],
+    '挑戦と広がり': ['いろいろな流れがやってきて、あれこれ試してみる2年です。うまくいくかより、気になったことに手を出してみることが、次の時期の手がかりになります。', '気になる誘いや場所があれば、まず一度だけ試してみてください。やってみた感想を短くメモしておくと、あとで選ぶときの手がかりになります。'],
+    '選択と集中': ['試してきたものの中から「これ」と決めて、人・モノ・カネを注ぎこむ2年です。広げることより、しぼって育てることを意識してみてください。', '続けたいことを一つ選び、そのために使う時間や予算を先に決めてみてください。ほかのことは、少しお休みしても大丈夫です。'],
+    '成長と成果': ['注いできたものが大きく伸びて、外からも声がかかる2年です。成果が見えやすいぶん忙しくなるので、ひとりで抱えこまず、まわりと分け合っていきましょう。', '新しく引き受ける前に、今の予定に入るかを一度確かめてみてください。任せられることは、早めにまわりに頼んでみましょう。'],
+    '整理と継承': ['伸びがひと段落して、やってきたことを振り返る2年です。体験を整理して言葉にし、人に教えたり渡したりすることで、それが次の人の力になります。', 'うまくいったやり方を、人に伝わる言葉でまとめてみてください。仲間や後輩に話してみると、自分の学びもはっきりします。'],
+    '手放しと新たな学び': ['12年の巡りの区切りの2年です。これまでの成果を味わいながら、次に持っていくものと、ここで終わりにするものを選びます。自分から押すより、人にゆだねたほうがうまく運びやすい時期です。そのぶん、次の12年に使える新しいことを学んでおきましょう。', '終わりにしてよいことを一つ決めて、空いた時間で前から気になっていた分野を学んでみてください。迷うときは、信頼できる人の考えを聞いてみましょう。']
   };
   function fortunePhaseAt(offset) {
     if (!window.Hoshi || !window.Hoshi.phaseForOffset) {
@@ -229,11 +229,11 @@
       return `<div${active ? ' class="fortune-phase-active"' : ''}><dt>${esc(phase.name)}</dt>
         <dd>${esc(texts[0])}${active ? esc(texts[1]) : ''}</dd></div>`;
     }).join('');
-    return `<p class="fortune-story">物語は、空亡の2年の「選別」から始まります。いったん立ち止まって大事なものを選び直したら、続く2年の「仕込み」でそれを小さく形にし始め、形になったものが呼んでくれたご縁を3年の「育成」で育て、そのご縁に支えられて3年の「伸長」で責任や挑戦を引き受け、最後の2年の「実り」で広げてきたことを仕組みと学びにまとめて、また次の空亡の「選別」へと戻っていきます。</p><ol class="fortune-phases" aria-label="今年を含む12年の流れ" role="list">${blocks}</ol>
+    return `<p class="note fortune-preface">空亡を区切りにした12年の巡りは、四柱推命の十神の流れをもとにした、このサイト独自の読み方です。</p><p class="fortune-story">物語は「旅立ち」から始まります。自分の足で歩き出し、「挑戦と広がり」であれこれ試し、「選択と集中」でこれと決めたものに力を注ぎ、「成長と成果」で大きく伸びて、「整理と継承」で体験を人に渡します。そして空亡の「手放しと新たな学び」で次に持っていくものを選び、また新しい12年へと旅立っていきます。</p><ol class="fortune-phases" aria-label="今年を含む12年の流れ" role="list">${blocks}</ol>
       <dl class="fortune-phase-guide">${explanations}</dl>`;
   }
   function fortuneCycleOffset(branch, kubou) {
-    return (S.BRANCHES.indexOf(branch) - S.BRANCHES.indexOf(kubou.charAt(0)) + 12) % 12;
+    return (S.BRANCHES.indexOf(branch) - S.BRANCHES.indexOf(kubou.charAt(0)) - 2 + 24) % 12;
   }
   function yearKubou(kanshi) {
     return ['戌亥', '申酉', '午未', '辰巳', '寅卯', '子丑'][Math.floor((S.kanshiIndex(kanshi) - 1) / 10)];
@@ -252,7 +252,7 @@
           <span>年の空亡: ${yearKubou(star.name)}</span></div>
         <div class="fortune-ryunen-tags">
           <span class="fortune-ryunen-phase" data-phase="${esc(phase.style)}">${esc(phase.name)}</span>
-          ${phase.from === 0 ? '<span class="fortune-ryunen-kubou">空亡</span>' : ''}
+          ${phase.kubou ? '<span class="fortune-ryunen-kubou">空亡</span>' : ''}
         </div>
       </li>`;
     }
@@ -266,12 +266,12 @@
     var year = ryunenYear(r), birthYear = year - c.age + 1;
     var branch = c.ryunen.name.charAt(1);
     var offset = fortuneCycleOffset(branch, r.kubou);
-    var kubouStart = year - offset;
-    var cycleStart = kubouStart;
+    var cycleStart = year - offset;
+    var kubouStart = offset >= 10 ? cycleStart + 10 : cycleStart - 2;
     var phase = fortunePhaseAt(offset);
     var phaseYear = offset - phase.from + 1;
     var nextPhase = fortunePhaseAt((phase.from + phase.length) % 12);
-    var nextYear = kubouStart + phase.from + phase.length;
+    var nextYear = cycleStart + phase.from + phase.length;
     var phaseText = phase.name + 'の' + phaseYear + '年目';
     var span = function (start, end) { return '<span class="fortune-years">' + start + '〜' + end + '年</span>'; };
     var current = c.age >= 1 && c.daiun;
@@ -292,11 +292,12 @@
           <div class="fortune-wheel"><h3>12年の時計</h3>${fortuneClock(year, branch, r.kubou)}</div>
           <ul class="fortune-legend">
             <li><i class="fortune-pink"></i>今年</li>
-            <li><i class="phase-sort"></i>選別（空亡）</li>
-            <li><i class="phase-prepare"></i>仕込み</li>
-            <li><i class="phase-nurture"></i>育成</li>
-            <li><i class="phase-extend"></i>伸長</li>
-            <li><i class="phase-reflect"></i>実り</li>
+            <li><i class="phase-depart"></i>旅立ち</li>
+            <li><i class="phase-challenge"></i>挑戦と広がり</li>
+            <li><i class="phase-focus"></i>選択と集中</li>
+            <li><i class="phase-growth"></i>成長と成果</li>
+            <li><i class="phase-inherit"></i>整理と継承</li>
+            <li><i class="phase-release"></i>手放しと新たな学び（空亡）</li>
           </ul>
         </div>
       </figure>
@@ -308,7 +309,7 @@
       </div><div><h3>空亡サイクル</h3>
         <p><strong>${esc(phaseText)}</strong>。${nextYear}年から${esc(nextPhase.name)}。</p>
         ${fortunePhaseGuide(cycleStart, year, phase)}
-        <p>${offset < 2 ? '今の空亡' : '前回の空亡'}は${span(kubouStart, kubouStart + 1)}。次は${span(kubouStart + 12, kubouStart + 13)}。</p>
+        <p>${offset >= 10 ? '今の空亡' : '前回の空亡'}は${span(kubouStart, kubouStart + 1)}。次は${span(kubouStart + 12, kubouStart + 13)}。</p>
       </div></div>
       ${fortuneRyunen(r, year)}
     </section>`;

@@ -76,11 +76,12 @@ h2 { font-size:1.14rem; }
 .guidance p { margin:0 0 12px; }
 .diagram { text-align:center; }
 .diagram svg { display:block; width:100%; max-width:400px; height:auto; margin:auto; }
-.sort { --phase-color:#c4bec9; }
-.prepare { --phase-color:#f6b7ce; }
-.nurture { --phase-color:var(--mint); }
-.extend { --phase-color:#f9dfa8; }
-.reflect { --phase-color:#d9c8f3; }
+.depart { --phase-color:#f6b7ce; }
+.challenge { --phase-color:#fcc9a6; }
+.focus { --phase-color:#f9dfa8; }
+.growth { --phase-color:var(--mint); }
+.inherit { --phase-color:#d9c8f3; }
+.release { --phase-color:#c4bec9; }
 .arc { fill:none; stroke:var(--phase-color); stroke-width:24; }
 .year-label, .wheel-center, .pin text { text-anchor:middle; dominant-baseline:central; }
 .year-label { fill:var(--ink); font-size:13px; font-weight:bold; }
