@@ -3030,7 +3030,7 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
     var name = r.displayName ? esc(r.displayName) + 'さん' : 'あなた';
     var h = `<section class="card" id="guide-fortune"><h2>運勢</h2>
       <figure class="fortune-figure">
-        <figcaption>${name}の大運と空亡サイクル</figcaption>
+        <figcaption>${name}の大運と12年サイクル</figcaption>
         <p class="fortune-note">${info ? '大運は' + info.un + '年ごと。' : ''}年と数え歳は立春で切り替わります。</p>
         ${fortuneTimeline(bands, birthYear, year, kubouStart, pinLines)}
         <p class="fortune-scroll-hint fortune-note">年表は左右にスクロールできます。</p>
@@ -3052,7 +3052,7 @@ if (typeof module !== 'undefined') module.exports = SHICHU_TEXTS;
         <p>${current ? '<strong>' + esc(current.name + '・' + current.stemStar + '・' + step + '年目') + '</strong>（' +
           span(birthYear + current.from - 1, birthYear + current.to - 1) + '）' : pinLines[1]}</p>
         ${next ? '<p>' + (current ? '次の大運' : '最初の大運') + ' <strong>' + esc(next.name) + '</strong> は ' + (birthYear + next.from - 1) + '年から。</p>' : ''}
-      </div><div><h3>空亡サイクル</h3>
+      </div><div><h3>12年サイクル</h3>
         <p><strong>${esc(phaseText)}</strong>。${nextYear}年から${esc(nextPhase.name)}。</p>
         ${fortunePhaseGuide(cycleStart, year, phase)}
         <p>${offset >= 10 ? '今の空亡' : '前回の空亡'}は${span(kubouStart, kubouStart + 1)}。次は${span(kubouStart + 12, kubouStart + 13)}。</p>
