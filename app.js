@@ -229,7 +229,7 @@
       return `<div${active ? ' class="fortune-phase-active"' : ''}><dt>${esc(phase.name)}</dt>
         <dd>${esc(texts[0])}${active ? esc(texts[1]) : ''}</dd></div>`;
     }).join('');
-    return `<p class="note fortune-preface">空亡を区切りにした12年の巡りは、四柱推命の十神の流れをもとにした、このサイト独自の読み方です。</p><p class="fortune-story">物語は「旅立ち」から始まります。自分の足で歩き出し、「挑戦と広がり」であれこれ試し、「選択と集中」でこれと決めたものに力を注ぎ、「成長と成果」で大きく伸びて、「整理と継承」で体験を人に渡します。そして空亡の「手放しと新たな学び」で次に持っていくものを選び、また新しい12年へと旅立っていきます。</p><ol class="fortune-phases" aria-label="今年を含む12年の流れ" role="list">${blocks}</ol>
+    return `<p class="note fortune-preface">空亡を区切りにした12年を一つのサイクルとして、四柱推命の十神の流れに当てはめて読むのは、このサイトならではの読み方です。この巡りにうまく乗ると、らせん階段を上るように、人生を一段ずつ登っていけると考えています。参考にしてみてください。</p><p class="fortune-story">物語は「旅立ち」から始まります。自分の足で歩き出し、「挑戦と広がり」であれこれ試し、「選択と集中」でこれと決めたものに力を注ぎ、「成長と成果」で大きく伸びて、「整理と継承」で体験を人に渡します。そして空亡の「手放しと新たな学び」で次に持っていくものを選び、また新しい12年へと旅立っていきます。</p><ol class="fortune-phases" aria-label="今年を含む12年の流れ" role="list">${blocks}</ol>
       <dl class="fortune-phase-guide">${explanations}</dl>`;
   }
   function fortuneCycleOffset(branch, kubou) {
