@@ -88,9 +88,7 @@
       return GEL.indexOf(groups[a].elem) - GEL.indexOf(groups[b].elem);
     });
   }
-  function gogyoGroupLabel(groups, group) {
-    return group + '（' + groups[group].elem + '）';
-  }
+  var gogyoGroupLabel = T.gogyoGroupLabel;
   function individualGogyoSummary(r) {
     var groups = r.groups, order = orderedGogyoGroups(groups), copy = T.individualGogyo;
     var ranked = order.slice().sort(function (a, b) { return groups[b].count - groups[a].count; });
@@ -108,7 +106,7 @@
     }).join('');
     if (missing) {
       if (copy[missing].zeroSummary) return summary + copy[missing].zeroSummary.replace('{group}', label(missing));
-      var action = T.individualGogyoAdvice(groups, missing, 'support').action;
+      var action = T.individualGogyoAdvice(groups, missing, 'support');
       return summary + '図で0個の' + label(missing) + 'は控えめです。' + firstSentence(action);
     }
     return summary + (few.length ? few.map(label).join('・') + 'は控えめです。' : '');
@@ -437,7 +435,7 @@
     var power = groups['比劫'].count + groups['印星'].count;
     var level = power >= 5 ? 'strong' : power >= 3 ? 'mid' : 'soft';
     var title = level === 'strong' ? '強め' : level === 'mid' ? '中くらい' : 'まわりの力を活かす';
-    add('日干の力：' + title, '自分で選ぶ比劫と支えを受け取る印星は、合わせて' + power + '個です。' + T.individualGogyoPower[level]);
+    add('日干の力：' + title, '自分を貫く力を担う' + label('比劫') + 'と支えを受け取る' + label('印星') + 'は、合わせて' + power + '個です。' + T.individualGogyoPower[level]);
     return items;
   }
 
@@ -1188,25 +1186,13 @@
   function luckRelHtml(r, label, star, periodTitle) {
     var rel = periodRelMap(r, label, star);
     var soft = ['kangou', 'shigou', 'hankai', 'sankyoku'];
-    var change = ['chuu', 'kei', 'gai', 'ha', 'tensen'];
     var h = '';
     var anySoft = soft.some(function (k) { return rel[k] && rel[k].length; });
-    var anyCh = change.some(function (k) { return rel[k] && rel[k].length; });
-    if (!anySoft && !anyCh) return '';
-    if (anySoft) {
-      h += '<h4>' + esc(periodTitle) + 'とあなた</h4>';
-      soft.forEach(function (k) {
-        (rel[k] || []).forEach(function (x) { h += timingCard(k, x, periodTitle); });
-      });
-    }
-    if (anyCh) {
-      h += '<details class="more inner"><summary>変化のサイン</summary>';
-      h += '<p class="note">流れが動きやすいめぐりです。こわい意味ではなく、間合いや休みを大切にすると、前進の力になります。</p>';
-      change.forEach(function (k) {
-        (rel[k] || []).forEach(function (x) { h += timingCard(k, x, periodTitle); });
-      });
-      h += '</details>';
-    }
+    if (!anySoft) return '';
+    h += '<h4>' + esc(periodTitle) + 'とあなた</h4>';
+    soft.forEach(function (k) {
+      (rel[k] || []).forEach(function (x) { h += timingCard(k, x, periodTitle); });
+    });
     return h;
   }
 
@@ -1232,7 +1218,7 @@
     var order = Object.keys(groups);
     return '<p class="note">上の丸が日干の五行（比劫）です。図の相生の矢印は ' +
       esc(order.concat(order[0]).join(' → ')) + ' とめぐります。丸の大きさと●は、命式にある五行の数を表します。</p>' +
-      '<p>自分の力（比劫）が思いを形にする力（食傷）を生み、それが人やお金とのご縁（財星）を呼び、ご縁が役割や信頼（官星）を育て、役割から得た学びや支え（印星）が、またあなた自身の力に戻ってきます。図の矢印は、そんなめぐりを表しています。</p>';
+      '<p>自分を貫く力・こだわり（比劫）が思いを形にする力（食傷）を生み、それが人やお金とのご縁（財星）を呼び、ご縁が役割や信頼（官星）を育て、役割から得た学びや支え（印星）が、また自分を貫く力につながります。図の矢印は、そんなめぐりを表しています。</p>';
   }
 
   function gogyoAdjustmentHtml(groups) {
@@ -1244,7 +1230,7 @@
       var advice = T.individualGogyoAdvice(groups, group, support ? 'support' : 'balance');
       items.push({
         title: gogyoGroupLabel(groups, group) + 'の力を' + (support ? '補う' : '整える'),
-        advice: advice.action + advice.reason
+        advice: advice
       });
     });
     if (!items.length) return '';
