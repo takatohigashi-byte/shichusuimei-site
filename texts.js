@@ -539,6 +539,13 @@ SHICHU_TEXTS.individualGogyo = {
   }
 };
 
+SHICHU_TEXTS.individualGogyoGuide = {
+  natalBalanced: '今は大きな偏りがないので、今のバランスを大事にしましょう。',
+  currentTitle: 'この10年と今年を足して見ると',
+  currentBalanced: '今の巡りを足しても、大きな偏りは出ていません。',
+  dayMaster: '月令を目安に、生まれ持った比劫と印星の点数を合わせて、整え方を選びます。'
+};
+
 SHICHU_TEXTS.gogyoGroupLabel = function (groups, group) {
   return group + '（' + groups[group].elem + '）';
 };
