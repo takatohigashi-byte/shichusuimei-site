@@ -138,22 +138,12 @@
     if (luck.length) addGogyoRelationPoints(points, S.natalItems(r), luck);
     return points;
   }
-  function dayMasterStrength(r, points) {
-    var groups = r.groups;
-    var support = points[groups.比劫.elem] + points[groups.印星.elem];
-    var strong = r.getsurei.name === '旺令' || r.getsurei.name === '相令';
-    if (strong) return support === 0 ? 'medium' : 'strong';
-    return support >= 3 ? 'medium' : 'weak';
-  }
   function individualGogyoLevels(r, points) {
-    var strength = dayMasterStrength(r, points);
     var levels = {};
     orderedGogyoGroups(r.groups).forEach(function (group) {
       var score = points[r.groups[group].elem];
       if (score === 0) levels[group] = 'support';
-      if (score >= 3 && (strength !== 'weak' || (group !== '比劫' && group !== '印星'))) {
-        levels[group] = 'balance';
-      }
+      if (score >= 3) levels[group] = 'balance';
     });
     return levels;
   }
@@ -438,7 +428,7 @@
   function isShengAdj(a, b) { return SHENG_NEXT[a] === b || SHENG_NEXT[b] === a; }
   function gogyoBalanceItems(r, points, levels) {
     var groups = r.groups;
-    var items = Object.keys(levels).map(function (group) {
+    return Object.keys(levels).map(function (group) {
       var label = gogyoGroupLabel(groups, group);
       return {
         title: label + (levels[group] === 'support' ? 'が0点' : 'に存在感がある'),
@@ -446,11 +436,6 @@
           label + 'が担うのは、' + T.individualGogyo[group].role + 'です。'
       };
     });
-    items.push({
-      title: '日干の力',
-      text: T.individualGogyoGuide.dayMaster
-    });
-    return items;
   }
 
   function gogyoAdvice(g) {
@@ -1258,14 +1243,20 @@
 
   function currentGogyoHtml(r) {
     var points = currentGogyoPoints(r, natalGogyoPoints(r));
-    var items = orderedGogyoGroups(r.groups).filter(function (group) {
+    var maxPoints = Math.max.apply(null, Object.values(points));
+    var strong = '', zero = '';
+    var items = Object.keys(r.groups).map(function (group) {
       var score = points[r.groups[group].elem];
-      return score === 0 || score >= 3;
-    }).map(function (group) {
-      return gogyoGroupLabel(r.groups, group) + ' ' + points[r.groups[group].elem] + '点';
+      if (score === maxPoints && score >= 3) {
+        strong += '<p>' + esc(T.labelIndividualGogyoGroups(r.groups, T.currentGogyoMeaning.strong[group])) + '</p>';
+      }
+      if (score === 0) {
+        zero += '<p>' + esc(T.labelIndividualGogyoGroups(r.groups, T.currentGogyoMeaning.zero[group])) + '</p>';
+      }
+      return gogyoGroupLabel(r.groups, group) + ' ' + score + '点';
     });
     return '<div class="unki-block" id="current-gogyo-points"><h3>' + esc(T.individualGogyoGuide.currentTitle) + '</h3><p>' +
-      esc(items.length ? items.join('、') : T.individualGogyoGuide.currentBalanced) + '</p></div>';
+      esc(items.join('、')) + '</p>' + strong + zero + '</div>';
   }
 
   function gogyoSectionHtml(r, sid, who) {
