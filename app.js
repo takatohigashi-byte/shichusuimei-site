@@ -1457,10 +1457,29 @@
 
     if (r.daiunInfo || r.current) {
       h += '<div class="chapter" id="ch3">' + chapterHead('3', 'この10年・今年・今月');
-      if (r.current) h += fortuneHtml(r);
-      h += '<section class="card text" id="guide-unki"><h2>' + ty('大運') + qTip('daiun', '大運') + '・今年・今月</h2>';
+      h += '<section class="card text">';
+      if (r.daiunInfo) {
+        var list = daiunTo100(r);
+        var cur = r.current;
+        h += '<div class="unki-table"><h3>' + ty('大運') + 'のながれ（およそ100歳まで）</h3>';
+        if (r.daiunInfo.replaced) h += '<p class="note">節入りまでの日数から求めた値が範囲外のため、10年運としています。</p>';
+        h += '<p class="note">数え歳は、生まれたときを1歳と数える、占いでよく使う年齢です。大運の区切りは人によって6〜10年ほど。色のついた行が、いまの大運です。</p>';
+        var rows = list.map(function (d) {
+          return { label: d.from + '〜' + d.to + '歳', star: d, current: cur && cur.daiun && cur.daiun.from === d.from };
+        });
+        h += periodTable('年齢<br>（数え）', rows, r) + '</div>';
+      }
       if (r.current) {
         var c = r.current;
+        h += ryunenTable(r);
+        var lines = [['大運', c.daiun], ['今年（流年）', c.ryunen], ['今月', c.ryugetsu], ['今日', c.ryujitsu]];
+        h += '<div class="unki-table"><h3>いまの運の一覧</h3><div class="stars-wrap"><table class="stars"><tr><th></th><th>' + ty('干支') + '</th><th>' + ty('通変星') + '</th><th>' + ty('十二運') + '</th><th>' + ty('地支') + '<br>' + ty('通変星') + '</th></tr>';
+        lines.forEach(function (l) { if (l[1]) h += '<tr><th>' + tyWrap(l[0]) + '</th><td>' + kanshiYomi(l[1].name) + '</td><td>' + tyCell(l[1].stemStar) + '</td><td>' + tyCell(l[1].juniun) + '</td><td>' + tyCell(l[1].branchStar) + '</td></tr>'; });
+        h += '</table></div></div>';
+      }
+      h += '</section>';
+      if (r.current) {
+        h += '<section class="card text" id="guide-unki"><h2>' + ty('大運') + qTip('daiun', '大運') + '・今年・今月</h2>';
         if (c.daiun) {
           h += '<div class="unki-block"><h3>' + unkiHeading('daiun', c.daiun, r) + qTip('daiun', '大運') + '</h3><p class="note">' + (c.daiun.from ? '数え' + c.daiun.from + '〜' + c.daiun.to + '歳' : '') + (c.daiun.name ? '・' + kanshiYomi(c.daiun.name) : '') + (c.daiun.stemStar ? '・' + tyCell(c.daiun.stemStar) : '') + '</p>' + unkiBody(c.daiun.stemStar, c.daiun.juniun);
           h += luckRelHtml(r, '大運', c.daiun, 'この10年（大運' + (c.daiun.name ? ' ' + c.daiun.name : '') + '）');
@@ -1477,24 +1496,10 @@
           h += '</div>';
         }
         if (c.ryujitsu) h += '<div class="unki-block"><h3>' + unkiHeading('day', c.ryujitsu, r) + '</h3>' + unkiBody(c.ryujitsu.stemStar, c.ryujitsu.juniun) + '</div>';
-        var lines = [['大運', c.daiun], ['今年（流年）', c.ryunen], ['今月', c.ryugetsu], ['今日', c.ryujitsu]];
-        h += '<div class="unki-table"><h3>いまの運の一覧</h3><div class="stars-wrap"><table class="stars"><tr><th></th><th>' + ty('干支') + '</th><th>' + ty('通変星') + '</th><th>' + ty('十二運') + '</th><th>' + ty('地支') + '<br>' + ty('通変星') + '</th></tr>';
-        lines.forEach(function (l) { if (l[1]) h += '<tr><th>' + tyWrap(l[0]) + '</th><td>' + kanshiYomi(l[1].name) + '</td><td>' + tyCell(l[1].stemStar) + '</td><td>' + tyCell(l[1].juniun) + '</td><td>' + tyCell(l[1].branchStar) + '</td></tr>'; });
-        h += '</table></div></div>';
+        h += '</section>';
+        h += fortuneHtml(r);
       }
-      if (r.daiunInfo) {
-        var list = daiunTo100(r);
-        var cur = r.current;
-        h += '<div class="unki-table"><h3>' + ty('大運') + 'のながれ（およそ100歳まで）</h3>';
-        if (r.daiunInfo.replaced) h += '<p class="note">節入りまでの日数から求めた値が範囲外のため、10年運としています。</p>';
-        h += '<p class="note">数え歳は、生まれたときを1歳と数える、占いでよく使う年齢です。大運の区切りは人によって6〜10年ほど。色のついた行が、いまの大運です。</p>';
-        var rows = list.map(function (d) {
-          return { label: d.from + '〜' + d.to + '歳', star: d, current: cur && cur.daiun && cur.daiun.from === d.from };
-        });
-        h += periodTable('年齢<br>（数え）', rows, r) + '</div>';
-      }
-      if (r.current) h += ryunenTable(r);
-      h += '</section></div>';
+      h += '</div>';
     }
 
     h += '<details class="more" id="guide-detail"><summary>命式のポイントを見る</summary>';
