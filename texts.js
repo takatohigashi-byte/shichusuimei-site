@@ -511,64 +511,31 @@ SHICHU_TEXTS.compatCycleReading = function (a, b, strongestGrowth) {
   };
 };
 
-SHICHU_TEXTS.individualCycleReading = function (r) {
-  var groups = r.groups, most, least;
-  Object.keys(groups).forEach(function (group) {
-    var count = groups[group].count;
-    if (count >= 3 && (!most || count > groups[most].count)) most = group;
-    if (count <= 1 && (!least || count < groups[least].count)) least = group;
-  });
-  if (!most && !least) return ['五つの段が同じ数でそろっています。'];
-
-  function hint(group, level) {
-    var label = SHICHU_TEXTS.gogyoGroupLabel(groups, group);
-    return label + 'が' + groups[group].count + '個なので、' +
-      SHICHU_TEXTS.individualGogyoAdvice(groups, group, level);
-  }
-
-  var paragraphs = [];
-  if (most) paragraphs.push(hint(most, 'balance'));
-  if (least) paragraphs.push(hint(least, 'support'));
-  return paragraphs;
-};
-
 SHICHU_TEXTS.individualGogyo = {
   比劫: {
     role: '自分を貫き、大事なこだわりを持つ力',
     support: '比劫を上げて補うには、今日の小さな選択で、自分はどうしたいかを一つ書き出してみましょう。比劫を生む印星を上げるなら、話しやすい人の助言を聞き、自分の希望を考える手がかりにできます。',
-    balance: '比劫の勢いを抑えるには、官星を上げて、意見が分かれたときの決め方をみんなで確認してみましょう。比劫が生む食傷を上げて気を抜くなら、自分の考えを短い提案にまとめて伝えてみましょう。',
-    few: '命式では、自分を貫く力に当たる比劫が1個です。小さな選択から、自分の希望を確かめてみてください。',
-    both: '命式では、自分を貫く力に当たる比劫が1個です。今の大運と今年の流れには比劫に当たる○があるので、自分の希望を言葉にするきっかけにできます。'
+    balance: '比劫の勢いを抑えるには、官星を上げて、意見が分かれたときの決め方をみんなで確認してみましょう。比劫が生む食傷を上げて気を抜くなら、自分の考えを短い提案にまとめて伝えてみましょう。'
   },
   食傷: {
     role: '思いや才能を表現し、形にする力',
     support: '食傷を上げて補うには、気になっていることを短いメモや下書きにしてみましょう。食傷を生む比劫を上げるなら、身近な話題の中から、自分が言葉にしたいことを一つ選んでみましょう。',
-    balance: '食傷の勢いを抑えるには、印星を上げて、広がった案の一つについて信頼できる人の意見を聞いてみましょう。食傷が生む財星を上げて気を抜くなら、案を必要としている人を思い浮かべ、実際に届ける手はずを考えてみましょう。',
-    zero: '命式の図では食傷は0個です。思いや才能をどんな形で表現すると心地よいか、短いメモから試すヒントにしてみてください。',
-    year: '命式では、思いを形にする力に当たる食傷が1個です。今年の流れにも食傷に当たる○があるので、短い下書きを試すきっかけにできます。',
-    zeroSummary: '図で0個の{group}は、思いをどんな形で表すと心地よいかを探るヒントです。気になることを短い下書きにしてみると、表現のきっかけになります。'
+    balance: '食傷の勢いを抑えるには、印星を上げて、広がった案の一つについて信頼できる人の意見を聞いてみましょう。食傷が生む財星を上げて気を抜くなら、案を必要としている人を思い浮かべ、実際に届ける手はずを考えてみましょう。'
   },
   財星: {
-    role: 'お金や実務を動かし、人の用事や世話を引き受ける力',
+    role: 'お金をやりくりし、人とのつながりを持つ力',
     support: '財星を上げて補うには、進めたい用事を一つ選び、使える時間とお金をメモしてみましょう。財星を生む食傷を上げるなら、その用事をどう進めたいか、思いついた案を短い下書きにしてみましょう。',
-    balance: '財星の勢いを抑えるには、比劫を上げて、自分が無理なく引き受けられる範囲を伝え、残りは仲間と分け合ってみましょう。財星が生む官星を上げて気を抜くなら、引き受けた用事について、誰が何をいつまでにするかを関係する人と約束してみましょう。',
-    many: '命式では、お金や実務を動かし、人の用事を引き受ける財星が{count}個です。引き受けることが重なったら、比劫を上げて仲間と分け合うか、官星を上げて役割を約束し、財星の気を抜く方法があります。',
-    decade: '命式では、計画を実際に動かす力に当たる財星が1個です。今の大運にも財星に当たる○があるので、予算や協力の頼み方を考えるきっかけにできます。',
-    summaryRole: 'お金や実務を動かす力'
+    balance: '財星が多いと、お金や用事、人の頼みごとに振り回されやすくなります。比劫は自分を貫く、こだわりの星で、財星を抑える働きがあります。『これは自分がやる』『これはやらない』と自分の軸で決めると、財の多さに流されにくくなります。財星が生む官星を上げて気を抜くなら、引き受けた用事について、誰が何をいつまでにするかを関係する人と約束してみましょう。'
   },
   官星: {
-    role: '役割や約束を引き受け、信頼をつくる力',
+    role: '責任や役割を引き受け、約束やルールを守る力',
     support: '官星を上げて補うには、身近な予定を一つ選び、誰が何をいつまでにするかを確認してみましょう。官星を生む財星を上げるなら、その予定に使える時間やお金、協力を頼める人を確かめてみましょう。',
-    balance: '官星の勢いを抑えるには、食傷を上げて、負担が重い役割の進め方を変える案を一つ言葉にしてみましょう。官星が生む印星を上げて気を抜くなら、役割を通じて気づいたことを一行書き留め、次に活かせる学びとして受け取ってみましょう。',
-    few: '命式では、役割や約束を支える官星が1個です。身近な予定で、担当と期限を決める場面を一つ選んでみてください。',
-    fewWithMissing: '命式では、役割や約束を支える官星が1個です。抱えている予定の中から、担当と期限を決めたいものを一つ選んでみてください。'
+    balance: '官星の勢いを抑えるには、食傷を上げて、負担が重い役割の進め方を変える案を一つ言葉にしてみましょう。官星が生む印星を上げて気を抜くなら、役割を通じて気づいたことを一行書き留め、次に活かせる学びとして受け取ってみましょう。'
   },
   印星: {
-    role: '学びや人からの支えを受け取り、活かす力',
-    support: '印星を上げて補うには、気になっていることを一つ、話しやすい人に聞いてみましょう。印星を生む官星を上げるなら、質問や相談の時間を相手と約束してみましょう。',
-    balance: '印星の勢いを抑えるには、財星を上げて、集めた情報の中から今ある時間や予算で試せることを一つ進めてみましょう。印星が生む比劫を上げて気を抜くなら、人から聞いた助言をふまえて、自分の希望に合うものを一つ選んでみましょう。',
-    few: '命式では、学びや支えを受け取る印星が1個です。知りたいことを一つ選んで、人に聞いてみるところから始められます。',
-    use: '最近の気づきを一行メモして、次にやってみたいことを考えてみましょう。'
+    role: '学びや人からの支えを受け取り、自分で考える力',
+    support: '印星を上げて補うには、気になっていることを一つ、話しやすい人に聞いてみましょう。印星を生む官星を上げるなら、身近な予定で、自分が担当することと期限を一つ決めてみましょう。',
+    balance: '印星の勢いを抑えるには、財星を上げて、集めた情報の中から今ある時間や予算で試せることを一つ進めてみましょう。印星が生む比劫を上げて気を抜くなら、人から聞いた助言をふまえて、自分の希望に合うものを一つ選んでみましょう。'
   }
 };
 
@@ -576,51 +543,14 @@ SHICHU_TEXTS.gogyoGroupLabel = function (groups, group) {
   return group + '（' + groups[group].elem + '）';
 };
 
-function labelIndividualGogyoGroups(groups, text) {
-  return text.replace(/(比劫|食傷|財星|官星|印星)(?!に当たる[木火土金水]がある)/g, function (group) {
+SHICHU_TEXTS.labelIndividualGogyoGroups = function (groups, text) {
+  return text.replace(/比劫|食傷|財星|官星|印星/g, function (group) {
     return SHICHU_TEXTS.gogyoGroupLabel(groups, group);
   });
-}
+};
 
 SHICHU_TEXTS.individualGogyoAdvice = function (groups, group, level) {
-  return labelIndividualGogyoGroups(groups, SHICHU_TEXTS.individualGogyo[group][level]);
-};
-
-SHICHU_TEXTS.individualGogyoDetail = function (groups, group, luck, hasMissing) {
-  var entry = groups[group], count = entry.count, elem = entry.elem;
-  var copy = SHICHU_TEXTS.individualGogyo[group];
-  var advice = copy[count < 2 ? 'support' : 'balance'];
-  var text;
-  if (count >= 3) {
-    text = copy.many || '命式では、' + copy.role + 'に当たる' + group + 'が{count}個です。' + advice;
-  } else {
-    var decade = luck.daiun[elem], year = luck.ryunen[elem];
-    var timing = decade && year ? '今の大運と今年の流れ' : decade ? '今の大運' : year ? '今年の流れ' : '';
-    var timedCopy = count === 1 && (decade && year ? copy.both : decade ? copy.decade : year ? copy.year : '');
-    var basic = count === 0 ? copy.zero : hasMissing && copy.fewWithMissing || copy.few;
-    text = timedCopy || basic || '命式では、' + copy.role + 'に当たる' + group + 'が{count}個です。' + advice.split('。')[0] + '。';
-    if (timing && !timedCopy) {
-      text += timing + 'にも' + group + 'に当たる' + elem + 'があるので、この行動を試すきっかけにできます。';
-    }
-  }
-  return labelIndividualGogyoGroups(groups, text.replace('{count}', count).replace('○', elem));
-};
-
-SHICHU_TEXTS.individualGogyoKeReading = function (from, to, groups) {
-  var fromLabel = SHICHU_TEXTS.gogyoGroupLabel(groups, from);
-  var toLabel = SHICHU_TEXTS.gogyoGroupLabel(groups, to);
-  var intro = '図では' + fromLabel + 'が' + toLabel + 'を剋します。';
-  if (from === '財星' && to === '印星') {
-    return intro + 'お金や用事を扱う時間が増えると、学びや人からの支えを受け取る時間が少なくなる、という読み方ができます。';
-  }
-  var copy = SHICHU_TEXTS.individualGogyo;
-  return intro + fromLabel + 'の「' + copy[from].role + '」を使う場面が増えたら、' + toLabel + 'の「' + copy[to].role + '」を使う時間も取ってみましょう。';
-};
-
-SHICHU_TEXTS.individualGogyoPower = {
-  strong: '自分の希望を確かめたうえで、役立ちそうな助言を一つ選んでみましょう。',
-  mid: '一人で考えがまとまらないときは、話しやすい人の意見を聞いてから選ぶ方法もあります。',
-  soft: '誰かの助言を聞いてから自分が試したいことを選ぶと、まわりの支えを活かしやすくなります。'
+  return SHICHU_TEXTS.labelIndividualGogyoGroups(groups, SHICHU_TEXTS.individualGogyo[group][level]);
 };
 
 SHICHU_TEXTS.gogyoActions = {
