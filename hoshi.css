@@ -114,6 +114,8 @@ h2 { font-size:1.14rem; }
 .present-phase strong { margin-right:.4em; color:#843f65; font-size:1.7rem; }
 .note { margin:6px 0 10px; color:#705a6b; font-size:.87rem; }
 .next { margin:0; font-weight:bold; color:#75445e; }
+.present-month { margin:6px 0 10px; color:#75445e; }
+.month-branch { color:#705a6b; font-size:.82rem; }
 
 .phases { display:grid; gap:8px; margin:10px 0; padding:0; list-style:none; }
 .phase {
