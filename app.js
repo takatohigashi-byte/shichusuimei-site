@@ -229,7 +229,7 @@
       return `<div${active ? ' class="fortune-phase-active"' : ''}><dt>${esc(phase.name)}</dt>
         <dd>${esc(texts[0])}${active ? esc(texts[1]) : ''}</dd></div>`;
     }).join('');
-    return `<ol class="fortune-phases" aria-label="今年を含む12年の流れ" role="list">${blocks}</ol>
+    return `<p class="fortune-story">物語は、空亡の2年の「選別」から始まります。いったん立ち止まって大事なものを選び直したら、続く2年の「仕込み」でそれを小さく形にし始め、形になったものが呼んでくれたご縁を3年の「育成」で育て、そのご縁に支えられて3年の「伸長」で責任や挑戦を引き受け、最後の2年の「実り」で広げてきたことを仕組みと学びにまとめて、また次の空亡の「選別」へと戻っていきます。</p><ol class="fortune-phases" aria-label="今年を含む12年の流れ" role="list">${blocks}</ol>
       <dl class="fortune-phase-guide">${explanations}</dl>`;
   }
   function fortuneCycleOffset(branch, kubou) {
