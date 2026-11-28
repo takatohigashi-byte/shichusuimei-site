@@ -35,12 +35,56 @@
     var a = splitSentences(s);
     return a.length ? a[0] : String(s || '').trim();
   }
+  // 鑑定文のダブり防止：render() ごとに、すでに出した文を記録する。
+  var seenSentences = new Set();
+  function resetSeenSentences() { seenSentences = new Set(); }
+  function dedupSentences(s) {
+    return splitSentences(s).filter(function (t) {
+      if (seenSentences.has(t)) return false;
+      seenSentences.add(t);
+      return true;
+    });
+  }
+  function markSeen(s) {
+    splitSentences(s).forEach(function (t) { seenSentences.add(t); });
+    return s;
+  }
+  function dedupParas(s) {
+    return dedupSentences(s).map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('');
+  }
+  // 生かし方のダブり防止：同じ文は2回目以降出さない。
+  var seenIkashi = new Set();
+  function resetSeenIkashi() { seenIkashi = new Set(); }
+  function ikashiHtml(text) {
+    if (!text || seenIkashi.has(text)) return '';
+    seenIkashi.add(text);
+    return '<p class="ikashi"><b>生かし方：</b>' + esc(text) + '</p>';
+  }
+  // 五行バランスの表示（案B：個数＋やさしい言葉）。内部の点数判定は変えない。
+  function gogyoCountPhrase(score) {
+    if (score === 0) return 'いまは見えていない星です';
+    if (score === 1) return 'ひとつあります';
+    if (score === 1.5) return 'ひとつあり、合でめぐっている分があります';
+    if (score === 2) return '2つあります';
+    if (score === 2.5) return '2つあり、合でめぐっている分があります';
+    if (score > 0 && score < 1) return '合でめぐっている分があります';
+    if (score % 1 !== 0) return 'たくさんあり、合でめぐっている分があります';
+    return 'たくさんあります';
+  }
+  function gogyoCountText(group, score) {
+    var t = (T.gogyoCountText && T.gogyoCountText[group]) || null;
+    if (!t) return '';
+    if (score > 0 && score < 1) return T.gogyoCountHalfNote || '';
+    var base = score === 0 ? t.none : score >= 3 ? t.many : score >= 2 ? t.few : t.one;
+    if (score % 1 !== 0 && score !== 0) base += T.gogyoCountHalfNote || '';
+    return base;
+  }
   function parasHtml(s) {
     return splitSentences(s).map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('');
   }
   var CARE_RE = /たら|ときは|すぎ|ひと呼吸|注意|確認|ペース配分|休息|余裕|おいて|整え|見直|過ぎない|押さえ/;
   function unkiBody(stemStar, juniun) {
-    var sents = splitSentences(tsuUn(stemStar));
+    var sents = dedupSentences(tsuUn(stemStar));
     var period = [], care = [], tips = [];
     sents.forEach(function (t, i) {
       if (i === 0) period.push(t);
@@ -48,7 +92,9 @@
       else tips.push(t);
     });
     var ju = junUn(juniun);
-    if (ju) period.push(ju);
+    if (ju) {
+      dedupSentences(ju).forEach(function (t) { period.push(t); });
+    }
     var h = '';
     function blk(title, arr) {
       if (!arr.length) return;
@@ -148,14 +194,14 @@
     return levels;
   }
   function individualGogyoSummary(r) {
-    var groups = r.groups, copy = T.individualGogyo;
     var levels = individualGogyoLevels(r, natalGogyoPoints(r));
-    var lines = Object.keys(levels).map(function (group) {
-      var label = gogyoGroupLabel(groups, group);
-      return levels[group] === 'support' ? '生まれ持ったバランスでは' + label + 'が0点です。' :
-        label + 'に存在感があり、' + copy[group].role + 'が表れています。';
-    });
-    return lines.join('') || '生まれ持ったバランスには大きな偏りがありません。';
+    var support = Object.keys(levels).filter(function (g) { return levels[g] === 'support'; }).length;
+    var balance = Object.keys(levels).filter(function (g) { return levels[g] === 'balance'; }).length;
+    if (!support && !balance) return '生まれ持ったバランスには大きな偏りがありません。';
+    var parts = [];
+    if (support) parts.push('いまは見えていない星が' + support + 'つ');
+    if (balance) parts.push('たくさんある星が' + balance + 'つ');
+    return markSeen('五行のバランスでは、' + parts.join('、') + 'あります。詳しくは下の「五行のバランス」を見てください。');
   }
   function gogyoSummaryLine(r, forCompat) {
     if (!forCompat) return individualGogyoSummary(r);
@@ -179,10 +225,14 @@
   function summaryHtml(r) {
     var nk = T.nikkan[r.dayStem] || { img: '', text: '' };
     var yearLine = '生年月日を基準に、今年の流れを見られます。';
-    if (r.current && r.current.ryunen) yearLine = firstSentence(tsuUn(r.current.ryunen.stemStar));
+    if (r.current && r.current.ryunen) {
+      var yearSents = splitSentences(tsuUn(r.current.ryunen.stemStar));
+      yearLine = yearSents.length > 1 ? yearSents[1] : firstSentence(tsuUn(r.current.ryunen.stemStar));
+      markSeen(yearLine);
+    }
     var title = r.displayName ? esc(r.displayName) + 'さんの鑑定' : 'あなたはこういう人';
     return '<section class="card summary" id="guide-summary"><h2>' + title + '</h2><div class="sum-lines">' +
-      '<div class="sum-item"><span class="lbl">' + ty('日干') + '＝あなた</span><p>' + kanYomi(r.dayStem) + '（' + esc(nk.img) + '）　' + esc(nk.text) + '</p></div>' +
+      '<div class="sum-item"><span class="lbl">' + ty('日干') + '＝あなた</span><p>' + kanYomi(r.dayStem) + '（' + esc(nk.img) + '）</p></div>' +
       '<div class="sum-item"><span class="lbl">' + ty('五行') + 'の特徴</span><p>' + esc(gogyoSummaryLine(r)) + '</p></div>' +
       '<div class="sum-item"><span class="lbl">今年のひとこと</span><p>' + esc(yearLine) + '</p></div>' +
       '</div></section>';
@@ -428,12 +478,12 @@
   function isShengAdj(a, b) { return SHENG_NEXT[a] === b || SHENG_NEXT[b] === a; }
   function gogyoBalanceItems(r, points, levels) {
     var groups = r.groups;
-    return Object.keys(levels).map(function (group) {
+    return orderedGogyoGroups(groups).map(function (group) {
       var label = gogyoGroupLabel(groups, group);
+      var score = points[groups[group].elem];
       return {
-        title: label + (levels[group] === 'support' ? 'が0点' : 'に存在感がある'),
-        text: '生まれ持ったバランスでは' + label + 'が' + points[groups[group].elem] + '点です。' +
-          label + 'が担うのは、' + T.individualGogyo[group].role + 'です。'
+        title: label + 'は、' + gogyoCountPhrase(score),
+        text: gogyoCountText(group, score)
       };
     });
   }
@@ -952,11 +1002,12 @@
     return starSoft(star) + '（' + esc(T.pillarStars[star][0]) + '）';
   }
 
-  function pillarAction(p, key) {
+  function pillarAction(p, key, variant) {
     var visible = T.pillarStars[p.stemStar];
     var inner = T.pillarStars[p.zokanStar];
     var step = T.pillarStages[p.juniun][1];
     var check = '「' + inner[2] + '」';
+    if (variant === 'kakkyoku') return '仕事では、' + visible[0] + 'を活かして、' + visible[1] + 'ところから始めてみましょう。';
     if (key === 'year') return '学校や家で興味を持ったことに取り組むなら、' + step + '、' + visible[1] + 'と、' + check + 'を確かめやすくなります。';
     if (key === 'month') return '仕事で迷ったら、' + check + 'を目安に、' + step + '、' + visible[1] + 'ところから。';
     if (key === 'hour') return '趣味や地域の活動では、' + check + 'を考えながら、' + step + '、' + visible[1] + '機会を作ってみてください。';
@@ -999,7 +1050,7 @@
       }
       h += parasHtml(junText(mon.juniun));
     }
-    h += '<p class="ikashi"><b>生かし方：</b>' + esc(pillarAction(mon, 'month')) + '</p>';
+    h += ikashiHtml(pillarAction(mon, 'month', 'kakkyoku'));
     return h + '</section>';
   }
 
@@ -1043,7 +1094,7 @@
       h += '</p><p class="stage-signs">十二運の' + tyCell(p.juniun) + 'は、' +
         esc(T.pillarStages[p.juniun][0]) + 'です。</p>';
     }
-    h += '<p class="ikashi"><b>生かし方：</b>' + esc(pillarAction(p, key)) + '</p>';
+    h += ikashiHtml(pillarAction(p, key));
     h += '</article>';
     return h;
   }
@@ -1206,9 +1257,9 @@
  var rel=r.relations||{}, n=0;
  var titles={kangou:'考え方を重ねて、新しい形をつくる',shigou:'暮らしのリズムを合わせる',hankai:'共通の関心を育てる',sankyoku:'力を一つのテーマに集める',chuu:'違うペースの間に余白をつくる',kei:'自分のこだわりと付き合う',gai:'言葉にして、すれ違いをほどく',ha:'いつものやり方を見直す',tensen:'変化の前に、足もとを整える'};
  Object.keys(REL_NAMES).forEach(function(k){(rel[k]||[]).forEach(function(x){
- n++;var labs=parsePairLabels(x)||[],roles={年:'育ってきた環境や家族との関わり',月:'仕事や人との関わり',日:'自分の気持ちや親しい人との関係',時:'これから育てたいこと'};
- var domains=labs.map(function(l){return roles[l]||'暮らしの一場面';}).join('と');
- var ideas={kangou:'持ち味を持ち寄る見方ができます。自分ひとりで抱えず、相手の得意な方法も試してみましょう。',shigou:'生活のペースをすり合わせる手がかりです。気持ちよく続く小さな習慣を一緒につくってみましょう。',hankai:'共通する関心を少しずつ育てる見方ができます。まずは気になることに触れる時間をつくってみましょう。',sankyoku:'一つのテーマへ力を集める見方ができます。何を大切にしたいかを一言にすると、選びやすくなります。',chuu:'異なるペースに気づく手がかりです。すぐに結論を出さず、それぞれの希望を聞いてみましょう。',kei:'大切にしたいことの違いを見つめる手がかりです。正解を争うより、無理のない約束を一つ決めてみましょう。',gai:'言わずに伝わると思っていることを確かめる手がかりです。短い言葉でも、希望を伝えてみましょう。',ha:'いつものやり方を見直す手がかりです。手放すことと残すことを分けると、次の一歩を選びやすくなります。',tensen:'いくつかの思いを整理する手がかりです。大きな決断を急がず、休む時間や相談相手を確保しましょう。'};
+ n++;var labs=parsePairLabels(x)||[];
+ var domains=labs.map(function(l){return l+'柱';}).join('と');
+ var ideas={kangou:'天干どうしが結びついています。2つの柱の星が引き合い、ひとつの働きにまとまりやすいからです。この2つの星を、同じ場面で使ってみましょう。',shigou:'地支どうしが結びついています。2つの柱の根っこがなじみ、安心感や居場所のつながりが生まれやすいからです。この2つに関わる人や場所を、大切にしてみましょう。',hankai:'地支が同じ方向に向かっています。力が半分そろった形なので、残りのひとつを、人や経験から受け取りやすいからです。気になる分野に、仲間と一緒に踏み出してみましょう。',sankyoku:'地支が3つそろっています。3つの柱が同じ方向を向くので、ひとつの力が大きくまとまるからです。やりたいことをひとつ決めて、この力を向けてみましょう。',chuu:'地支が向かい合っています。2つの柱の考え方に違いがあり、それがはっきり表に出やすいからです。違いは個性として受け止め、ひと呼吸おいてから選びましょう。',kei:'地支がこだわりをぶつけ合っています。それぞれの柱が、大事にしたいものを持っているからです。こだわりを言葉にして、自分の中で整理してみましょう。',gai:'地支が小さな行き違いを生みやすい形です。それぞれの柱の気持ちが、少しずれて伝わることがあるからです。大事なことは、ひと言そえて伝えましょう。',ha:'地支が今の形を見直すきっかけになっています。2つの柱が、新しいやり方を求めているからです。小さなところから、ひとつ変えてみましょう。',tensen:'この柱の星は、働きがゆるやかに出る場所です。決まった型にこだわらず、自由なやり方で試してみましょう。'};
  var line=(domains?domains+'の間で、':'いくつかの暮らしの場面で、')+ideas[k];
  h+='<article class="rel-card"><h3>'+esc(titles[k])+'</h3><p>あなたの場合は、'+esc(line)+'</p><details class="more inner"><summary>対応する言葉と組み合わせを読む</summary><p>'+esc(x)+'</p><p>'+ty(REL_NAMES[k], k === 'sankyoku' ? '三局' : REL_NAMES[k]) + 'を用語ずかんで読む</p></details></article>';
  });});
@@ -1248,12 +1299,12 @@
     var items = Object.keys(r.groups).map(function (group) {
       var score = points[r.groups[group].elem];
       if (score === maxPoints && score >= 3) {
-        strong += '<p>' + esc(T.labelIndividualGogyoGroups(r.groups, T.currentGogyoMeaning.strong[group])) + '</p>';
+        strong += dedupParas(T.labelIndividualGogyoGroups(r.groups, T.currentGogyoMeaning.strong[group]));
       }
       if (score === 0) {
-        zero += '<p>' + esc(T.labelIndividualGogyoGroups(r.groups, T.currentGogyoMeaning.zero[group])) + '</p>';
+        zero += dedupParas(T.labelIndividualGogyoGroups(r.groups, T.currentGogyoMeaning.zero[group]));
       }
-      return gogyoGroupLabel(r.groups, group) + ' ' + score + '点';
+      return gogyoGroupLabel(r.groups, group) + '：' + gogyoCountPhrase(score);
     });
     return '<div class="unki-block" id="current-gogyo-points"><h3>' + esc(T.individualGogyoGuide.currentTitle) + '</h3><p>' +
       esc(items.join('、')) + '</p>' + strong + zero + '</div>';
@@ -1269,10 +1320,11 @@
     h += '</div>';
     var points = natalGogyoPoints(r);
     var levels = individualGogyoLevels(r, points);
+    h += '<p class="note">五行のバランスは、命式の●を1点、△を1組1.5点として数えます。大運と流年も1点ずつ加え、合う組はすべて数えます。合は2つの柱が結びついて生まれる働きなので、1つの星より強く見ています。</p>';
     h += gogyoAdjustmentHtml(r.groups, levels);
     var bal = gogyoBalanceItems(r, points, levels);
     h+='<details class="more inner"><summary>もっと読む</summary>';
-    h+=bal.map(function(a){return '<h4>'+tyWrap(a.title)+'</h4><p>'+esc(a.text)+'</p>';}).join('');
+    h+=bal.map(function(a){return '<h4>'+tyWrap(a.title)+'</h4>'+dedupParas(a.text);}).join('');
     h+='<p class="note">●は命式の天干と地支を数えたものです。ほかの記号は、組み合わせや今の流れを示します。</p></details>';
     h+='<h3>今の流れ</h3><p>＋はこの10年、⊕は今年のテーマです。生まれ持った数が増減したわけではありません。下の「大運・今年・今月」で、いま試したいことを一つ選んでみましょう。</p></section>';
     return h;
@@ -1438,7 +1490,8 @@
   function render(r) {
     var h = '';
     lastK = r;
-
+    resetSeenSentences();
+    resetSeenIkashi();
     h += '<div class="chapter" id="ch-intro">';
     h += reassureHtml();
     h += summaryHtml(r);
@@ -1512,7 +1565,13 @@
           h += luckRelHtml(r, '流月', c.ryugetsu, '今月');
           h += '</div>';
         }
-        if (c.ryujitsu) h += '<div class="unki-block"><h3>' + unkiHeading('day', c.ryujitsu, r) + '</h3>' + unkiBody(c.ryujitsu.stemStar, c.ryujitsu.juniun) + '</div>';
+        if (c.ryujitsu) {
+          if (c.ryunen && c.ryujitsu.name === c.ryunen.name) {
+            h += '<div class="unki-block"><h3>' + unkiHeading('day', c.ryujitsu, r) + '</h3><p>今日は、今年の流れの中で、目の前のひとつに取り組む日です。ひとつ終えたら、小さく区切りをつけましょう。</p></div>';
+          } else {
+            h += '<div class="unki-block"><h3>' + unkiHeading('day', c.ryujitsu, r) + '</h3>' + unkiBody(c.ryujitsu.stemStar, c.ryujitsu.juniun) + '</div>';
+          }
+        }
         h += '</section>';
         h += fortuneHtml(r);
       }
@@ -1620,6 +1679,8 @@
 
   function renderCompat(rA, rB, nameA, nameB) {
     nameA = nameA || 'あなた'; nameB = nameB || 'お相手';
+    resetSeenSentences();
+    resetSeenIkashi();
     lastA = { rA: rA, rB: rB, na: nameA, nb: nameB };
     var c = S.compat(rA, rB, 'A', 'B');
     var dr = c.dayRel;
